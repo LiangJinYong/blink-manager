@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Error</title>
+</head>
+<body>
+	<h1>Interal Error</h1>
+	<p th:text="${exception}"></p>
+	<ul th:each="error: ${exception.getStackTrace()}" th:text="${error.toString()}"></ul>
+</body>
+</html>

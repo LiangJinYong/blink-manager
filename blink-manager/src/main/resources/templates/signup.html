@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<title>User Signup</title>
+</head>
+<body>
+	<form th:action="@{/user/signup}" method="post">
+		<input type="text" name="name" placeholder="id" value="test"><br />
+		<input type="password" name="password" placeholder="password" value="1234"><br />
+		<input type="text" name="hospital.displayName" placeholder="hospital name" value="척 병원"><br />
+		<input type="text" name="hospital.tel" placeholder="hospital tel" value="01033334444"><br />
+		<input type="text" name="hospital.postcode" placeholder="hospital postcode" value="55403"><br />
+		<input type="text" name="hospital.address" placeholder="hospital address" value="서울시 성동구"><br />
+		<input type="text" name="hospital.addressDetail" placeholder="hospital address detail" value="아이디캐슬"><br />
+		<input type="text" name="hospital.employeeName" placeholder="hospital employee name" value="메이크잇"><br />
+		<input type="text" name="hospital.employeePosition" placeholder="hospital employee position" value="대리"><br />
+		<input type="text" name="hospital.employeeTel" placeholder="hospital employee tel" value="01099998888"><br />
+		<input type="text" name="hospital.employeeEmail" placeholder="hospital employee email" value="test@naver.com"><br />
+		<input type="text" name="hospital.agreenSendYn" placeholder="hospital agreen send YN" value="0"><br />
+		<input type="text" name="hospital.programInUse" placeholder="hospital program in use" value="건보공단"><br />
+		
+		<input type="submit" value="signup">
+	</form>
+</body>
+</html>
