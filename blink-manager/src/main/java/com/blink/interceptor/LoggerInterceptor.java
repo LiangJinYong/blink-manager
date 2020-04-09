@@ -1,7 +1,5 @@
 package com.blink.interceptor;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 

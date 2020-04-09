@@ -1,0 +1,241 @@
+spring:
+    application:
+        name: blink-web-admin
+
+    jackson:
+        serialization:
+            fail-on-empty-beans: false
+        
+management:
+    endpoints:
+        web:
+            exposure:
+                include: metrics
+feign:
+    hystrix:
+        enabled: true
+hystrix:
+    command:
+        default: # 기본 채팅방 생성 리퀘스트
+            execution:
+                metrics:
+                    rollingStats:
+                        timeInMilliseconds: 30000 # 오류 감시 시간, default 10000
+                isolation:
+                    thread:
+                        timeoutInMilliseconds: 1000 # default 1,000ms, hystirx명령에 대해 1초 timeout 설정
+            circuitBreaker:
+                requestVolumeThreshold: 20   # Minimum number of request to calculate circuit breaker's health. default 20, 최소 요청 개수
+                errorThresholdPercentage: 50 # Error percentage to open circuit. default 50, 오류 %    
+        FeignAuthMTService#sendAuthCodeMT(AuthCodeMTDto): # 인증 코드 MT 발송 리퀘스트
+            execution:
+                metrics:
+                    rollingStats:
+                        timeInMilliseconds: 10000 # 오류 감시 시간, default 10000
+                isolation:
+                    thread:
+                        timeoutInMilliseconds: 1000 # default 1,000ms, hystirx명령에 대해 1초 timeout 설정
+            circuitBreaker:
+                requestVolumeThreshold: 5   # Minimum number of request to calculate circuit breaker's health. default 20, 최소 요청 개수
+                errorThresholdPercentage: 50 # Error percentage to open circuit. default 50, 오류 %                
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+        type:
+          descriptor:
+            sql: trace
+
+            
+---
+
+spring:
+    servlet:
+      multipart:
+        max-file-size: 250MB
+        max-request-size: 250MB
+      
+    auth-code-mt:
+        host: http://211.233.76.241:2189
+    blink-remote:
+         host: http://15.165.22.0:8000/bioage/
+    datasource:
+        url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_db_makeit?characterEncoding=utf-8&serverTimezone=UTC
+        username: admin
+        password: 1nf0bank
+        driverClassName: com.mysql.cj.jdbc.Driver
+        platform: mysql
+        initialization-mode: always
+        hikari:
+            connection-timeout: 5000
+            validation-timeout: 300000
+            minimum-idle: 5
+            maximum-pool-size: 5
+            max-lifetime: 6000
+    mail:
+        host: smart.whoismail.net
+        port: 587
+        username: help@blink.bio
+        password: bhealth1!
+        protocol: smtp
+        tls: false
+    cloud:
+        aws:
+            credentials:
+                accessKey: AKIAZ72TXLIUEE2X2I75
+                secretKey: 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
+            s3:
+                bucket: blink-develop
+            region:
+                static: ap-northeast-2              
+    jpa:
+        database: MYSQL
+        generate-ddl: false
+        show-sql: true
+        hibernate:
+            ddl-auto: none
+            naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+        properties:
+          hibernate:
+            use-new-id-generator-mappings: false
+            enable_lazy_load_no_trans: true
+            format_sql: true
+            use_sql_comments : true
+            dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+            default_batch_fetch_size: 100
+
+auth:
+    code:
+        length: 4
+        expire:
+            second: 600
+
+            
+---
+
+spring:
+    auth-code-mt:
+        host: http://211.233.76.241:2189
+    blink-remote:
+        host: http://15.165.22.0:8000/bioage/
+    profiles: dev   
+    servlet:
+      multipart:
+        max-file-size: 250MB
+        max-request-size: 250MB
+          
+    datasource:
+        url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_db_makeit?characterEncoding=utf-8&serverTimezone=UTC
+        username: admin
+        password: 1nf0bank
+        driverClassName: com.mysql.cj.jdbc.Driver
+        platform: mysql
+        initialization-mode: always
+        hikari:
+            connection-timeout: 5000
+            validation-timeout: 300000
+            minimum-idle: 5
+            maximum-pool-size: 5
+            max-lifetime: 6000
+    mail:
+        host: smart.whoismail.net
+        port: 587
+        username: help@blink.bio
+        password: bhealth1!
+        protocol: smtp
+        tls: false
+    cloud:
+        aws:
+            credentials:
+                accessKey: AKIAZ72TXLIUEE2X2I75
+                secretKey: 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
+            s3:
+                bucket: blink-develop
+            region:
+                static: ap-northeast-2        
+    jpa:
+        database: MYSQL
+        generate-ddl: false
+        show-sql: true
+        hibernate:
+            ddl-auto: update
+            naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+        properties:
+          hibernate:
+            use-new-id-generator-mappings: false
+            enable_lazy_load_no_trans: true
+            format_sql: true
+            use_sql_comments : true
+            dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+            default_batch_fetch_size: 100
+            
+auth:
+    code:
+        length: 4
+        expire:
+            second: 600
+            
+---
+
+spring:
+    auth-code-mt:
+        host: http://211.233.76.241:2189
+    blink-remote:
+        host: http://15.165.22.0:8000/bioage/
+    profiles: product    
+    
+    servlet:
+      multipart:
+        max-file-size: 250MB
+        max-request-size: 250MB    
+    datasource:
+        url: jdbc:mysql://blink-product-database.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_product?characterEncoding=utf-8&serverTimezone=UTC
+        username: blinkdb
+        password: blinkdbpw
+        driverClassName: com.mysql.cj.jdbc.Driver
+        platform: mysql
+        initialization-mode: always
+        hikari:
+            connection-timeout: 5000
+            validation-timeout: 300000
+            minimum-idle: 5
+            maximum-pool-size: 5
+            max-lifetime: 6000
+    mail:
+        host: smart.whoismail.net
+        port: 587
+        username: help@blink.bio
+        password: bhealth1!
+        protocol: smtp
+        tls: false
+    cloud:
+        aws:
+            credentials:
+                accessKey: AKIAZ72TXLIUEE2X2I75
+                secretKey: 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
+            s3:
+                bucket: blink-store-product
+            region:
+                static: ap-northeast-2        
+    jpa:
+        database: MYSQL
+        generate-ddl: false
+        show-sql: true
+        hibernate:
+            ddl-auto: update
+            naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+        properties:
+          hibernate:
+            use-new-id-generator-mappings: false
+            enable_lazy_load_no_trans: true
+            format_sql: true
+            use_sql_comments : true
+            dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+            default_batch_fetch_size: 100
+
+auth:
+    code:
+        length: 4
+        expire:
+            second: 600            

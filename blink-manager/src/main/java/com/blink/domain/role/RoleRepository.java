@@ -1,8 +1,6 @@
-package com.blink.repository;
+package com.blink.domain.role;
 
 import org.springframework.data.repository.CrudRepository;
-
-import com.blink.entity.Role;
 
 public interface RoleRepository extends CrudRepository<Role, Long> {
 

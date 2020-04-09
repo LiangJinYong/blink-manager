@@ -1,4 +1,4 @@
-package com.blink.entity;
+package com.blink.domain.admin;
 
 import java.time.LocalDateTime;
 
@@ -11,23 +11,21 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
-import lombok.Data;
+import com.blink.domain.BaseTimeEntity;
+import com.blink.domain.hospital.Hospital;
+
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data
-@Entity
+@Getter
 @NoArgsConstructor
-@Table(name = "admin")
-public class User {
+@Entity
+public class Admin extends BaseTimeEntity {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
-	private LocalDateTime createdAt = LocalDateTime.now();
-
-	private LocalDateTime updatedAt;
 
 	@Column(length = 64)
 	private String email;
@@ -39,17 +37,25 @@ public class User {
 
 	private LocalDateTime regDate = LocalDateTime.now();
 
-	private Integer reqChange = 0;
+	private Integer reqChange = 1;
 
 	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "hospital_id")
 	private Hospital hospital;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "role_id")
-	private Role role;
+	private Long roleId = 2L;
 
 	@Column(length = 1)
 	private Integer loginTryCnt = 0;
-
+	
+	@Builder
+	public Admin(String email, String name, String password) {
+		this.email = email;
+		this.name = name;
+		this.password = password;
+	}
+	
+	public void setHospital(Hospital hospital) {
+		this.hospital = hospital;
+	}
 }

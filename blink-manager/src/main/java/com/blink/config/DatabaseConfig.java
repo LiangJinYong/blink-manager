@@ -1,5 +1,7 @@
 package com.blink.config;
 
+import java.util.Properties;
+
 import javax.sql.DataSource;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -13,9 +15,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-@Configuration
-@PropertySource("classpath:/application.properties")
-@EnableTransactionManagement
+//@Configuration
+//@PropertySource("classpath:/application.properties")
+//@EnableTransactionManagement
 public class DatabaseConfig {
 
 	@Bean
@@ -34,5 +36,11 @@ public class DatabaseConfig {
 	@Bean
 	public PlatformTransactionManager transactionManager() throws Exception {
 		return new DataSourceTransactionManager(dataSource());
+	}
+	
+	@Bean
+	@ConfigurationProperties(prefix="spring.jpa")
+	public Properties hibernateConfig() {
+		return new Properties();
 	}
 }
