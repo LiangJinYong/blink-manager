@@ -47,6 +47,9 @@ logging:
           descriptor:
             sql: trace
 
+admin:
+  display:
+    name: 비링크 헬스케어
             
 ---
 
@@ -94,7 +97,7 @@ spring:
         generate-ddl: false
         show-sql: true
         hibernate:
-            ddl-auto: none
+            ddl-auto: update
             naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
         properties:
           hibernate:
@@ -159,7 +162,7 @@ spring:
         generate-ddl: false
         show-sql: true
         hibernate:
-            ddl-auto: update
+            ddl-auto: none
             naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
         properties:
           hibernate:
@@ -223,7 +226,7 @@ spring:
         generate-ddl: false
         show-sql: true
         hibernate:
-            ddl-auto: update
+            ddl-auto: none
             naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
         properties:
           hibernate:

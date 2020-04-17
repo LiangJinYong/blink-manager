@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.blink.domain.hospital.HospitalRepository;
-import com.blink.web.dto.HospitalResponseDto;
+import com.blink.web.admin.web.dto.HospitalResponseDto;
 
 import lombok.RequiredArgsConstructor;
 

@@ -2,16 +2,16 @@ package com.blink.web;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.blink.model.ApiResponseMessage;
+import com.blink.common.CommonResponse;
+import com.blink.common.CommonResultCode;
 import com.blink.service.ParserService;
-import com.blink.web.dto.UserParserRequestDto;
+import com.blink.web.admin.web.dto.UserParserRequestDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,16 +23,13 @@ public class ParserController {
 	private final ParserService parserService;
 	
 	@PostMapping("/registUser")
-	public ResponseEntity<ApiResponseMessage> registUser(@RequestBody List<UserParserRequestDto> userList) {
-		ApiResponseMessage message; 
+	public ResponseEntity<CommonResponse> registUser(@RequestBody List<UserParserRequestDto> userList) {
 		try {
 			
 			parserService.save(userList);
-			message = new ApiResponseMessage("200", "success", "", "");
+			return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 		} catch (Exception e) {
-			message = new ApiResponseMessage("500", "error", "", "");
+			return ResponseEntity.ok(new CommonResponse(CommonResultCode.INTERNAL_ERROR));
 		}
-		
-		return new ResponseEntity<ApiResponseMessage>(message, HttpStatus.OK);
 	}
 }

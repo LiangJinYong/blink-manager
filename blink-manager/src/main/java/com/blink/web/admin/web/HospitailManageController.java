@@ -1,4 +1,4 @@
-package com.blink.web;
+package com.blink.web.admin.web;
 
 import java.util.Map;
 
@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.blink.service.HospitalService;
 
 @RestController
-@RequestMapping("/hospital")
+@RequestMapping("/admin/hospital")
 public class HospitailManageController {
 
 	@Autowired
 	private HospitalService hospitalService;
 
-	@GetMapping("")
+	@GetMapping
 	public Map<String, Object> getHospitalListInfo(final Pageable pageable,
 			@RequestParam(name = "hospitalName", defaultValue = "", required = false) String displayName) {
 

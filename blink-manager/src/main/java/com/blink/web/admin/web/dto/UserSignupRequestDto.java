@@ -1,4 +1,4 @@
-package com.blink.web.dto;
+package com.blink.web.admin.web.dto;
 
 import com.blink.domain.admin.Admin;
 import com.blink.domain.hospital.Hospital;
@@ -13,14 +13,13 @@ import lombok.ToString;
 @NoArgsConstructor
 public class UserSignupRequestDto {
 
-	private String userId;
+	private String username;
 	private String password;
 	private String hospitalName;
 	private String hospitalTel;
 	private String postcode;
 	private String address;
 	private String addressDetail;
-	// TODO 사업자 등록증 첨부
 	private String employeeName;
 	private String employeePosition;
 	private String employeeTel;
@@ -28,8 +27,8 @@ public class UserSignupRequestDto {
 	private Integer agreenSendYn;
 	private String programInUse;
 
-	public Admin toAdminEntity(String userId, String password, String employeeEmail) {
-		return Admin.builder().name(userId).password(password).email(employeeEmail).build();
+	public Admin toAdminEntity(String username, String password, String employeeEmail) {
+		return Admin.builder().name(username).password(password).email(employeeEmail).build();
 	}
 
 	public Hospital toHospitalEntity(String hospitalName, String hospitalTel, String postcode, String address,
@@ -44,15 +43,15 @@ public class UserSignupRequestDto {
 								.employeePosition(employeePosition)
 								.employeeTel(employeeTel).employeeEmail(employeeEmail)
 								.agreenSendYn(agreenSendYn)
-								.name(userId)
+								.name(username)
 								.programInUse(programInUse).build();
 	}
 
 	@Builder
-	public UserSignupRequestDto(String userId, String password, String hospitalName, String hospitalTel,
+	public UserSignupRequestDto(String username, String password, String hospitalName, String hospitalTel,
 			String postcode, String address, String addressDetail, String employeeName, String employeePosition,
 			String employeeTel, String employeeEmail, Integer agreenSendYn, String programInUse) {
-		this.userId = userId;
+		this.username = username;
 		this.password = password;
 		this.hospitalName = hospitalName;
 		this.hospitalTel = hospitalTel;

@@ -15,12 +15,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
@@ -28,7 +22,7 @@ import org.springframework.util.MultiValueMap;
 
 import com.blink.domain.admin.AdminRepository;
 import com.blink.domain.hospital.HospitalRepository;
-import com.blink.web.dto.UserSignupRequestDto;
+import com.blink.web.admin.web.dto.UserSignupRequestDto;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -52,18 +46,11 @@ public class AccountControllerTest {
 	@Test
 	public void signup() throws Exception {
 		
-		// given
-//		MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-//	    bodyMap.add("user-file", getUserFileResource());
-//	    HttpHeaders headers = new HttpHeaders();
-//	    headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-//	    HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-		
 		String filePath = "/Users/liangjinyong/Downloads/faq.png";
 		FileSystemResource resource = new FileSystemResource(new File(filePath));
 		
 		UserSignupRequestDto requestDto = UserSignupRequestDto.builder()
-				.userId("mytest3")
+				.username("mytest3")
 				.password(passwordEncoder.encode("123456"))
 				.hospitalName("our hospital")
 				.hospitalTel("01011112222")

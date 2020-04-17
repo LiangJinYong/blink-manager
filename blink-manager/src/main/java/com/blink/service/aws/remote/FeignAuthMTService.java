@@ -5,8 +5,7 @@ import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.blink.web.dto.AuthCodeMTDto;
-
+import com.blink.web.admin.web.dto.AuthCodeMTDto;
 
 @FeignClient(name="auth-code-mt-api", url = "${spring.auth-code-mt.host}", fallbackFactory = FeignAuthMTServiceFallbackFactory.class)
 public interface FeignAuthMTService {

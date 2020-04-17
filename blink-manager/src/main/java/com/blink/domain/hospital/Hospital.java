@@ -1,15 +1,22 @@
 package com.blink.domain.hospital;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import com.blink.domain.BaseTimeEntity;
+import com.blink.domain.admin.Admin;
+import com.blink.domain.qna.WebQna;
+import com.blink.enumeration.Role;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -18,8 +25,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Entity
-@Table(name = "hospital")
 public class Hospital extends BaseTimeEntity {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -50,18 +57,31 @@ public class Hospital extends BaseTimeEntity {
 
 	private LocalDateTime regDate = LocalDateTime.now();
 
-	private Long roleId = 2L;
+	@Enumerated(EnumType.ORDINAL)
+	private Role roleId = Role.HOSPITAL;
 
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "bit(1)")
 	private Integer agreenSendYn = 1;
 
 	private String programInUse;
 
-	@Column(nullable = false)
-	private Integer accountStatus = 0;
+	@OneToOne(mappedBy = "hospital")
+	private Admin admin;
+
+	@Column(length = 45, nullable = false)
+	private String groupId;
+
+	@OneToMany(mappedBy = "hospital")
+	private List<WebQna> webQnaList;
+
+	public void assignGroupId(String groupId) {
+		this.groupId = groupId;
+	}
 
 	@Builder
-	public Hospital(String displayName, String tel, String postcode, String address, String addressDetail, String employeeName, String employeePosition, String employeeTel, String employeeEmail, Integer agreenSendYn, String name, String programInUse) {
+	public Hospital(String displayName, String tel, String postcode, String address, String addressDetail,
+			String employeeName, String employeePosition, String employeeTel, String employeeEmail,
+			Integer agreenSendYn, String name, String programInUse, String groupId) {
 		this.displayName = displayName;
 		this.tel = tel;
 		this.postcode = postcode;
@@ -74,5 +94,6 @@ public class Hospital extends BaseTimeEntity {
 		this.agreenSendYn = agreenSendYn;
 		this.name = name;
 		this.programInUse = programInUse;
+		this.groupId = groupId;
 	}
 }

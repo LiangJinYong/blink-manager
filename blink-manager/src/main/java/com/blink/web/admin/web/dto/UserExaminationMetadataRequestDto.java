@@ -1,4 +1,4 @@
-package com.blink.web.dto;
+package com.blink.web.admin.web.dto;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

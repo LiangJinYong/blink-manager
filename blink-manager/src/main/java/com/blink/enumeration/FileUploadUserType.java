@@ -1,4 +1,4 @@
-package com.blink.common;
+package com.blink.enumeration;
 
 public enum FileUploadUserType {
 	WEB, APP

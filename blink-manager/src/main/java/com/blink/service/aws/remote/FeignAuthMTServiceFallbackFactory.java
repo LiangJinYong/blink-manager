@@ -2,7 +2,7 @@ package com.blink.service.aws.remote;
 
 import org.springframework.stereotype.Component;
 
-import com.blink.web.dto.AuthCodeMTDto;
+import com.blink.web.admin.web.dto.AuthCodeMTDto;
 
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;

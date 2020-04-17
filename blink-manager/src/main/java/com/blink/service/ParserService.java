@@ -13,9 +13,9 @@ import com.blink.domain.user.UserData;
 import com.blink.domain.user.UserDataRepository;
 import com.blink.domain.user.UserExaminationMetadata;
 import com.blink.domain.user.UserExaminationMetadataRepository;
-import com.blink.web.dto.UserDataRequestDto;
-import com.blink.web.dto.UserExaminationMetadataRequestDto;
-import com.blink.web.dto.UserParserRequestDto;
+import com.blink.web.admin.web.dto.UserDataRequestDto;
+import com.blink.web.admin.web.dto.UserExaminationMetadataRequestDto;
+import com.blink.web.admin.web.dto.UserParserRequestDto;
 
 import lombok.RequiredArgsConstructor;
 
