@@ -29,7 +29,7 @@ public class WebNoticeController {
 
 	private final WebNoticeService webNoticeService;
 
-	@ApiOperation(notes = "검색 기간: ONEDAY: 당일, ONEWEEK: 1주일, ONEMONTH: 1개월, THREEMONTH: 3개월, SIXMONTH: 6개월, ONEYEAR:1년", value="공지사항 조회")
+	@ApiOperation(notes = "검색 기간: ONEDAY: 당일, ONEWEEK: 1주일, ONEMONTH: 1개월, THREEMONTH: 3개월, SIXMONTH: 6개월, ONEYEAR:1년", value = "공지사항 조회")
 	@GetMapping
 	public ResponseEntity<CommonResponse> getNoticeList(@RequestParam("title") Optional<String> title,
 			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period,
@@ -39,11 +39,11 @@ public class WebNoticeController {
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, noticeList));
 	}
 
-	@ApiOperation(value="공지사항 등록")
+	@ApiOperation(value = "공지사항 등록")
 	@PostMapping
 	public ResponseEntity<CommonResponse> postNotice(@RequestParam("title") String title,
-			@RequestParam("description") String description, @RequestParam("file") MultipartFile[] files,
-			Principal principal) {
+			@RequestParam("description") String description,
+			@RequestParam(name = "file", required = false) MultipartFile[] files, Principal principal) {
 
 		String username = principal.getName();
 		webNoticeService.save(title, description, files, username);

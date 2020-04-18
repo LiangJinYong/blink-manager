@@ -96,4 +96,8 @@ public class Hospital extends BaseTimeEntity {
 		this.programInUse = programInUse;
 		this.groupId = groupId;
 	}
+	
+	public void modifyEmaail(String newEmail) {
+		this.employeeEmail = newEmail;
+	}
 }

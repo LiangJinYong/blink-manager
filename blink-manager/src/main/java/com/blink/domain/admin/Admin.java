@@ -79,4 +79,12 @@ public class Admin extends BaseTimeEntity {
 	public void increaseLoginTryCount() {
 		loginTryCnt++;
 	}
+	
+	public void setTempPassword(String tempPassword) {
+		this.password = tempPassword;
+	}
+	
+	public void modifyEmail(String newEmail) {
+		this.email = newEmail;
+	}
 }

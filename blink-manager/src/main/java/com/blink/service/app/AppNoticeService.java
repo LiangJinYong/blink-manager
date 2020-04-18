@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.blink.domain.app.notice.AppNotice;
 import com.blink.domain.app.notice.AppNoticeRepository;
-import com.blink.web.admin.app.dto.AppNoticeSaveRequestDto;
+import com.blink.enumeration.SearchPeriod;
+import com.blink.util.CommonUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,38 +19,17 @@ public class AppNoticeService {
 
 	private final AppNoticeRepository appNoticeRepository;
 
-	public Page<AppNotice> getNoticeList(String title, Integer period, Pageable pageable) {
-		LocalDateTime time = LocalDateTime.now();
-
-		switch (period) {
-		case 1:
-			time = time.minusDays(1);
-			break;
-		case 2:
-			time = time.minusDays(7);
-			break;
-
-		case 3:
-			time = time.minusDays(30);
-			break;
-		case 4:
-			time = time.minusDays(90);
-			break;
-		case 5:
-			time = time.minusDays(180);
-			break;
-		case 6:
-			time = time.minusDays(365);
-			break;
-		}
+	public Page<AppNotice> getNoticeList(String title, SearchPeriod period, Pageable pageable) {
+		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 		
 		Page<AppNotice> list = appNoticeRepository.findByNameAndPeriod(title, time, pageable);
 		return list;
 	}
 
-	public void save(AppNoticeSaveRequestDto requestDto) {
+	public void save(String title, String description) {
 
-		appNoticeRepository.save(requestDto.toEntity());
+		AppNotice entity = AppNotice.builder().title(title).description(description).build();
+		appNoticeRepository.save(entity);
 	}
 
 }

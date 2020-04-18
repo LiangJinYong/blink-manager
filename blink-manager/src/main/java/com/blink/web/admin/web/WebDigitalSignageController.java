@@ -15,41 +15,40 @@ import org.springframework.web.multipart.MultipartFile;
 import com.blink.common.CommonResponse;
 import com.blink.common.CommonResultCode;
 import com.blink.enumeration.SearchPeriod;
-import com.blink.service.WebQnaService;
-import com.blink.web.admin.web.dto.WebQnaAdminResponseDto;
+import com.blink.service.WebDigitalSignageService;
+import com.blink.web.admin.web.dto.WebDigitalSignageAdminResponseDto;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RestController("adminWebQnaController")
-@RequestMapping("/admin/web/qna")
-public class WebQnaController {
+@RestController("adminWebDigitalSignageController")
+@RequestMapping("/admin/web/digitalSignages")
+public class WebDigitalSignageController {
 
-	private final WebQnaService webQnaService;
-
-	@ApiOperation(value = "고객센터 - 질문 답변")
+	private final WebDigitalSignageService webDigitalSignageService;
+	
+	@ApiOperation(value = "사이니지 - 질문 답변")
 	@PostMapping("/answer")
-	public ResponseEntity<CommonResponse> registerAnswer(@RequestParam("qnaId") Long qnaId,
+	public ResponseEntity<CommonResponse> registerAnswer(@RequestParam("digitalSignageId") Long digitalSignageId,
 			@RequestParam("answerContent") String answerContent,
 			@RequestParam(name = "file", required = false) MultipartFile[] files, Principal principal) {
 
 		String username = principal.getName();
-		webQnaService.registerAnswer(qnaId, answerContent, files, username);
+		webDigitalSignageService.registerAnswer(digitalSignageId, answerContent, files, username);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 	}
-
-	@ApiOperation(value = "고객센터 - 전체 조회")
+	
+	@ApiOperation(value = "사아니지 - 전체 조회")
 	@GetMapping
 	public ResponseEntity<CommonResponse> getQnaList(@RequestParam("title") Optional<String> title,
 			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period, Pageable pageable,
 			Principal principal) {
 
 		String username = principal.getName();
-		WebQnaAdminResponseDto webQnaAdmin = webQnaService.getAdminQnaInfo(title.orElse("_"),
+		WebDigitalSignageAdminResponseDto webDigitalSignageAdmin = webDigitalSignageService.getAdminDigitalSignageInfo(title.orElse("_"),
 				period.orElse(SearchPeriod.ONEMONTH), pageable, username);
 
-		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, webQnaAdmin));
+		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, webDigitalSignageAdmin));
 	}
-
 }

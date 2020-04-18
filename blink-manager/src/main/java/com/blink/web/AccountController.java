@@ -1,3 +1,4 @@
+
 package com.blink.web;
 
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.blink.common.CommonResponse;
 import com.blink.common.CommonResultCode;
 import com.blink.service.AccountService;
+import com.blink.util.CommonUtils;
 import com.blink.util.JwtUtil;
 import com.blink.web.admin.web.dto.UserSignupRequestDto;
 
@@ -25,7 +27,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RestController
+@RestController("unauthenticatedAccountController")
 @RequestMapping("/account")
 public class AccountController {
 
@@ -150,4 +152,49 @@ public class AccountController {
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}
+	
+	@ApiOperation("아이디/비밀번호 찾기 - 계정 유효성 체크")
+	@GetMapping("/valid")
+	public ResponseEntity<CommonResponse> isAccountValid(@RequestParam("username") String username, @RequestParam("employeeTel") String employeeTel) {
+		
+		if(!accountService.isAccountValid(username, employeeTel)) {
+			return ResponseEntity.ok(new CommonResponse(CommonResultCode.ACCOUNT_INFO_NONEXIST));
+		} else {
+			accountService.sendAuthCode(employeeTel);
+			return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
+		}
+	}
+	
+	@ApiOperation("아이디 찾기")
+	@GetMapping("/findID")
+	public ResponseEntity<CommonResponse> findID(@RequestParam("employeeTel") String employeeTel, @RequestParam(value = "authCode") Integer authCode) {
+		
+		Map<String, Object> result = new HashMap<>();
+		
+		if (accountService.checkAuthCode(employeeTel, authCode)) {
+			String username = accountService.getUsername(employeeTel);
+			result.put("userID", username);
+			return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
+		} else {
+			return ResponseEntity.ok(new CommonResponse(CommonResultCode.AUTH_CODE_NOT_EQUAL));
+		}
+	}
+	
+	@ApiOperation("비밀번호 찾기")
+	@GetMapping("/findPassword")
+	public ResponseEntity<CommonResponse> findPassword(@RequestParam("employeeTel") String employeeTel, @RequestParam(value = "authCode") Integer authCode) {
+		
+		Map<String, Object> result = new HashMap<>();
+		
+		if (accountService.checkAuthCode(employeeTel, authCode)) {
+			
+			String tempPassword = CommonUtils.getRamdomPassword(6);
+			result.put("tempPassword", tempPassword);
+			accountService.updatePassword(employeeTel, tempPassword);
+			return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
+		} else {
+			return ResponseEntity.ok(new CommonResponse(CommonResultCode.AUTH_CODE_NOT_EQUAL));
+		}
+	}
 }
+	

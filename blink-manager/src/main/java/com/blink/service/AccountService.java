@@ -3,6 +3,7 @@ package com.blink.service;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -212,4 +213,37 @@ public class AccountService {
 		return userStatus;
 	}
 
+	public boolean isAccountValid(String username, String employeeTel) {
+		int accountCount = hospitalRepo.findCountByNameAndEmployeeTel(username, employeeTel);
+		return accountCount > 0;
+	}
+
+	public String getUsername(String employeeTel) {
+		List<Hospital> list = hospitalRepo.findByEmployeeTel(employeeTel);
+		return list.get(0).getName();
+	}
+
+	public void updatePassword(String employeeTel, String tempPassword) {
+		
+		List<Hospital> list = hospitalRepo.findByEmployeeTel(employeeTel);
+		if (list.size() > 0) {
+			Admin admin = list.get(0).getAdmin();
+			admin.setTempPassword(passwordEncoder.encode(tempPassword));
+		} else {
+			throw new RuntimeException("No such account");
+		}
+	}
+
+	public void updateEmail(String username, String newEmail) {
+		Admin admin = adminRepo.findByName(username);
+		
+		if (admin != null) {
+			admin.modifyEmail(newEmail);
+			
+			Hospital hospital = admin.getHospital();
+			hospital.modifyEmaail(newEmail);
+		} else {
+			throw new RuntimeException("No such hospital");
+		}
+	}
 }

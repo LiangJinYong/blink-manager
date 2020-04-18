@@ -20,6 +20,7 @@ import com.blink.enumeration.SearchPeriod;
 import com.blink.service.WebQnaService;
 import com.blink.web.hospital.dto.WebQnaResponseDto;
 
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -29,15 +30,17 @@ public class WebQnaController {
 
 	private final WebQnaService webQnaService;
 
+	@ApiOperation(value = "고객센터 - 질문 등록")
 	@PostMapping("/question")
 	public ResponseEntity<CommonResponse> registerQuestion(@RequestParam("questionType") QuestionType questionType,
 			@RequestParam("title") String title, @RequestParam("questionContent") String questionContent,
-			@RequestParam("file") MultipartFile[] files, Principal principal) {
+			@RequestParam(name = "file", required = false) MultipartFile[] files, Principal principal) {
 		String username = principal.getName();
 		webQnaService.registerQuestion(questionType, title, questionContent, files, username);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 	}
 
+	@ApiOperation(value = "고객센터 - 해당 병원 질문 조회")
 	@GetMapping
 	public ResponseEntity<CommonResponse> getQnaList(@RequestParam("title") Optional<String> title,
 			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period, Pageable pageable,
@@ -45,7 +48,7 @@ public class WebQnaController {
 		String username = principal.getName();
 		Page<WebQnaResponseDto> webQnaList = webQnaService.getHospitalQnaList(title.orElse("_"),
 				period.orElse(SearchPeriod.ONEMONTH), pageable, username);
-		
+
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, webQnaList));
 	}
 

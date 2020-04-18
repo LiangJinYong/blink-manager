@@ -23,7 +23,7 @@ public class FileUploadUtils {
 	public String upload(MultipartFile[] files, String uploadDirectory, FileUploadUserType fileUploadUserType, Long userId) {
 		String groupId = null;
 
-		if (files != null) {
+		if (files != null && files.length > 0) {
 			int fileId = 1;
 			groupId = webFilesRepository.findFileGroupId("fileGroup");
 			for (MultipartFile file : files) {

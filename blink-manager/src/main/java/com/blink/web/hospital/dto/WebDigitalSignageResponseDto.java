@@ -4,17 +4,17 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.blink.enumeration.QuestionType;
+import com.blink.enumeration.SignageType;
 import com.blink.web.admin.web.dto.WebFileResponseDto;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+
 @Data
 @RequiredArgsConstructor
-public class WebQnaResponseDto {
-
+public class WebDigitalSignageResponseDto {
 	private final Long id;
-	private final QuestionType questionType;
+	private final SignageType signageType;
 	private final String title;
 	private final LocalDateTime createdAt;
 	private final boolean answerYn;
@@ -25,4 +25,5 @@ public class WebQnaResponseDto {
 	private final String hospitalName;
 	private List<WebFileResponseDto> questionFiles = new ArrayList<>();
 	private List<WebFileResponseDto> answerFiles = new ArrayList<>();
+
 }

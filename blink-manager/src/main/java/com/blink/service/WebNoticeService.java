@@ -16,6 +16,7 @@ import com.blink.domain.webfiles.WebFilesRepository;
 import com.blink.enumeration.FileUploadUserType;
 import com.blink.enumeration.Role;
 import com.blink.enumeration.SearchPeriod;
+import com.blink.util.CommonUtils;
 import com.blink.util.FileUploadUtils;
 import com.blink.web.admin.web.dto.WebFileResponseDto;
 import com.blink.web.admin.web.dto.WebNoticeResponseDto;
@@ -33,28 +34,7 @@ public class WebNoticeService {
 
 	public Page<WebNoticeResponseDto> getNoticeList(String title, SearchPeriod period, Pageable pageable) {
 
-		LocalDateTime time = LocalDateTime.now();
-
-		switch (period) {
-		case ONEDAY:
-			time = time.minusDays(1);
-			break;
-		case ONEWEEK:
-			time = time.minusDays(7);
-			break;
-		case ONEMONTH:
-			time = time.minusDays(30);
-			break;
-		case THREEMONTH:
-			time = time.minusDays(90);
-			break;
-		case SIXMONTH:
-			time = time.minusDays(180);
-			break;
-		case ONEYEAR:
-			time = time.minusDays(365);
-			break;
-		}
+		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 
 		Page<WebNoticeResponseDto> list = webNoticeRepository.findByTitleAndPeriod(title, time, pageable);
 
