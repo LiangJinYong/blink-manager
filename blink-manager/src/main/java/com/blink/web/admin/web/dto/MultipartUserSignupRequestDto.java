@@ -29,7 +29,7 @@ public class MultipartUserSignupRequestDto {
 	private String employeePosition;
 	private String employeeTel;
 	private String employeeEmail;
-	private Integer agreenSendYn;
+	private Integer agreeSendYn;
 	private String programInUse;
 	private MultipartFile file;
 	

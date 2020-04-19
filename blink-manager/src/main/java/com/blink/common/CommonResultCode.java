@@ -15,7 +15,9 @@ public enum CommonResultCode {
 	AUTH_CODE_NOT_CHECKED(2103, "인증코드 체크가 필요합니다."), 
 	ACCOUNT_INFO_NONEXIST(2013, "존재하지 않는 계정입니다."),
 	ACCOUNT_PASSWORD_INCORRECT(2014, "비밀번호가 틀렸습니다."),
-	INTERNAL_ERROR(5000, "서버 내부 오류"); 
+	NO_REQUIRED_NOTICE_FOUND(2201, "필수고지사항 데이터가 없습니다."),
+	NO_SUCH_DATA(4000, "해당 데이터가 없습니다."),
+	INTERNAL_ERROR(5000, "서버 내부 오류"), ; 
 	
 	private final int resultCode;
 	private final String resultMessage;

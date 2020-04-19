@@ -15,6 +15,7 @@ import javax.persistence.OneToOne;
 
 import com.blink.domain.BaseTimeEntity;
 import com.blink.domain.admin.Admin;
+import com.blink.domain.judge.WebJudge;
 import com.blink.domain.qna.WebQna;
 import com.blink.enumeration.Role;
 
@@ -61,7 +62,7 @@ public class Hospital extends BaseTimeEntity {
 	private Role roleId = Role.HOSPITAL;
 
 	@Column(nullable = false, columnDefinition = "bit(1)")
-	private Integer agreenSendYn = 1;
+	private Integer agreeSendYn = 1;
 
 	private String programInUse;
 
@@ -70,6 +71,9 @@ public class Hospital extends BaseTimeEntity {
 
 	@Column(length = 45, nullable = false)
 	private String groupId;
+	
+	@OneToOne(mappedBy = "hospital")
+	private WebJudge webJudge;
 
 	@OneToMany(mappedBy = "hospital")
 	private List<WebQna> webQnaList;
@@ -81,7 +85,7 @@ public class Hospital extends BaseTimeEntity {
 	@Builder
 	public Hospital(String displayName, String tel, String postcode, String address, String addressDetail,
 			String employeeName, String employeePosition, String employeeTel, String employeeEmail,
-			Integer agreenSendYn, String name, String programInUse, String groupId) {
+			Integer agreeSendYn, String name, String programInUse, String groupId) {
 		this.displayName = displayName;
 		this.tel = tel;
 		this.postcode = postcode;
@@ -91,7 +95,7 @@ public class Hospital extends BaseTimeEntity {
 		this.employeePosition = employeePosition;
 		this.employeeTel = employeeTel;
 		this.employeeEmail = employeeEmail;
-		this.agreenSendYn = agreenSendYn;
+		this.agreeSendYn = agreeSendYn;
 		this.name = name;
 		this.programInUse = programInUse;
 		this.groupId = groupId;

@@ -3,7 +3,8 @@ package com.blink.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.transaction.Transactional;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -16,11 +17,14 @@ import com.blink.domain.admin.Admin;
 import com.blink.domain.admin.AdminRepository;
 import com.blink.enumeration.Role;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Service
+@Transactional
 public class CustomUserDetailsService implements UserDetailsService {
 
-	@Autowired
-	private AdminRepository adminRepository;
+	private final AdminRepository adminRepository;
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

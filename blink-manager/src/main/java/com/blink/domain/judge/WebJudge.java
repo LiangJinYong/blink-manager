@@ -11,7 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
 import com.blink.domain.BaseTimeEntity;
-import com.blink.domain.admin.Admin;
+import com.blink.domain.hospital.Hospital;
 import com.blink.enumeration.JudgeStatus;
 
 import lombok.Builder;
@@ -28,8 +28,8 @@ public class WebJudge extends BaseTimeEntity {
 	private Long id;
 
 	@OneToOne
-	@JoinColumn(name = "user_id")
-	private Admin user;
+	@JoinColumn(name = "hospital_id")
+	private Hospital hospital;
 
 	@Enumerated(EnumType.STRING)
 	private JudgeStatus judgeStatus;
@@ -38,8 +38,13 @@ public class WebJudge extends BaseTimeEntity {
 	private String rejectMsg;
 	
 	@Builder
-	public WebJudge(Admin user, JudgeStatus judgeStatus) {
-		this.user = user;
+	public WebJudge(Hospital hospital, JudgeStatus judgeStatus) {
+		this.hospital = hospital;
 		this.judgeStatus = judgeStatus;
+	}
+
+	public void changeJudgeStatus(JudgeStatus judgeStatus, String rejectMsg) {
+		this.judgeStatus = judgeStatus;
+		this.rejectMsg = rejectMsg;
 	}
 }

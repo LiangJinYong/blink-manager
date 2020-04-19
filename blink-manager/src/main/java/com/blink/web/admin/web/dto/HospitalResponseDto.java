@@ -14,17 +14,17 @@ public class HospitalResponseDto {
 	private String contractDate;
 	private String employeeName;
 	private String contact;
-	private Integer agreenSendYn;
+	private Integer agreeSendYn;
 	private String fullAddress;
 	private String employeeEmail;
 	
-	public HospitalResponseDto(String hospitalName, String hospitalId, String contractDate, String employeeName, String contact, Integer agreenSendYn, String fullAddress, String employeeEmail) {
+	public HospitalResponseDto(String hospitalName, String hospitalId, String contractDate, String employeeName, String contact, Integer agreeSendYn, String fullAddress, String employeeEmail) {
 		this.hospitalName = hospitalName;
 		this.hospitalId = hospitalId;
 		this.contractDate = contractDate;
 		this.employeeName = employeeName;
 		this.contact = contact;
-		this.agreenSendYn = agreenSendYn;
+		this.agreeSendYn = agreeSendYn;
 		this.fullAddress = fullAddress;
 		this.employeeEmail = employeeEmail;
 	}

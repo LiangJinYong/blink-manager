@@ -93,7 +93,7 @@ public class AccountController {
 			@RequestParam("employeePosition") String employeePosition, //
 			@RequestParam("employeeTel") String employeeTel, //
 			@RequestParam("employeeEmail") String employeeEmail, //
-			@RequestParam("agreenSendYn") Integer agreenSendYn, //
+			@RequestParam("agreeSendYn") Integer agreeSendYn, //
 			@RequestParam("programInUse") String programInUse, //
 			@RequestParam("licensePhoto") MultipartFile file) {
 
@@ -108,7 +108,7 @@ public class AccountController {
 				.employeePosition(employeePosition) //
 				.employeeTel(employeeTel) //
 				.employeeEmail(employeeEmail) //
-				.agreenSendYn(1) //
+				.agreeSendYn(1) //
 				.programInUse(programInUse) //
 				.build();
 		try {

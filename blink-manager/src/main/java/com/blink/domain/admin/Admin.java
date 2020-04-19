@@ -16,7 +16,6 @@ import javax.persistence.OneToOne;
 
 import com.blink.domain.BaseTimeEntity;
 import com.blink.domain.hospital.Hospital;
-import com.blink.domain.judge.WebJudge;
 import com.blink.enumeration.Role;
 
 import lombok.Builder;
@@ -52,14 +51,11 @@ public class Admin extends BaseTimeEntity {
 	private Integer loginTryCnt = 0;
 
 	@Column(nullable = false, columnDefinition = "tinyint(1) unsigned")
-	private Integer accountStatus = 0;
+	private boolean accountStatus;
 	
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "hospital_id")
 	private Hospital hospital;
-
-	@OneToOne(mappedBy = "user")
-	private WebJudge webJudge;
 
 	@Builder
 	public Admin(String email, String name, String password) {
@@ -86,5 +82,10 @@ public class Admin extends BaseTimeEntity {
 	
 	public void modifyEmail(String newEmail) {
 		this.email = newEmail;
+	}
+	
+	public void setAccountStatus(boolean accountStatus) {
+		this.accountStatus = accountStatus;
+		this.regDate = LocalDateTime.now();
 	}
 }

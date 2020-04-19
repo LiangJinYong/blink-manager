@@ -74,7 +74,7 @@ public class AccountService {
 		Hospital hospital = requestDto.toHospitalEntity(requestDto.getHospitalName(), requestDto.getHospitalTel(),
 				requestDto.getPostcode(), requestDto.getAddress(), requestDto.getAddressDetail(),
 				requestDto.getEmployeeName(), requestDto.getEmployeePosition(), requestDto.getEmployeeTel(),
-				requestDto.getEmployeeEmail(), requestDto.getAgreenSendYn(), requestDto.getProgramInUse());
+				requestDto.getEmployeeEmail(), requestDto.getAgreeSendYn(), requestDto.getProgramInUse());
 
 		hospital.assignGroupId(groupId);
 		
@@ -90,7 +90,7 @@ public class AccountService {
 		userAuthCode.get().setSignupYn(true);
 
 		WebJudge webJudge = WebJudge.builder() //
-				.user(admin) //
+				.hospital(hospital) //
 				.judgeStatus(JudgeStatus.WAITING) //
 				.build();
 
@@ -199,14 +199,14 @@ public class AccountService {
 			userStatus.put("displayName", displayName);
 		}
 
-		Integer accountStatus = user.getAccountStatus();
+		boolean accountStatus = user.isAccountStatus();
 		userStatus.put("accountStatus", accountStatus);
-		if (1 != accountStatus) {
-			JudgeStatus judgeStatus = user.getWebJudge().getJudgeStatus();
+		if (!accountStatus) {
+			JudgeStatus judgeStatus = user.getHospital().getWebJudge().getJudgeStatus();
 			userStatus.put("judgeStatus", judgeStatus);
 
 			if (judgeStatus.equals(JudgeStatus.DENIED)) {
-				userStatus.put("rejectMsg", user.getWebJudge().getRejectMsg());
+				userStatus.put("rejectMsg", user.getHospital().getWebJudge().getRejectMsg());
 			}
 		}
 

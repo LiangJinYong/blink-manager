@@ -86,7 +86,7 @@ public class WebQnaService {
 	}
 
 	// ------------------ ADMIN ------------------
-	public void registerAnswer(Long qnaId, String answerContent, MultipartFile[] files, String username) {
+	public void registerAnswer(Long qnaId, String answerContent, MultipartFile[] files) {
 		
 		String answerGroupId = fileUploadUtils.upload(files, "webQnaFiles", FileUploadUserType.WEB, 0L);
 		
@@ -99,8 +99,7 @@ public class WebQnaService {
 		webQna.completeAnswer(answerContent);
 	}
 
-	public WebQnaAdminResponseDto getAdminQnaInfo(String title, SearchPeriod period, Pageable pageable,
-			String username) {
+	public WebQnaAdminResponseDto getAdminQnaInfo(String title, SearchPeriod period, Pageable pageable) {
 		
 		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 		

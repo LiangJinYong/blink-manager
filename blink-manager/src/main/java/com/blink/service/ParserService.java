@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class ParserService {
 
 	private final UserDataRepository userDataRepository;

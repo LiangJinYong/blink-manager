@@ -24,7 +24,7 @@ public class UserSignupRequestDto {
 	private String employeePosition;
 	private String employeeTel;
 	private String employeeEmail;
-	private Integer agreenSendYn;
+	private Integer agreeSendYn;
 	private String programInUse;
 
 	public Admin toAdminEntity(String username, String password, String employeeEmail) {
@@ -33,7 +33,7 @@ public class UserSignupRequestDto {
 
 	public Hospital toHospitalEntity(String hospitalName, String hospitalTel, String postcode, String address,
 			String addressDetail, String employeeName, String employeePosition, String employeeTel,
-			String employeeEmail, Integer agreenSendYn, String programInUse) {
+			String employeeEmail, Integer agreeSendYn, String programInUse) {
 		return Hospital.builder().displayName(hospitalName)
 								.tel(hospitalTel)
 								.postcode(postcode)
@@ -42,7 +42,7 @@ public class UserSignupRequestDto {
 								.employeeName(employeeName)
 								.employeePosition(employeePosition)
 								.employeeTel(employeeTel).employeeEmail(employeeEmail)
-								.agreenSendYn(agreenSendYn)
+								.agreeSendYn(agreeSendYn)
 								.name(username)
 								.programInUse(programInUse).build();
 	}
@@ -50,7 +50,7 @@ public class UserSignupRequestDto {
 	@Builder
 	public UserSignupRequestDto(String username, String password, String hospitalName, String hospitalTel,
 			String postcode, String address, String addressDetail, String employeeName, String employeePosition,
-			String employeeTel, String employeeEmail, Integer agreenSendYn, String programInUse) {
+			String employeeTel, String employeeEmail, Integer agreeSendYn, String programInUse) {
 		this.username = username;
 		this.password = password;
 		this.hospitalName = hospitalName;
@@ -62,7 +62,7 @@ public class UserSignupRequestDto {
 		this.employeePosition = employeePosition;
 		this.employeeTel = employeeTel;
 		this.employeeEmail = employeeEmail;
-		this.agreenSendYn = agreenSendYn;
+		this.agreeSendYn = agreeSendYn;
 		this.programInUse = programInUse;
 	}
 }

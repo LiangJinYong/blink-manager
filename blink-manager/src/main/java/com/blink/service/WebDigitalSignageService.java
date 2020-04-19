@@ -23,7 +23,6 @@ import com.blink.util.FileUploadUtils;
 import com.blink.web.admin.web.dto.WebDigitalSignageAdminResponseDto;
 import com.blink.web.admin.web.dto.WebFileResponseDto;
 import com.blink.web.hospital.dto.WebDigitalSignageResponseDto;
-import com.blink.web.hospital.dto.WebQnaResponseDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -89,7 +88,7 @@ public class WebDigitalSignageService {
 	}
 	
 	// ------------------ ADMIN ------------------
-	public void registerAnswer(Long digitalSignageId, String answerContent, MultipartFile[] files, String username) {
+	public void registerAnswer(Long digitalSignageId, String answerContent, MultipartFile[] files) {
 		
 		String answerGroupId = fileUploadUtils.upload(files, "webDigitalSignageFiles", FileUploadUserType.WEB, 0L);
 		
@@ -103,7 +102,7 @@ public class WebDigitalSignageService {
 	}
 
 	public WebDigitalSignageAdminResponseDto getAdminDigitalSignageInfo(String title, SearchPeriod period,
-			Pageable pageable, String username) {
+			Pageable pageable) {
 		
 		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 		

@@ -61,7 +61,7 @@ public class AccountControllerTest {
 				.employeePosition("Boss")
 				.employeeTel("01044445555")
 				.employeeEmail("test@naver.com")
-				.agreenSendYn(1)
+				.agreeSendYn(1)
 				.programInUse("Excel")
 				.build();
 		
@@ -77,7 +77,7 @@ public class AccountControllerTest {
 		param.add("employeePosition", "Boss");
 		param.add("employeeTel", "01044445555");
 		param.add("employeeEmail", "test@naver.com");
-		param.add("agreenSendYn", 1);
+		param.add("agreeSendYn", 1);
 		param.add("programInUse", "PPT");
 		param.add("licensePhoto", resource);
         
