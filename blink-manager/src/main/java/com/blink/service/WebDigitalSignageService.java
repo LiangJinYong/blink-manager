@@ -41,7 +41,7 @@ public class WebDigitalSignageService {
 			MultipartFile[] files, String username) {
 		Admin user = adminRepository.findByName(username);
 		Long userId = user.getHospital().getId();
-		String questionGroupId = fileUploadUtils.upload(files, "webDigitalSignageFiles", FileUploadUserType.WEB, userId);
+		String questionGroupId = fileUploadUtils.upload(files, "webDigitalSignageFiles", FileUploadUserType.WEB, userId, null);
 		
 		WebDigitalSignage webDigitalSignage = WebDigitalSignage.builder() //
 			.hospital(user.getHospital()) //
@@ -90,7 +90,7 @@ public class WebDigitalSignageService {
 	// ------------------ ADMIN ------------------
 	public void registerAnswer(Long digitalSignageId, String answerContent, MultipartFile[] files) {
 		
-		String answerGroupId = fileUploadUtils.upload(files, "webDigitalSignageFiles", FileUploadUserType.WEB, 0L);
+		String answerGroupId = fileUploadUtils.upload(files, "webDigitalSignageFiles", FileUploadUserType.WEB, 0L, null);
 		
 		WebDigitalSignage digitalSignage = webDigitalSignageRepository.findById(digitalSignageId).orElseThrow(() -> new IllegalArgumentException("No such digital signage"));
 		

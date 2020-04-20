@@ -15,6 +15,7 @@ import javax.persistence.OneToOne;
 
 import com.blink.domain.BaseTimeEntity;
 import com.blink.domain.admin.Admin;
+import com.blink.domain.agreeUser.AgreeUserList;
 import com.blink.domain.judge.WebJudge;
 import com.blink.domain.qna.WebQna;
 import com.blink.enumeration.Role;
@@ -77,6 +78,9 @@ public class Hospital extends BaseTimeEntity {
 
 	@OneToMany(mappedBy = "hospital")
 	private List<WebQna> webQnaList;
+	
+	@OneToMany(mappedBy="hospital")
+	private List<AgreeUserList> agreeUserLists;
 
 	public void assignGroupId(String groupId) {
 		this.groupId = groupId;

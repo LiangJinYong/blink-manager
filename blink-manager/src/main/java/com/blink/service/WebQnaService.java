@@ -40,8 +40,8 @@ public class WebQnaService {
 	public void registerQuestion(QuestionType questionType, String title, String questionContent, MultipartFile[] files,
 			String username) {
 		Admin user = adminRepository.findByName(username);
-		Long userId = user.getHospital().getId();
-		String questionGroupId = fileUploadUtils.upload(files, "webQnaFiles", FileUploadUserType.WEB, userId);
+		Long hospitalId = user.getHospital().getId();
+		String questionGroupId = fileUploadUtils.upload(files, "webQnaFiles", FileUploadUserType.WEB, hospitalId, null);
 
 		WebQna webQna = WebQna.builder() //
 				.hospital(user.getHospital()) //
@@ -88,7 +88,7 @@ public class WebQnaService {
 	// ------------------ ADMIN ------------------
 	public void registerAnswer(Long qnaId, String answerContent, MultipartFile[] files) {
 		
-		String answerGroupId = fileUploadUtils.upload(files, "webQnaFiles", FileUploadUserType.WEB, 0L);
+		String answerGroupId = fileUploadUtils.upload(files, "webQnaFiles", FileUploadUserType.WEB, 0L, null);
 		
 		WebQna webQna = webQnaRepository.findById(qnaId).orElseThrow(() -> new IllegalArgumentException("No such qna"));
 		

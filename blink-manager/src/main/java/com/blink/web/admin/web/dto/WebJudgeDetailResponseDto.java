@@ -13,7 +13,9 @@ public class WebJudgeDetailResponseDto {
 	private final String hospitalName;
 	private final LocalDateTime createdAt;
 	private final String hospitalTel;
+	private final String postcode;
 	private final String address;
+	private final String addressDetail;
 
 	private final String fileName;
 	private final String fileKey;

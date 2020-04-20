@@ -147,7 +147,7 @@ public class AccountController {
 		String token = jwtUtil.generateToken(username);
 		result.put("token", token);
 		
-		Map<String, Object> userStatus = accountService.getUserStatus(username);
+		Map<String, Object> userStatus = accountService.getUserStatusInfo(username);
 		result.putAll(userStatus);
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
@@ -155,9 +155,9 @@ public class AccountController {
 	
 	@ApiOperation("아이디/비밀번호 찾기 - 계정 유효성 체크")
 	@GetMapping("/valid")
-	public ResponseEntity<CommonResponse> isAccountValid(@RequestParam("username") String username, @RequestParam("employeeTel") String employeeTel) {
+	public ResponseEntity<CommonResponse> isAccountValid(@RequestParam("employeeName") String employeeName, @RequestParam("employeeTel") String employeeTel) {
 		
-		if(!accountService.isAccountValid(username, employeeTel)) {
+		if(!accountService.isAccountValid(employeeName, employeeTel)) {
 			return ResponseEntity.ok(new CommonResponse(CommonResultCode.ACCOUNT_INFO_NONEXIST));
 		} else {
 			accountService.sendAuthCode(employeeTel);

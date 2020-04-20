@@ -186,35 +186,43 @@ public class AccountService {
 		return userAuthCode.isPresent();
 	}
 
-	public Map<String, Object> getUserStatus(String username) {
+	public Map<String, Object> getUserStatusInfo(String username) {
 
-		Map<String, Object> userStatus = new HashMap<String, Object>();
+		Map<String, Object> userStatusInfo = new HashMap<String, Object>();
 
 		Admin user = adminRepo.findByName(username);
 
+		Hospital hospital = user.getHospital();
+		
 		if (user.getRoleId() == Role.MASTER) {
-			userStatus.put("displayName", adminDisplayName);
+			userStatusInfo.put("displayName", adminDisplayName);
 		} else {
-			String displayName = user.getHospital().getDisplayName();
-			userStatus.put("displayName", displayName);
-		}
-
-		boolean accountStatus = user.isAccountStatus();
-		userStatus.put("accountStatus", accountStatus);
-		if (!accountStatus) {
-			JudgeStatus judgeStatus = user.getHospital().getWebJudge().getJudgeStatus();
-			userStatus.put("judgeStatus", judgeStatus);
-
-			if (judgeStatus.equals(JudgeStatus.DENIED)) {
-				userStatus.put("rejectMsg", user.getHospital().getWebJudge().getRejectMsg());
+			String displayName = hospital.getDisplayName();
+			userStatusInfo.put("displayName", displayName);
+			
+			boolean accountStatus = user.isAccountStatus();
+			userStatusInfo.put("accountStatus", accountStatus);
+			
+			if (!accountStatus) {
+				JudgeStatus judgeStatus = hospital.getWebJudge().getJudgeStatus();
+				userStatusInfo.put("judgeStatus", judgeStatus);
+				
+				if (judgeStatus.equals(JudgeStatus.DENIED)) {
+					userStatusInfo.put("rejectMsg", hospital.getWebJudge().getRejectMsg());
+				} else if (judgeStatus.equals(JudgeStatus.APPROVED)) {
+					userStatusInfo.put("employeeName", hospital.getEmployeeName());
+					userStatusInfo.put("employeeEmail", hospital.getEmployeeEmail());
+					userStatusInfo.put("employeeTel", hospital.getEmployeeTel());
+				}
 			}
 		}
 
-		return userStatus;
+
+		return userStatusInfo;
 	}
 
-	public boolean isAccountValid(String username, String employeeTel) {
-		int accountCount = hospitalRepo.findCountByNameAndEmployeeTel(username, employeeTel);
+	public boolean isAccountValid(String employeeName, String employeeTel) {
+		int accountCount = hospitalRepo.findCountByEmployeeNameAndEmployeeTel(employeeName, employeeTel);
 		return accountCount > 0;
 	}
 

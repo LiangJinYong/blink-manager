@@ -20,12 +20,18 @@ public class FileUploadUtils {
 	private final WebFilesRepository webFilesRepository;
 	private final BucketService bucketService;
 	
-	public String upload(MultipartFile[] files, String uploadDirectory, FileUploadUserType fileUploadUserType, Long userId) {
-		String groupId = null;
+	public String upload(MultipartFile[] files, String uploadDirectory, FileUploadUserType fileUploadUserType, Long userId, String groupId) {
 
 		if (files != null && files.length > 0) {
+			
 			int fileId = 1;
-			groupId = webFilesRepository.findFileGroupId("fileGroup");
+			
+			if (groupId == null) {
+				groupId = webFilesRepository.findFileGroupId("fileGroup");
+			} else {
+				fileId = getNextFileId(groupId);
+			}
+			
 			for (MultipartFile file : files) {
 				try {
 					FileResource fileResource = bucketService.upload(Optional.of(uploadDirectory), file);
@@ -53,5 +59,11 @@ public class FileUploadUtils {
 		}
 		
 		return groupId;
+	}
+
+	private int getNextFileId(String groupId) {
+
+		int maxFileId = webFilesRepository.findMaxFileIdByGroupId(groupId);
+		return maxFileId + 1;
 	}
 }

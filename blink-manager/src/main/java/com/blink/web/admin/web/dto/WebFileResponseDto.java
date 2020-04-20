@@ -9,4 +9,5 @@ public class WebFileResponseDto {
 
 	private final String fileKey;
 	private final String fileName;
+	private final String groupFileId;
 }

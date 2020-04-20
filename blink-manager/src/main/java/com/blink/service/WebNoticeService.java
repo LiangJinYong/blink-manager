@@ -10,13 +10,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.blink.domain.admin.Admin;
-import com.blink.domain.admin.AdminRepository;
 import com.blink.domain.notice.WebNotice;
 import com.blink.domain.notice.WebNoticeRepository;
 import com.blink.domain.webfiles.WebFilesRepository;
 import com.blink.enumeration.FileUploadUserType;
-import com.blink.enumeration.Role;
 import com.blink.enumeration.SearchPeriod;
 import com.blink.util.CommonUtils;
 import com.blink.util.FileUploadUtils;
@@ -33,7 +30,6 @@ public class WebNoticeService {
 	private final WebNoticeRepository webNoticeRepository;
 	private final WebFilesRepository webFilesRepository;
 	private final FileUploadUtils fileUploadUtils;
-	private final AdminRepository adminRepository;
 
 	public Page<WebNoticeResponseDto> getNoticeList(String title, SearchPeriod period, Pageable pageable) {
 
@@ -55,16 +51,9 @@ public class WebNoticeService {
 		return list;
 	}
 
-	public void save(String title, String description, MultipartFile[] files, String username) {
+	public void save(String title, String description, MultipartFile[] files) {
 
-		Admin user = adminRepository.findByName(username);
-
-		Long userId = 0L;
-		if (user.getRoleId() == Role.HOSPITAL) {
-			userId = user.getHospital().getId();
-		}
-
-		String groupId = fileUploadUtils.upload(files, "webNoticeFiles", FileUploadUserType.WEB, userId);
+		String groupId = fileUploadUtils.upload(files, "webNoticeFiles", FileUploadUserType.WEB, 0L, null);
 
 		WebNotice webNotice = WebNotice.builder() //
 				.title(title) //

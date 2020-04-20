@@ -15,30 +15,13 @@ import com.blink.web.admin.web.dto.WebJudgeDetailResponseDto;
 
 public interface WebJudgeRepository extends JpaRepository<WebJudge, Long> {
 	
-	@Query("SELECT new com.blink.web.admin.web.dto.SingleWebJudgeRecordDto(j.id, j.createdAt, h.displayName, CONCAT('(', h.postcode, ') ', h.address, ' ', h.addressDetail), h.tel, j.judgeStatus) FROM WebJudge j JOIN j.hospital h WHERE h.address LIKE %:searchText% AND j.createdAt >= :time")
+	@Query("SELECT new com.blink.web.admin.web.dto.SingleWebJudgeRecordDto(j.id, j.createdAt, h.displayName, h.postcode, h.address, h.addressDetail, h.tel, j.judgeStatus) FROM WebJudge j JOIN j.hospital h WHERE h.address LIKE %:searchText% AND j.createdAt >= :time")
 	Page<SingleWebJudgeRecordDto> findBySearchTextAndPeriod(@Param("searchText") String searchText, @Param("time") LocalDateTime time, Pageable pageable);
 
 	@Query("SELECT COUNT(j.id) FROM WebJudge j WHERE j.judgeStatus = :status")
 	long findCountByJudgeStatus(@Param("status") JudgeStatus status);
 
-	@Query("SELECT new com.blink.web.admin.web.dto.WebJudgeDetailResponseDto(h.name, h.displayName, j.createdAt, h.tel, CONCAT('(', h.postcode, ') ', h.address, ' ', h.addressDetail), f.fileName, f.fileKey, h.employeeName, h.employeePosition, h.employeeTel, h.employeeEmail, h.agreeSendYn, h.programInUse) FROM WebJudge j JOIN j.hospital h JOIN WebFiles f ON h.groupId = f.groupId WHERE j.id = :webJudgeId")
+	@Query("SELECT new com.blink.web.admin.web.dto.WebJudgeDetailResponseDto(h.name, h.displayName, j.createdAt, h.tel, h.postcode, h.address, h.addressDetail, f.fileName, f.fileKey, h.employeeName, h.employeePosition, h.employeeTel, h.employeeEmail, h.agreeSendYn, h.programInUse) FROM WebJudge j JOIN j.hospital h JOIN WebFiles f ON h.groupId = f.groupId WHERE j.id = :webJudgeId")
 	Optional<WebJudgeDetailResponseDto> findJudgeDetailById(@Param("webJudgeId") Long webJudgeId);
 
 }
-/*
-private String username;
-private String hospitalName;
-private LocalDateTime createdAt;
-private String hospitalTel;
-private String address;
-
-private String fileName;
-private String fileKey;
-
-private String employeeName;
-private String employeePosition;
-private String employeeTel;
-private String employeeEmail;
-private Integer agreeSendYn;
-private String programInUse;
-*/
