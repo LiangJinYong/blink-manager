@@ -63,7 +63,7 @@ public class Hospital extends BaseTimeEntity {
 	private Role roleId = Role.HOSPITAL;
 
 	@Column(nullable = false, columnDefinition = "bit(1)")
-	private Integer agreeSendYn = 1;
+	private Integer agreeSendYn;
 
 	private String programInUse;
 
@@ -72,6 +72,12 @@ public class Hospital extends BaseTimeEntity {
 
 	@Column(length = 45, nullable = false)
 	private String groupId;
+	
+	private Integer signagesStand;
+	
+	private Integer signagesMountable;
+	
+	private Integer signagesExisting;
 	
 	@OneToOne(mappedBy = "hospital")
 	private WebJudge webJudge;

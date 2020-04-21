@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.blink.domain.admin.Admin;
 import com.blink.domain.admin.AdminRepository;
+import com.blink.domain.hospital.HospitalRepository;
 import com.blink.domain.qna.WebQna;
 import com.blink.domain.qna.WebQnaRepository;
 import com.blink.domain.webfiles.WebFilesRepository;
@@ -34,17 +35,15 @@ public class WebQnaService {
 	private final WebQnaRepository webQnaRepository;
 	private final WebFilesRepository webFilesRepository;
 	private final FileUploadUtils fileUploadUtils;
-	private final AdminRepository adminRepository;
+	private final HospitalRepository hospitalRepository;
 
 	// ------------------ HOSPITAL ------------------
-	public void registerQuestion(QuestionType questionType, String title, String questionContent, MultipartFile[] files,
-			String username) {
-		Admin user = adminRepository.findByName(username);
-		Long hospitalId = user.getHospital().getId();
+	public void registerQuestion(Long hospitalId, QuestionType questionType, String title, String questionContent, MultipartFile[] files) {
+		
 		String questionGroupId = fileUploadUtils.upload(files, "webQnaFiles", FileUploadUserType.WEB, hospitalId, null);
 
 		WebQna webQna = WebQna.builder() //
-				.hospital(user.getHospital()) //
+				.hospital(hospitalRepository.findById(hospitalId).get()) //
 				.questionType(questionType) //
 				.title(title) //
 				.questionContent(questionContent) //
@@ -57,11 +56,8 @@ public class WebQnaService {
 		webQnaRepository.save(webQna);
 	}
 
-	public Page<WebQnaResponseDto> getHospitalQnaList(String title, SearchPeriod period, Pageable pageable, String username) {
+	public Page<WebQnaResponseDto> getHospitalQnaList(Long hospitalId, String title, SearchPeriod period, Pageable pageable) {
 		
-		Admin user = adminRepository.findByName(username);
-		Long hospitalId = user.getHospital().getId();
-
 		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 
 		Page<WebQnaResponseDto> list = webQnaRepository.findByTitleAndPeriodWithHospital(title, time, hospitalId, pageable);

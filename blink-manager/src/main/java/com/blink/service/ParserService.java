@@ -2,7 +2,10 @@ package com.blink.service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -27,17 +30,36 @@ public class ParserService {
 	private final UserDataRepository userDataRepository;
 	private final UserExaminationMetadataRepository userExaminationMetadataRepository;
 	
-	@Transactional
-	public void save(List<UserParserRequestDto> userList) {
+	public List<Map<String, Object>> save(List<UserParserRequestDto> userList) {
+		
+		List<Map<String, Object>> result = new ArrayList<>();
 		
 		for(UserParserRequestDto user: userList) {
 			UserDataRequestDto userDataDto = user.getUserData();
 			UserExaminationMetadataRequestDto userExaminationMetadataDto = user.getUserExaminationMetadata();
 			String phone = userDataDto.getPhone();
+			String ssnPartial = userDataDto.getSsnPartial();
 			
-			Optional<UserData> userData = userDataRepository.findByPhone(phone);
+			Optional<UserData> userData = null;
 			
-			if (userData.isPresent()) {
+			if (!"".equals(phone) || phone == null) {
+				userData = userDataRepository.findByPhone(phone);
+			}
+			
+			if (userData != null && userData.isPresent()) {
+				
+				// 이름으로 한번 체크
+				Optional<UserData> userDataByName = userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
+				
+				// 없으면 
+				if (!userDataByName.isPresent()) {
+					Map<String, Object> map = new HashMap<>();
+					map.put("phone", phone);
+					map.put("ssnPartial", ssnPartial);
+					
+					result.add(map);
+				}
+				
 				System.out.println("==> UserData 등록됨");
 				//userData 등록됨
 				Integer examinationYear = userExaminationMetadataDto.getExaminationYear();
@@ -76,6 +98,8 @@ public class ParserService {
 				userExaminationMetadataRepository.save(userExaminationMetadataEntity);
 			}
 		}
+		
+		return result;
 	}
 
 }

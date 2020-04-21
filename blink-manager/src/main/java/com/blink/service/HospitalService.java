@@ -1,7 +1,6 @@
 package com.blink.service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDateTime;
 
 import javax.transaction.Transactional;
 
@@ -10,7 +9,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.blink.domain.hospital.HospitalRepository;
-import com.blink.web.admin.web.dto.HospitalResponseDto;
+import com.blink.enumeration.SearchPeriod;
+import com.blink.util.CommonUtils;
+import com.blink.web.admin.web.dto.hospital.HospitalDetailResponseDto;
+import com.blink.web.admin.web.dto.hospital.HospitalResponseDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,18 +21,25 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class HospitalService {
 
-	private final HospitalRepository hospitalRepo;
+	private final HospitalRepository hospitalRepository;
 
-	public Map<String, Object> getHospitalListInfo(String displayName, Pageable pageable) {
-		Map<String, Object> result = new HashMap<String, Object>();
+	// ------------------ ADMIN ------------------
+	public HospitalResponseDto getHospitalList(String searchText, SearchPeriod period,
+			Pageable pageable) {
 		
-		Page<HospitalResponseDto> findByDisplayName = hospitalRepo.findByDisplayNameContaining(displayName, pageable);
-		result.put("hospitalListPage", findByDisplayName);
+		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 		
-//		result.put("hospitalCount", hospitalListPage.getTotalElements());
-		result.put("totalExaminationCount", 1234);
-		result.put("mostExamHospital", "국민건강내과의원");
-		return result;
+		Page<HospitalDetailResponseDto> hospitalList =  hospitalRepository.findBySearchTextAndPeriod(searchText, time, pageable);
+		HospitalResponseDto responseDto = new HospitalResponseDto(0, 0, "xxx", hospitalList);
+		
+		return responseDto;
+	}
+
+	// ------------------ HOSPITAL ------------------
+	public HospitalDetailResponseDto getHospitalDetail(Long hospitalId) {
+		
+		HospitalDetailResponseDto responseDto = hospitalRepository.findDetailById(hospitalId);
+		return responseDto;
 	}
 
 }

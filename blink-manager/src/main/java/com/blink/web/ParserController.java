@@ -1,6 +1,7 @@
 package com.blink.web;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,12 +25,12 @@ public class ParserController {
 	
 	@PostMapping("/registUser")
 	public ResponseEntity<CommonResponse> registUser(@RequestBody List<UserParserRequestDto> userList) {
-		try {
 			
-			parserService.save(userList);
-			return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
-		} catch (Exception e) {
-			return ResponseEntity.ok(new CommonResponse(CommonResultCode.INTERNAL_ERROR));
-		}
+			List<Map<String,Object>> result = parserService.save(userList);
+			
+			if (result.size() == 0) {
+				return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
+			}
+			return ResponseEntity.ok(new CommonResponse(CommonResultCode.NO_USER_DATA, result));
 	}
 }

@@ -1,12 +1,12 @@
 package com.blink.web.hospital;
 
-import java.security.Principal;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,23 +31,21 @@ public class WebQnaController {
 	private final WebQnaService webQnaService;
 
 	@ApiOperation(value = "고객센터 - 질문 등록")
-	@PostMapping("/question")
-	public ResponseEntity<CommonResponse> registerQuestion(@RequestParam("questionType") QuestionType questionType,
+	@PostMapping("/question/{hospitalId}")
+	public ResponseEntity<CommonResponse> registerQuestion(@PathVariable("hospitalId") Long hospitalId, @RequestParam("questionType") QuestionType questionType,
 			@RequestParam("title") String title, @RequestParam("questionContent") String questionContent,
-			@RequestParam(name = "file", required = false) MultipartFile[] files, Principal principal) {
-		String username = principal.getName();
-		webQnaService.registerQuestion(questionType, title, questionContent, files, username);
+			@RequestParam(name = "file", required = false) MultipartFile[] files) {
+		webQnaService.registerQuestion(hospitalId, questionType, title, questionContent, files);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 	}
 
 	@ApiOperation(value = "고객센터 - 해당 병원 질문 조회")
-	@GetMapping
-	public ResponseEntity<CommonResponse> getQnaList(@RequestParam("title") Optional<String> title,
-			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period, Pageable pageable,
-			Principal principal) {
-		String username = principal.getName();
-		Page<WebQnaResponseDto> webQnaList = webQnaService.getHospitalQnaList(title.orElse("_"),
-				period.orElse(SearchPeriod.ONEMONTH), pageable, username);
+	@GetMapping("/{hospitalId}")
+	public ResponseEntity<CommonResponse> getQnaList(@PathVariable("hospitalId") Long hospitalId, @RequestParam("title") Optional<String> title,
+			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period, Pageable pageable) {
+		
+		Page<WebQnaResponseDto> webQnaList = webQnaService.getHospitalQnaList(hospitalId, title.orElse("_"),
+				period.orElse(SearchPeriod.ONEMONTH), pageable);
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, webQnaList));
 	}

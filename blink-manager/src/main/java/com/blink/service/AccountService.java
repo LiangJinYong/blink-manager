@@ -151,7 +151,7 @@ public class AccountService {
 				.phoneNumber(employeeTel) //
 				.build();
 
-		mtService.sendAuthCodeMT(authCodeMTDto);
+//		mtService.sendAuthCodeMT(authCodeMTDto);
 
 		Optional<UserAuthCode> userAuthCode = userAuthCodeRepo.findByPhoneNumber(employeeTel);
 
@@ -216,7 +216,6 @@ public class AccountService {
 				}
 			}
 		}
-
 
 		return userStatusInfo;
 	}

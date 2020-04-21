@@ -11,10 +11,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.blink.domain.admin.Admin;
 import com.blink.domain.admin.AdminRepository;
 import com.blink.domain.agreeUser.AgreeUserList;
 import com.blink.domain.agreeUser.AgreeUserListRepository;
+import com.blink.domain.hospital.HospitalRepository;
 import com.blink.domain.webfiles.WebFiles;
 import com.blink.domain.webfiles.WebFilesRepository;
 import com.blink.enumeration.FileUploadUserType;
@@ -36,112 +36,111 @@ public class AgreeUserService {
 	private final AgreeUserListRepository agreeUserListRepository;
 	private final WebFilesRepository webFilesRepository;
 	private final FileUploadUtils fileUploadUtils;
-	private final AdminRepository adminRepository;
 	private final BucketService bucketService;
+	private final HospitalRepository hospitalRepository;
 
 	// ------------------ HOSPITAL ------------------
-	public void registerAgreeUserList(MultipartFile[] files, String username) {
-
-		Admin user = adminRepository.findByName(username);
-		Long hospitalId = user.getHospital().getId();
+	public void registerAgreeUserList(MultipartFile[] files, Long hospitalId) {
 
 		String groupId = fileUploadUtils.upload(files, "agreeUserListFiles", FileUploadUserType.WEB, hospitalId, null);
 
 		AgreeUserList agreeUserList = AgreeUserList.builder() //
-				.hospital(user.getHospital()) //
+				.hospital(hospitalRepository.findById(hospitalId).get()) //
 				.groupId(groupId) //
 				.build();
-		
+
 		agreeUserListRepository.save(agreeUserList);
 	}
 
 	public AgreeUserResponseDto getHospitalAgreeUserInfo(String searchText, SearchPeriod period, Pageable pageable,
-			String username) {
-		Admin user = adminRepository.findByName(username);
-		Long hospitalId = user.getHospital().getId();
+			Long hospitalId) {
 
 		LocalDateTime time = CommonUtils.getSearchPeriod(period);
-		
-		Page<AgreeUserListResponseDto> agreeUserLists = agreeUserListRepository.findBySearchTextAndPeriodWithHospital(time, hospitalId, pageable);
-		
+
+		Page<AgreeUserListResponseDto> agreeUserLists = agreeUserListRepository
+				.findBySearchTextAndPeriodWithHospital(time, hospitalId, pageable);
+
 		List<AgreeUserListResponseDto> content = agreeUserLists.getContent();
-		
-		for(AgreeUserListResponseDto dto: content) {
+
+		for (AgreeUserListResponseDto dto : content) {
 			String groupId = dto.getGroupId();
 			if (groupId != null) {
 				List<WebFileResponseDto> questionFiles = webFilesRepository.findByGroupId(groupId);
 				dto.setFiles(questionFiles);
 			}
 		}
-		
+
 		AgreeUserResponseDto responseDto = new AgreeUserResponseDto(agreeUserLists);
-		
+
 		return responseDto;
 	}
 
-	public void updateAgreeUserListInfo(Long agreeUserListId, String[] groupFileIdsToBeDeleted, MultipartFile[] files, String username) {
-		
+	public void updateAgreeUserListInfo(Long agreeUserListId, String[] groupFileIdsToBeDeleted, MultipartFile[] files,
+			Long hospitalId) {
+
 		// Delete specified files
-		for(String groupFileId: groupFileIdsToBeDeleted) {
+		for (String groupFileId : groupFileIdsToBeDeleted) {
 			String[] split = groupFileId.split("-");
-			
+
 			String groupId = split[0];
 			Integer fileId = Integer.parseInt(split[1]);
-			
+
 			Optional<WebFiles> webFile = webFilesRepository.findByGroupIdAndFileId(groupId, fileId);
-			
+
 			if (webFile.isPresent()) {
 				WebFiles webFileEntity = webFile.get();
 				bucketService.delete(webFileEntity.getFileKey());
 				webFilesRepository.delete(webFileEntity);
 			}
 		}
-		
+
 		// Upload new files
-		Admin user = adminRepository.findByName(username);
-		Long hospitalId = user.getHospital().getId();
-		
-		AgreeUserList agreeUserList = agreeUserListRepository.findById(agreeUserListId).orElseThrow(() -> new IllegalArgumentException("No such agree user list"));
-		
-		fileUploadUtils.upload(files, "agreeUserListFiles", FileUploadUserType.WEB, hospitalId, agreeUserList.getGroupId());
+		AgreeUserList agreeUserList = agreeUserListRepository.findById(agreeUserListId)
+				.orElseThrow(() -> new IllegalArgumentException("No such agree user list"));
+
+		fileUploadUtils.upload(files, "agreeUserListFiles", FileUploadUserType.WEB, hospitalId,
+				agreeUserList.getGroupId());
 	}
 
-	public void deleteAgreeUserListInfo(Long agreeUserListId) {
-		AgreeUserList agreeUserList = agreeUserListRepository.findById(agreeUserListId).orElseThrow(() -> new IllegalArgumentException("No such agree user list"));
-		
+	public void deleteAgreeUserListInfo(Long hospitalId, Long agreeUserListId) {
+		AgreeUserList agreeUserList = agreeUserListRepository.findById(agreeUserListId)
+				.orElseThrow(() -> new IllegalArgumentException("No such agree user list"));
+
 		String groupId = agreeUserList.getGroupId();
-		
+
 		List<WebFileResponseDto> webFileList = webFilesRepository.findByGroupId(groupId);
-		
-		for(WebFileResponseDto dto: webFileList) {
+
+		for (WebFileResponseDto dto : webFileList) {
 			String fileKey = dto.getFileKey();
 			bucketService.delete(fileKey);
 		}
-		
+
 		webFilesRepository.deleteByGroupId(groupId);
-		
+
 		agreeUserListRepository.delete(agreeUserList);
 	}
 
 	public com.blink.web.admin.web.dto.agreeUserList.AgreeUserResponseDto getAdminAgreeUserInfo(String title,
 			SearchPeriod period, Pageable pageable) {
 
-LocalDateTime time = CommonUtils.getSearchPeriod(period);
-		
-		Page<AgreeUserListResponseDto> agreeUserLists = agreeUserListRepository.findBySearchTextAndPeriodWithAdmin(time, pageable);
-		
+		LocalDateTime time = CommonUtils.getSearchPeriod(period);
+
+		Page<AgreeUserListResponseDto> agreeUserLists = agreeUserListRepository.findBySearchTextAndPeriodWithAdmin(time,
+				pageable);
+
 		List<AgreeUserListResponseDto> content = agreeUserLists.getContent();
-		
-		for(AgreeUserListResponseDto dto: content) {
+
+		for (AgreeUserListResponseDto dto : content) {
 			String groupId = dto.getGroupId();
 			if (groupId != null) {
 				List<WebFileResponseDto> questionFiles = webFilesRepository.findByGroupId(groupId);
 				dto.setFiles(questionFiles);
 			}
 		}
-		
-		com.blink.web.admin.web.dto.agreeUserList.AgreeUserResponseDto responseDto = new com.blink.web.admin.web.dto.agreeUserList.AgreeUserResponseDto(agreeUserLists);
-		
+
+		com.blink.web.admin.web.dto.agreeUserList.AgreeUserResponseDto responseDto = new com.blink.web.admin.web.dto.agreeUserList.AgreeUserResponseDto(
+				agreeUserLists);
+
 		return responseDto;
 	}
 }

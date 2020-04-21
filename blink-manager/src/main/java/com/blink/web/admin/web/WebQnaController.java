@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController("adminWebQnaController")
-@RequestMapping("/admin/web/qna")
+@RequestMapping("/admin/web/qnas")
 public class WebQnaController {
 
 	private final WebQnaService webQnaService;

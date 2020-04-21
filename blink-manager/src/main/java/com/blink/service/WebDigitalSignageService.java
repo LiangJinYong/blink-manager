@@ -10,8 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.blink.domain.admin.Admin;
-import com.blink.domain.admin.AdminRepository;
+import com.blink.domain.hospital.HospitalRepository;
 import com.blink.domain.signage.WebDigitalSignage;
 import com.blink.domain.signage.WebDigitalSignageRepository;
 import com.blink.domain.webfiles.WebFilesRepository;
@@ -34,17 +33,16 @@ public class WebDigitalSignageService {
 	private final WebDigitalSignageRepository webDigitalSignageRepository;
 	private final WebFilesRepository webFilesRepository;
 	private final FileUploadUtils fileUploadUtils;
-	private final AdminRepository adminRepository;
+	private final HospitalRepository hospitalRepository;
 
 	// ------------------ HOSPITAL ------------------
-	public void registerQuestion(SignageType signageType, int signageNoticeStyle, String title, String questionContent,
-			MultipartFile[] files, String username) {
-		Admin user = adminRepository.findByName(username);
-		Long userId = user.getHospital().getId();
-		String questionGroupId = fileUploadUtils.upload(files, "webDigitalSignageFiles", FileUploadUserType.WEB, userId, null);
+	public void registerQuestion(Long hospitalId, SignageType signageType, int signageNoticeStyle, String title, String questionContent,
+			MultipartFile[] files) {
+		
+		String questionGroupId = fileUploadUtils.upload(files, "webDigitalSignageFiles", FileUploadUserType.WEB, hospitalId, null);
 		
 		WebDigitalSignage webDigitalSignage = WebDigitalSignage.builder() //
-			.hospital(user.getHospital()) //
+			.hospital(hospitalRepository.findById(hospitalId).get()) //
 			.signageType(signageType) //
 			.signageNoticeStyle(signageNoticeStyle) //
 			.title(title) //
@@ -58,11 +56,8 @@ public class WebDigitalSignageService {
 		webDigitalSignageRepository.save(webDigitalSignage);
 	}
 
-	public Page<WebDigitalSignageResponseDto> getHospitalDigitalSignageList(String title, SearchPeriod period,
-			Pageable pageable, String username) {
-		
-		Admin user = adminRepository.findByName(username);
-		Long hospitalId = user.getHospital().getId();
+	public Page<WebDigitalSignageResponseDto> getHospitalDigitalSignageList(Long hospitalId, String title, SearchPeriod period,
+			Pageable pageable) {
 		
 		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 		

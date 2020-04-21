@@ -32,8 +32,8 @@ public class AgreeUserController {
 	private final AgreeUserService agreeUserService;
 
 	@ApiOperation(value = "동의자 리스트 등록")
-	@PostMapping
-	public ResponseEntity<CommonResponse> registerAgreeUserList(@RequestParam("file") MultipartFile[] files,
+	@PostMapping("/{hospitalId}")
+	public ResponseEntity<CommonResponse> registerAgreeUserList(@PathVariable("hospitalId") Long hospitalId, @RequestParam("file") MultipartFile[] files,
 			Principal principal) {
 
 		if (files.length > 2) {
@@ -46,42 +46,36 @@ public class AgreeUserController {
 			}
 		}
 
-		String username = principal.getName();
-
-		agreeUserService.registerAgreeUserList(files, username);
+		agreeUserService.registerAgreeUserList(files, hospitalId);
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 	}
 
 	@ApiOperation(value = "해당 병원 동의자 리스트 가져오기", notes = "필요한 정보외에 groupFileId(형식 groupId-FileId)도 같이 전달, 동이자 라시트 정보 수정시 사용")
-	@GetMapping
-	public ResponseEntity<CommonResponse> getAgreeUserInfo(@RequestParam("searchText") Optional<String> searchText,
-			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period, Pageable pageable,
-			Principal principal) {
-
-		String username = principal.getName();
+	@GetMapping("/{hospitalId}")
+	public ResponseEntity<CommonResponse> getAgreeUserInfo(@PathVariable("hospitalId") Long hospitalId, @RequestParam("searchText") Optional<String> searchText,
+			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period, Pageable pageable) {
 
 		AgreeUserResponseDto responseDto = agreeUserService.getHospitalAgreeUserInfo(searchText.orElse("_"),
-				period.orElse(SearchPeriod.ONEMONTH), pageable, username);
+				period.orElse(SearchPeriod.ONEMONTH), pageable, hospitalId);
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, responseDto));
 	}
 
 	@ApiOperation(value = "동의자 리스트 수정", notes="삭제된 파일의 groupFileId를 넘겨야함")
-	@PutMapping("/{agreeUserListId}")
-	public ResponseEntity<CommonResponse> updateAgreeUserListInfo(@PathVariable("agreeUserListId") Long agreeUserListId,
+	@PutMapping("/{hospitalId}/{agreeUserListId}")
+	public ResponseEntity<CommonResponse> updateAgreeUserListInfo(@PathVariable("hospitalId") Long hospitalId, @PathVariable("agreeUserListId") Long agreeUserListId,
 			@RequestParam("groupFileId") String[] groupFileIdsToBeDeleted,
-			@RequestParam(name = "file", required = false) MultipartFile[] files, Principal principal) {
+			@RequestParam(name = "file", required = false) MultipartFile[] files) {
 
-		String username = principal.getName();
-		agreeUserService.updateAgreeUserListInfo(agreeUserListId, groupFileIdsToBeDeleted, files, username);
+		agreeUserService.updateAgreeUserListInfo(agreeUserListId, groupFileIdsToBeDeleted, files, hospitalId);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 	}
 
-	@DeleteMapping("/{agreeUserListId}")
-	@ApiOperation(value = "동의자 리스트 수정")
-	public ResponseEntity<CommonResponse> deleteAgreeUserListInfo(@PathVariable("agreeUserListId") Long agreeUserListId) {
-		agreeUserService.deleteAgreeUserListInfo(agreeUserListId);
+	@DeleteMapping("/{hospitalId}/{agreeUserListId}")
+	@ApiOperation(value = "동의자 리스트 삭제")
+	public ResponseEntity<CommonResponse> deleteAgreeUserListInfo(@PathVariable("hospitalId") Long hospitalId, @PathVariable("agreeUserListId") Long agreeUserListId) {
+		agreeUserService.deleteAgreeUserListInfo(hospitalId, agreeUserListId);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 	}
 }
