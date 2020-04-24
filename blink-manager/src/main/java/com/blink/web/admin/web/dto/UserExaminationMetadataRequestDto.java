@@ -39,7 +39,7 @@ public class UserExaminationMetadataRequestDto {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		
 		return UserExaminationMetadata.builder()
-				.agreeYN(agreeYn)
+				.agreeYn(agreeYn)
 				.dateExamined(LocalDate.parse(dateExamined, formatter))
 				.hospitalDataId(hospitalDataId)
 				.agreeMail(agreeMail)

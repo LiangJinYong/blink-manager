@@ -2,5 +2,5 @@ package com.blink.enumeration;
 
 public enum JudgeStatus {
 
-	WAITING, DENIED, APPROVED, ACCOMPLISHED
+	WAITING, DENIED, APPROVED, SIGNWAITING, ACCOMPLISHED
 }

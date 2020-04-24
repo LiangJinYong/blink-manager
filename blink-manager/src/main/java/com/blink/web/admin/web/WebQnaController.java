@@ -39,10 +39,10 @@ public class WebQnaController {
 
 	@ApiOperation(value = "고객센터 - 전체 조회")
 	@GetMapping
-	public ResponseEntity<CommonResponse> getQnaList(@RequestParam("title") Optional<String> title,
+	public ResponseEntity<CommonResponse> getQnaList(@RequestParam("searchText") Optional<String> searchText,
 			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period, Pageable pageable) {
 
-		WebQnaAdminResponseDto webQnaAdmin = webQnaService.getAdminQnaInfo(title.orElse("_"),
+		WebQnaAdminResponseDto webQnaAdmin = webQnaService.getAdminQnaInfo(searchText.orElse("_"),
 				period.orElse(SearchPeriod.ONEMONTH), pageable);
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, webQnaAdmin));

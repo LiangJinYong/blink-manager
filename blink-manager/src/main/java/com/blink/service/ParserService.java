@@ -1,5 +1,8 @@
 package com.blink.service;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -12,10 +15,40 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.blink.domain.data.BloodData;
+import com.blink.domain.data.BloodDataRepository;
+import com.blink.domain.data.BoneData;
+import com.blink.domain.data.BoneDataRepository;
+import com.blink.domain.data.CancerData;
+import com.blink.domain.data.CancerDataRepository;
+import com.blink.domain.data.CommentData;
+import com.blink.domain.data.CommentDataRepository;
+import com.blink.domain.data.ElderfunctionData;
+import com.blink.domain.data.ElderfunctionDataRepository;
+import com.blink.domain.data.HepatitisData;
+import com.blink.domain.data.HepatitisDataRepository;
+import com.blink.domain.data.InstrumentationData;
+import com.blink.domain.data.InstrumentationDataRepository;
+import com.blink.domain.data.MentalData;
+import com.blink.domain.data.MentalDataRepository;
+import com.blink.domain.data.RadiologyData;
+import com.blink.domain.data.RadiologyDataRepository;
+import com.blink.domain.data.SurveyData;
+import com.blink.domain.data.SurveyDataRepository;
+import com.blink.domain.data.UrineData;
+import com.blink.domain.data.UrineDataRepository;
 import com.blink.domain.user.UserData;
 import com.blink.domain.user.UserDataRepository;
+import com.blink.domain.user.UserExaminationEntireDataOfOne;
+import com.blink.domain.user.UserExaminationEntireDataOfOneRepository;
 import com.blink.domain.user.UserExaminationMetadata;
+import com.blink.domain.user.UserExaminationMetadataDetail;
+import com.blink.domain.user.UserExaminationMetadataDetailRepository;
 import com.blink.domain.user.UserExaminationMetadataRepository;
+import com.blink.enumeration.Gender;
+import com.blink.enumeration.InspectionSubType;
+import com.blink.enumeration.InspectionType;
+import com.blink.enumeration.Nationality;
 import com.blink.web.admin.web.dto.UserDataRequestDto;
 import com.blink.web.admin.web.dto.UserExaminationMetadataRequestDto;
 import com.blink.web.admin.web.dto.UserParserRequestDto;
@@ -29,42 +62,64 @@ public class ParserService {
 
 	private final UserDataRepository userDataRepository;
 	private final UserExaminationMetadataRepository userExaminationMetadataRepository;
-	
+
+	private final CancerDataRepository cancerDataRepository;
+	private final BloodDataRepository bloodDataRepository;
+	private final RadiologyDataRepository radiologyDataRepository;
+	private final UrineDataRepository urineDataRepository;
+	private final CommentDataRepository commentDataRepository;
+	private final InstrumentationDataRepository instrumentationDataRepository;
+	private final SurveyDataRepository surveyDataRepository;
+	private final HepatitisDataRepository hepatitisDataRepository;
+	private final MentalDataRepository mentalDataRepository;
+	private final BoneDataRepository boneDataRepository;
+	private final ElderfunctionDataRepository elderfunctionDataRepository;
+
+	private final UserExaminationEntireDataOfOneRepository userExaminationEntireDataOfOneRepository;
+	private final UserExaminationMetadataDetailRepository userExaminationMetadataDetailRepository;
+
 	public List<Map<String, Object>> save(List<UserParserRequestDto> userList) {
-		
+
 		List<Map<String, Object>> result = new ArrayList<>();
-		
-		for(UserParserRequestDto user: userList) {
+
+		for (UserParserRequestDto user : userList) {
 			UserDataRequestDto userDataDto = user.getUserData();
 			UserExaminationMetadataRequestDto userExaminationMetadataDto = user.getUserExaminationMetadata();
 			String phone = userDataDto.getPhone();
 			String ssnPartial = userDataDto.getSsnPartial();
-			
+
 			Optional<UserData> userData = null;
-			
+
 			if (!"".equals(phone) || phone == null) {
 				userData = userDataRepository.findByPhone(phone);
 			}
-			
+
 			if (userData != null && userData.isPresent()) {
-				
+
 				// 이름으로 한번 체크
-				Optional<UserData> userDataByName = userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
-				
-				// 없으면 
-				if (!userDataByName.isPresent()) {
+				Optional<UserData> userDataBySsn = userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
+
+				// 없으면
+				if (!userDataBySsn.isPresent()) {
 					Map<String, Object> map = new HashMap<>();
 					map.put("phone", phone);
 					map.put("ssnPartial", ssnPartial);
-					
+
 					result.add(map);
+				} else {
+					// update
+					UserDataRequestDto dto = user.getUserData();
+					String birthday = dto.getBirthday();
+					
+					userDataBySsn.get().update(dto.getName(), LocalDate.parse(birthday), Gender.values()[dto.getGender()], Nationality.values()[dto.getNationality()]);
 				}
-				
+
 				System.out.println("==> UserData 등록됨");
-				//userData 등록됨
+				// userData 등록됨
 				Integer examinationYear = userExaminationMetadataDto.getExaminationYear();
-				Optional<UserExaminationMetadata> userExaminationMetadata = userExaminationMetadataRepository.findByUserAndExaminationYear(userData, examinationYear);
-				
+				Optional<UserExaminationMetadata> userExaminationMetadata = userExaminationMetadataRepository
+						.findByUserAndExaminationYear(userData, examinationYear);
+
 				if (userExaminationMetadata.isPresent()) {
 					System.out.println("==> UserExaminationMetadata 업데이트");
 					// 기록 등록됨 -> 업데이트
@@ -75,31 +130,752 @@ public class ParserService {
 					Integer agreeSms = userExaminationMetadataDto.getAgreeSms();
 					Integer agreeVisit = userExaminationMetadataDto.getAgreeVisit();
 					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-					
-					userExaminationMetadata.get().update(agreeYn, LocalDate.parse(dateExamined, formatter), hospitalDataId, agreeMail, agreeSms, agreeVisit, examinationYear);
-					
+
+					userExaminationMetadata.get().update(agreeYn, LocalDate.parse(dateExamined, formatter),
+							hospitalDataId, agreeMail, agreeSms, agreeVisit, examinationYear);
+
 				} else {
 					// 기록 미동록
 					System.out.println("==> UserExaminationMetadata 미동록");
 					UserExaminationMetadata userExaminationMetadataEntity = userExaminationMetadataDto.toEntity();
 					userExaminationMetadataEntity.setUserData(userData.get());
-					
+
 					userExaminationMetadataRepository.save(userExaminationMetadataEntity);
 				}
 			} else {
 				System.out.println("==> UserData 미동록");
-				//userData 미등록
+				// userData 미등록
 				UserData userDataEntity = userDataDto.toEntity();
 				userDataEntity = userDataRepository.save(userDataEntity);
-				
+
 				UserExaminationMetadata userExaminationMetadataEntity = userExaminationMetadataDto.toEntity();
 				userExaminationMetadataEntity.setUserData(userDataEntity);
-				
+
 				userExaminationMetadataRepository.save(userExaminationMetadataEntity);
 			}
 		}
-		
+
 		return result;
 	}
 
+	public void entireSave(List<Map<String, Object>> param) {
+
+		for (Map<String, Object> map : param) {
+
+			Map<String, String> userDataMap = (Map<String, String>) map.get("userData");
+
+			String phone = userDataMap.get("phone");
+			String ssnPartial = userDataMap.get("ssnPartial");
+
+			Optional<UserData> userData = userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
+
+			if (userData.isPresent()) {
+				Integer examinationYear = Integer.parseInt((String) map.get("examinationYear"));
+				Integer inspectionType = Integer.parseInt((String) map.get("inspectionType"));
+				Integer inspectionSubType = Integer.parseInt((String) map.get("inspectionSubType"));
+
+				// DB에 해당 연도에 존재하는 metadata
+				Optional<UserExaminationMetadata> metadata = userExaminationMetadataRepository
+						.findByUserDataAndExaminationYear(userData.get(), examinationYear);
+
+				if (metadata.isPresent()) {
+					// update address
+					UserExaminationMetadata metadataEntity = metadata.get();
+					String userAddress = (String) map.get("userAddress");
+					metadataEntity.updateAddress(userAddress);
+
+					Optional<UserExaminationMetadataDetail> metadataDetail = userExaminationMetadataDetailRepository
+							.findByMetaDataAndExaminationYearAndType(metadataEntity.getId(), examinationYear,
+									inspectionType, inspectionSubType);
+
+					if (metadataDetail.isPresent()) {
+						saveMetadataDetail(map, metadata.get(), metadataDetail.get());
+					} else {
+						saveMetadataDetail(map, metadata.get(), null);
+					}
+
+					UserExaminationEntireDataOfOne dataOfOne = metadataEntity.getUserExaminationEntireDataOfOne();
+					dataOfOne = saveDataOfOne(map, dataOfOne, userData.get());
+
+					metadataEntity.setUserExaminationEntireDataOfOne(dataOfOne);
+				} else {
+					UserExaminationEntireDataOfOne newDataOfOne = saveDataOfOne(map, null, userData.get());
+					UserExaminationMetadata newMetaData = saveMetadata(map, newDataOfOne, userData.get());
+					saveMetadataDetail(map, newMetaData, null);
+				}
+			} else {
+				UserData newUserEntity = UserData.builder() //
+						.name("") //
+						.nationality(Nationality.Native) //
+						.phone(phone) //
+						.birthday(LocalDate.now()) //
+						.gender(Gender.MALE) //
+						.ssnPartial(ssnPartial) //
+						.build();
+
+				newUserEntity = userDataRepository.save(newUserEntity);
+
+				UserExaminationEntireDataOfOne newDataOfOne = saveDataOfOne(map, null, newUserEntity);
+				UserExaminationMetadata newMetaData = saveMetadata(map, newDataOfOne, newUserEntity);
+				saveMetadataDetail(map, newMetaData, null);
+			}
+		}
+	}
+
+	private void saveMetadataDetail(Map<String, Object> map, UserExaminationMetadata metadata,
+			UserExaminationMetadataDetail metadataDetail) {
+
+		String dateExamined = (String) map.get("dateExamined");
+		LocalDate dateExaminedDate = LocalDate.parse(dateExamined);
+
+		String inspectionType = (String) map.get("inspectionType");
+		String inspectionSubType = (String) map.get("inspectionSubType");
+
+		String doctorName = (String) map.get("doctorName");
+		String doctorLicenseNumber = (String) map.get("doctorLicenseNumber");
+		String inspectionPlace = (String) map.get("inspectionPlace");
+		String dateInterpreted = (String) map.get("dateInterpreted");
+		LocalDate dateInterpretedDate = null;
+		if (!"".equals(dateInterpreted)) {
+			dateInterpretedDate = LocalDate.parse(dateInterpreted);
+		}
+
+		if (metadataDetail == null) {
+			UserExaminationMetadataDetail metadataDetailEntity = UserExaminationMetadataDetail.builder() //
+					.userExaminationMetadata(metadata) //
+					.inspectionType(InspectionType.values()[Integer.parseInt(inspectionType)]) //
+					.inspectionSubType(InspectionSubType.values()[Integer.parseInt(inspectionSubType)]) //
+					.dateExamined(dateExaminedDate) //
+					.dateInterpreted(dateInterpretedDate) //
+					.doctorName(doctorName) //
+					.doctorLicenseNumber(doctorLicenseNumber) //
+					.inspectionPlace(inspectionPlace) //
+					.build();
+
+			metadataDetailEntity = userExaminationMetadataDetailRepository.save(metadataDetailEntity);
+		} else {
+			metadataDetail.updateDetailInfo(dateExaminedDate, inspectionPlace, doctorName, doctorLicenseNumber,
+					dateInterpretedDate);
+		}
+	}
+
+	private UserExaminationMetadata saveMetadata(Map<String, Object> map, UserExaminationEntireDataOfOne dataOfOne,
+			UserData userData) {
+		String address = (String) map.get("userAddress");
+		String dateExamined = (String) map.get("dateExamined");
+		LocalDate dateExaminedDate = LocalDate.parse(dateExamined);
+		String examinationYear = (String) map.get("examinationYear");
+		String hospitalDataId = (String) map.get("hospitalDataId");
+
+		UserExaminationMetadata userExaminationMetadataEntity = UserExaminationMetadata.builder() //
+				.userData(userData) //
+				.examinationYear(Integer.parseInt(examinationYear)) //
+				.dateExamined(dateExaminedDate) //
+				.hospitalDataId(Long.parseLong(hospitalDataId)) //
+				.address(address) //
+				.userExaminationEntireDataOfOne(dataOfOne) //
+				.build();
+
+		userExaminationMetadataEntity = userExaminationMetadataRepository.save(userExaminationMetadataEntity);
+
+		System.out.println("userExaminationMetadata: " + userExaminationMetadataEntity.getId());
+		return userExaminationMetadataEntity;
+	}
+
+	private UserExaminationEntireDataOfOne saveDataOfOne(Map<String, Object> map,
+			UserExaminationEntireDataOfOne dataOfOne, UserData userData) {
+		Map<String, Map<String, String>> dataItem = (Map<String, Map<String, String>>) map
+				.get("userExaminationEntireDataOfOne");
+
+		if (dataOfOne == null) {
+			dataOfOne = new UserExaminationEntireDataOfOne();
+
+			// cancerData
+			CancerData cancerData = insertCancerData(dataItem);
+			dataOfOne.setCancerData(cancerData);
+
+			// bloodData
+			BloodData bloodDataEntity = insertBloodData(dataItem);
+			dataOfOne.setBloodData(bloodDataEntity);
+
+			// radiologyData
+			RadiologyData radiologyDataEntity = insertRadiologyData(dataItem);
+			dataOfOne.setRadiologyData(radiologyDataEntity);
+
+			// urineData
+			UrineData UrineDataEntity = insertUrineData(dataItem);
+			dataOfOne.setUrineData(UrineDataEntity);
+
+			// commentData
+			CommentData commentDataEntity = insertCommentData(dataItem);
+			dataOfOne.setCommentData(commentDataEntity);
+
+			// instrumentationData
+			InstrumentationData instrumentationDataEntity = insertInstrumentationData(dataItem);
+			dataOfOne.setInstrumentationData(instrumentationDataEntity);
+
+			// surveyData
+			SurveyData surveyDataEntity = insertSurveyData(dataItem);
+			dataOfOne.setSurveyData(surveyDataEntity);
+
+			// hepatitisData
+			HepatitisData hepatitisDataEntity = insertHepatitisData(dataItem);
+			dataOfOne.setHepatitisData(hepatitisDataEntity);
+
+			// mentalData
+			MentalData mentalDataEntity = insertMentalData(dataItem);
+			dataOfOne.setMentalData(mentalDataEntity);
+
+			// boneData
+			BoneData boneDataEntity = insertBoneData(dataItem);
+			dataOfOne.setBoneData(boneDataEntity);
+
+			// elderfunctionData
+			ElderfunctionData elderfunctionDataEntity = insertElderfunctionData(dataItem);
+			dataOfOne.setElderfunctionData(elderfunctionDataEntity);
+
+			String examinationYearString = (String) map.get("examinationYear");
+			dataOfOne.setExaminationYear(Integer.parseInt(examinationYearString));
+			dataOfOne.setUserData(userData);
+			userExaminationEntireDataOfOneRepository.save(dataOfOne);
+		} else {
+
+			CancerData cancerData = dataOfOne.getCancerData();
+
+			if (cancerData == null) {
+				CancerData cancerDataEntity = insertCancerData(dataItem);
+				dataOfOne.setCancerData(cancerDataEntity);
+			} else {
+				updateCancerData(map, cancerData);
+			}
+
+			BloodData bloodData = dataOfOne.getBloodData();
+
+			if (bloodData == null) {
+				BloodData bloodDataEntity = insertBloodData(dataItem);
+				dataOfOne.setBloodData(bloodDataEntity);
+			} else {
+				updateBloodData(dataItem, bloodData);
+			}
+
+			RadiologyData radiologyData = dataOfOne.getRadiologyData();
+
+			if (radiologyData == null) {
+				RadiologyData radiologyDataEntity = insertRadiologyData(dataItem);
+				dataOfOne.setRadiologyData(radiologyDataEntity);
+			} else {
+				updateRadiologyData(dataItem, radiologyData);
+			}
+
+			UrineData urineData = dataOfOne.getUrineData();
+
+			if (urineData == null) {
+				UrineData UrineDataEntity = insertUrineData(dataItem);
+				dataOfOne.setUrineData(UrineDataEntity);
+			} else {
+				updateUrineData(dataItem, urineData);
+			}
+
+			CommentData commentData = dataOfOne.getCommentData();
+
+			if (commentData == null) {
+				CommentData commentDataEntity = insertCommentData(dataItem);
+				dataOfOne.setCommentData(commentDataEntity);
+			} else {
+				updateCommentData(dataItem, commentData);
+			}
+
+			InstrumentationData instrumentationData = dataOfOne.getInstrumentationData();
+
+			if (instrumentationData == null) {
+				InstrumentationData instrumentationDataEntity = insertInstrumentationData(dataItem);
+				dataOfOne.setInstrumentationData(instrumentationDataEntity);
+			} else {
+				updateInstrumentationData(dataItem, instrumentationData);
+			}
+
+			SurveyData surveyData = dataOfOne.getSurveyData();
+
+			if (surveyData == null) {
+				SurveyData surveyDataEntity = insertSurveyData(dataItem);
+				dataOfOne.setSurveyData(surveyDataEntity);
+			} else {
+				updateSurveyData(dataItem, surveyData);
+			}
+
+			HepatitisData hepatitisData = dataOfOne.getHepatitisData();
+
+			if (hepatitisData == null) {
+				HepatitisData hepatitisDataEntity = insertHepatitisData(dataItem);
+				dataOfOne.setHepatitisData(hepatitisDataEntity);
+			} else {
+				updateHepatitisData(dataItem, hepatitisData);
+			}
+
+			MentalData mentalData = dataOfOne.getMentalData();
+
+			if (mentalData == null) {
+				MentalData mentalDataEntity = insertMentalData(dataItem);
+				dataOfOne.setMentalData(mentalDataEntity);
+			} else {
+				updateMentalData(dataItem, mentalData);
+			}
+
+			BoneData boneData = dataOfOne.getBoneData();
+
+			if (boneData == null) {
+				BoneData boneDataEntity = insertBoneData(dataItem);
+				dataOfOne.setBoneData(boneDataEntity);
+			} else {
+				updateBoneData(dataItem, boneData);
+			}
+
+			ElderfunctionData elderfunctionData = dataOfOne.getElderfunctionData();
+
+			if (elderfunctionData == null) {
+				ElderfunctionData elderfunctionDataEntity = insertElderfunctionData(dataItem);
+				dataOfOne.setElderfunctionData(elderfunctionDataEntity);
+			} else {
+				updateElderfunctionData(dataItem, elderfunctionData);
+			}
+		}
+
+		System.out.println("userExaminationEntireDataOfOne: " + dataOfOne.getId());
+		return dataOfOne;
+	}
+
+	private CancerData insertCancerData(Map<String, Map<String, String>> dataItem) {
+		Map<String, String> cancerDataItem = dataItem.get("cancerData");
+
+		if (cancerDataItem != null) {
+			CancerData cancerData = CancerData.builder() //
+					.cancerWombInspectionItems(cancerDataItem.get("cancerWombInspectionItems")) //
+					.cancerWombResult(cancerDataItem.get("cancerWombResult")) //
+					.cancerWombDecision(cancerDataItem.get("cancerWombDecision")) //
+					.cancerWombRecommendedText(cancerDataItem.get("cancerWombRecommendedText")) //
+					.cancerLiverInspectionItems(cancerDataItem.get("cancerLiverInspectionItems")) //
+					.cancerLiverResult(cancerDataItem.get("cancerLiverResult")) //
+					.cancerLiverDecision(cancerDataItem.get("cancerLiverDecision")) //
+					.cancerLiverRecommendedText(cancerDataItem.get("cancerLiverRecommendedText")) //
+					.cancerStomachInspectionItems(cancerDataItem.get("cancerStomachInspectionItems")) //
+					.cancerStomachResult(cancerDataItem.get("cancerStomachResult")) //
+					.cancerStomachDecision(cancerDataItem.get("cancerStomachDecision")) //
+					.cancerStomachRecommendedText(cancerDataItem.get("cancerStomachRecommendedText")) //
+					.cancerColonInspectionItems(cancerDataItem.get("cancerColonInspectionItems")) //
+					.cancerColonResult(cancerDataItem.get("cancerColonResult")) //
+					.cancerColonDecision(cancerDataItem.get("cancerColonDecision")) //
+					.cancerColonRecommendedText(cancerDataItem.get("cancerColonRecommendedText")) //
+					.cancerBreastInspectionItems(cancerDataItem.get("cancerBreastInspectionItems")) //
+					.cancerBreastResult(cancerDataItem.get("cancerBreastResult")) //
+					.cancerBreastDecision(cancerDataItem.get("cancerBreastDecision")) //
+					.cancerBreastRecommendedText(cancerDataItem.get("cancerBreastRecommendedText")) //
+					.cancerLiverSecondInspectionItems(cancerDataItem.get("cancerLiverSecondInspectionItems")) //
+					.cancerLiverSecondResult(cancerDataItem.get("cancerLiverSecondResult")) //
+					.cancerLiverSecondDecision(cancerDataItem.get("cancerLiverSecondDecision")) //
+					.cancerLiverSecondRecommendedText(cancerDataItem.get("cancerLiverSecondRecommendedText")) //
+					.cancerLungInspectionItems(cancerDataItem.get("cancerLungInspectionItems")) //
+					.cancerLungResult(cancerDataItem.get("cancerLungResult")) //
+					.cancerLungDecision(cancerDataItem.get("cancerLungDecision")) //
+					.cancerLungRecommendedText(cancerDataItem.get("cancerLungRecommendedText")) //
+					.cancerColonSecondInspectionItems(cancerDataItem.get("cancerColonSecondInspectionItems")) //
+					.cancerColonSecondResult(cancerDataItem.get("cancerColonSecondResult")) //
+					.cancerColonSecondDecision(cancerDataItem.get("cancerColonSecondDecision")) //
+					.cancerColonSecondRecommendedText(cancerDataItem.get("cancerColonSecondRecommendedText")) //
+					.build();
+
+			cancerData = cancerDataRepository.save(cancerData);
+			return cancerData;
+		}
+
+		return null;
+	}
+
+	private void updateCancerData(Map<String, Object> map, CancerData cancerData) {
+		Map<String, Object> dataItem = (Map<String, Object>) map.get("userExaminationEntireDataOfOne");
+
+		Map<String, String> cancerDataItem = (Map<String, String>) dataItem.get("cancerData");
+
+		if (cancerDataItem != null) {
+			String inspectionType = (String) map.get("inspectionType");
+			String inspectionSubType = (String) map.get("inspectionSubType");
+
+			if ("3".equals(inspectionType) && "4".equals(inspectionSubType)) {
+				cancerData.setCancerWombDecision(cancerDataItem.get("cancerWombDecision"));
+				cancerData.setCancerWombInspectionItems(cancerDataItem.get("cancerWombInspectionItems"));
+				cancerData.setCancerWombRecommendedText(cancerDataItem.get("cancerWombRecommendedText"));
+				cancerData.setCancerWombResult(cancerDataItem.get("cancerWombResult"));
+			} else if ("3".equals(inspectionType) && "5".equals(inspectionSubType)) {
+				cancerData.setCancerStomachDecision(cancerDataItem.get("cancerStomachDecision"));
+				cancerData.setCancerStomachInspectionItems(cancerDataItem.get("cancerStomachInspectionItems"));
+				cancerData.setCancerStomachRecommendedText(cancerDataItem.get("cancerStomachRecommendedText"));
+				cancerData.setCancerStomachResult(cancerDataItem.get("cancerStomachResult"));
+			} else if ("3".equals(inspectionType) && "6".equals(inspectionSubType)) {
+				cancerData.setCancerColonDecision(cancerDataItem.get("cancerColonDecision"));
+				cancerData.setCancerColonInspectionItems(cancerDataItem.get("cancerColonInspectionItems"));
+				cancerData.setCancerColonRecommendedText(cancerDataItem.get("cancerColonRecommendedText"));
+				cancerData.setCancerColonResult(cancerDataItem.get("cancerColonResult"));
+			} else if ("3".equals(inspectionType) && "7".equals(inspectionSubType)) {
+				cancerData.setCancerBreastDecision(cancerDataItem.get("cancerBreastDecision"));
+				cancerData.setCancerBreastInspectionItems(cancerDataItem.get("cancerBreastInspectionItems"));
+				cancerData.setCancerBreastRecommendedText(cancerDataItem.get("cancerBreastRecommendedText"));
+				cancerData.setCancerBreastResult(cancerDataItem.get("cancerBreastResult"));
+			} else if ("3".equals(inspectionType) && "8".equals(inspectionSubType)) {
+				cancerData.setCancerLiverDecision(cancerDataItem.get("cancerLiverDecision"));
+				cancerData.setCancerLiverInspectionItems(cancerDataItem.get("cancerLiverInspectionItems"));
+				cancerData.setCancerLiverRecommendedText(cancerDataItem.get("cancerLiverRecommendedText"));
+				cancerData.setCancerLiverResult(cancerDataItem.get("cancerLiverResult"));
+			} else if ("3".equals(inspectionType) && "9".equals(inspectionSubType)) {
+				cancerData.setCancerLiverSecondDecision(cancerDataItem.get("cancerLiverSecondDecision"));
+				cancerData.setCancerLiverSecondInspectionItems(cancerDataItem.get("cancerLiverSecondInspectionItems"));
+				cancerData.setCancerLiverSecondRecommendedText(cancerDataItem.get("cancerLiverSecondRecommendedText"));
+				cancerData.setCancerLiverSecondResult(cancerDataItem.get("cancerLiverSecondResult"));
+			} else if ("3".equals(inspectionType) && "10".equals(inspectionSubType)) {
+				cancerData.setCancerLungDecision(cancerDataItem.get("cancerLungDecision"));
+				cancerData.setCancerLungInspectionItems(cancerDataItem.get("cancerLungInspectionItems"));
+				cancerData.setCancerLungRecommendedText(cancerDataItem.get("cancerLungRecommendedText"));
+				cancerData.setCancerLungResult(cancerDataItem.get("cancerLungResult"));
+			} else if ("3".equals(inspectionType) && "11".equals(inspectionSubType)) {
+				cancerData.setCancerColonDecision(cancerDataItem.get("cancerColonDecision"));
+				cancerData.setCancerColonSecondDecision(cancerDataItem.get("cancerColonSecondDecision"));
+				cancerData.setCancerColonSecondInspectionItems(cancerDataItem.get("cancerColonSecondInspectionItems"));
+				cancerData.setCancerColonSecondRecommendedText(cancerDataItem.get("cancerColonSecondRecommendedText"));
+				cancerData.setCancerColonSecondResult(cancerDataItem.get("cancerColonSecondResult"));
+			}
+		}
+	}
+
+	private BloodData insertBloodData(Map<String, Map<String, String>> dataItem) {
+		Map<String, String> bloodDataItem = dataItem.get("bloodData");
+
+		if (bloodDataItem != null) {
+			BloodData bloodData = BloodData.builder() //
+					.hemoglobin(bloodDataItem.get("hemoglobin")) //
+					.hemoglobinResult(bloodDataItem.get("hemoglobinResult")) //
+					.fastingGlucose(bloodDataItem.get("fastingGlucose")) //
+					.fastingGlucoseResult(bloodDataItem.get("fastingGlucoseResult")) //
+					.lipidResult(bloodDataItem.get("lipidResult")) //
+					.totalCholesterol(bloodDataItem.get("totalCholesterol")) //
+					.hdlCholesterol(bloodDataItem.get("hdlCholesterol")) //
+					.triglyceride(bloodDataItem.get("triglyceride")) //
+					.ldlCholesterol(bloodDataItem.get("ldlCholesterol")) //
+					.renalDiseaseResult(bloodDataItem.get("renalDiseaseResult")) //
+					.creatinine(bloodDataItem.get("creatinine")) //
+					.eGfr(bloodDataItem.get("egfr")) //
+					.liverDiseaseResult(bloodDataItem.get("liverDiseaseResult")) //
+					.alt(bloodDataItem.get("alt")) //
+					.ast(bloodDataItem.get("ast")) //
+					.gammaGtp(bloodDataItem.get("gammaGtp")) //
+					.build();
+			bloodData = bloodDataRepository.save(bloodData);
+			return bloodData;
+		}
+		return null;
+	}
+
+	private void updateBloodData(Map<String, Map<String, String>> dataItem, BloodData bloodData) {
+		Map<String, String> bloodDataItem = dataItem.get("bloodData");
+
+		if (bloodDataItem != null) {
+			bloodData.setAlt(bloodDataItem.get("alt"));
+			bloodData.setAst(bloodDataItem.get("ast"));
+			bloodData.setCreatinine(bloodDataItem.get("creatinine"));
+			bloodData.setEGfr(bloodDataItem.get("eGfr"));
+			bloodData.setFastingGlucose(bloodDataItem.get("fastingGlucose"));
+			bloodData.setFastingGlucoseResult(bloodDataItem.get("fastingGlucoseResult"));
+			bloodData.setGammaGtp(bloodDataItem.get("gammaGtp"));
+			bloodData.setHdlCholesterol(bloodDataItem.get("hdlCholesterol"));
+			bloodData.setHemoglobin(bloodDataItem.get("hemoglobin"));
+			bloodData.setHemoglobinResult(bloodDataItem.get("hemoglobinResult"));
+			bloodData.setLdlCholesterol(bloodDataItem.get("ldlCholesterol"));
+			bloodData.setLipidResult(bloodDataItem.get("lipidResult"));
+			bloodData.setLiverDiseaseResult(bloodDataItem.get("liverDiseaseResult"));
+			bloodData.setRenalDiseaseResult(bloodDataItem.get("renalDiseaseResult"));
+			bloodData.setTotalCholesterol(bloodDataItem.get("totalCholesterol"));
+			bloodData.setTriglyceride(bloodDataItem.get("triglyceride"));
+		}
+	}
+
+	private RadiologyData insertRadiologyData(Map<String, Map<String, String>> dataItem) {
+		Map<String, String> radiologyDataItem = dataItem.get("radiologyData");
+
+		if (radiologyDataItem != null) {
+			RadiologyData radiologyData = RadiologyData.builder() //
+					.chestXRay(radiologyDataItem.get("chestXRay")) //
+					.chestXRayResult(radiologyDataItem.get("chestXRayResult")) //
+					.build();
+
+			radiologyData = radiologyDataRepository.save(radiologyData);
+			return radiologyData;
+		}
+		return null;
+	}
+
+	private void updateRadiologyData(Map<String, Map<String, String>> dataItem, RadiologyData radiologyData) {
+		Map<String, String> radiologyDataItem = dataItem.get("radiologyData");
+
+		if (radiologyDataItem != null) {
+			radiologyData.setChestXRay(radiologyDataItem.get("chestXRay"));
+			radiologyData.setChestXRayResult(radiologyDataItem.get("chestXRayResult"));
+		}
+	}
+
+	private UrineData insertUrineData(Map<String, Map<String, String>> dataItem) {
+		Map<String, String> urineDataItem = dataItem.get("urineData");
+
+		if (urineDataItem != null) {
+			UrineData urineData = UrineData.builder() //
+					.urineProtein(urineDataItem.get("urineProtein")) //
+					.build();
+			urineData = urineDataRepository.save(urineData);
+			return urineData;
+		}
+		return null;
+	}
+
+	private void updateUrineData(Map<String, Map<String, String>> dataItem, UrineData urineData) {
+		Map<String, String> urineDataItem = dataItem.get("urineData");
+
+		if (urineDataItem != null) {
+			urineData.setUrineProtein(urineDataItem.get("urineProtein"));
+		}
+	}
+
+	private CommentData insertCommentData(Map<String, Map<String, String>> dataItem) {
+		Map<String, String> commentDataItem = dataItem.get("commentData");
+
+		if (commentDataItem != null) {
+			CommentData commentData = CommentData.builder() //
+					.finalInterpretation(commentDataItem.get("finalInterpretation")) //
+					.suspiciousDisease(commentDataItem.get("suspiciousDisease")) //
+					.existingDisease(commentDataItem.get("existingDisease")) //
+					.howLifeHabitManagement(commentDataItem.get("howLifeHabitManagement")) //
+					.otherComments(commentDataItem.get("otherComments")) //
+					.build();
+			commentData = commentDataRepository.save(commentData);
+
+			return commentData;
+		}
+
+		return null;
+	}
+
+	private void updateCommentData(Map<String, Map<String, String>> dataItem, CommentData commentData) {
+		Map<String, String> commentDataItem = dataItem.get("commentData");
+
+		if (commentDataItem != null) {
+			commentData.setExistingDisease(commentDataItem.get("existingDisease"));
+			commentData.setFinalInterpretation(commentDataItem.get("finalInterpretation"));
+			commentData.setHowLifeHabitManagement(commentDataItem.get("howLifeHabitManagement"));
+			commentData.setOtherComments(commentDataItem.get("otherComments"));
+		}
+	}
+
+	private InstrumentationData insertInstrumentationData(Map<String, Map<String, String>> dataItem) {
+		Map<String, String> instrumentationDataItem = dataItem.get("instrumentationData");
+
+		if (instrumentationDataItem != null) {
+			InstrumentationData instrumentationData = InstrumentationData.builder() //
+					.height(instrumentationDataItem.get("height")) //
+					.weight(instrumentationDataItem.get("weight")) //
+					.bmi(instrumentationDataItem.get("bmi")) //
+					.bmiResult(instrumentationDataItem.get("bmiResult")) //
+					.waistCircumference(instrumentationDataItem.get("waistCircumference")) //
+					.waistCircumferenceResult(instrumentationDataItem.get("waistCircumferenceResult")) //
+					.visionLeft(instrumentationDataItem.get("visionLeft")) //
+					.visionRight(instrumentationDataItem.get("visionRight")) //
+					.visionCorrection(instrumentationDataItem.get("visionCorrection")) //
+					.hearingLeft(instrumentationDataItem.get("hearingLeft")) //
+					.hearingRight(instrumentationDataItem.get("hearingRight")) //
+					.hearingResult(instrumentationDataItem.get("hearingResult")) //
+					.bloodPressureResult(instrumentationDataItem.get("bloodPressureResult")) //
+					.systolicBloodPressure(instrumentationDataItem.get("systolicBloodPressure")) //
+					.diastolicBloodPressure(instrumentationDataItem.get("diastolicBloodPressure")) //
+					.build();
+			instrumentationData = instrumentationDataRepository.save(instrumentationData);
+			return instrumentationData;
+		}
+
+		return null;
+	}
+
+	private void updateInstrumentationData(Map<String, Map<String, String>> dataItem,
+			InstrumentationData instrumentationData) {
+		Map<String, String> instrumentationDataItem = dataItem.get("instrumentationData");
+
+		if (instrumentationDataItem != null) {
+			instrumentationData.setHeight(instrumentationDataItem.get("height"));
+			instrumentationData.setWeight(instrumentationDataItem.get("weight"));
+			instrumentationData.setBmi(instrumentationDataItem.get("bmi"));
+			instrumentationData.setBmiResult(instrumentationDataItem.get("bmiResult"));
+			instrumentationData.setWaistCircumference(instrumentationDataItem.get("waistCircumference"));
+			instrumentationData.setWaistCircumferenceResult(instrumentationDataItem.get("waistCircumferenceResult"));
+			instrumentationData.setVisionLeft(instrumentationDataItem.get("visionLeft"));
+			instrumentationData.setVisionRight(instrumentationDataItem.get("visionRight"));
+			instrumentationData.setVisionCorrection(instrumentationDataItem.get("visionCorrection"));
+			instrumentationData.setHearingLeft(instrumentationDataItem.get("hearingLeft"));
+			instrumentationData.setHearingRight(instrumentationDataItem.get("hearingRight"));
+			instrumentationData.setHearingResult(instrumentationDataItem.get("hearingResult"));
+			instrumentationData.setBloodPressureResult(instrumentationDataItem.get("bloodPressureResult"));
+			instrumentationData.setSystolicBloodPressure(instrumentationDataItem.get("systolicBloodPressure"));
+			instrumentationData.setDiastolicBloodPressure(instrumentationDataItem.get("diastolicBloodPressure"));
+		}
+	}
+
+	private SurveyData insertSurveyData(Map<String, Map<String, String>> dataItem) {
+		Map<String, String> surveyDataItem = dataItem.get("surveyData");
+
+		if (surveyDataItem != null) {
+			SurveyData surveyData = SurveyData.builder() //
+					.pastDiseaseHistory(surveyDataItem.get("pastDiseaseHistory")) //
+					.nowDrugTreatment(surveyDataItem.get("nowDrugTreatment")) //
+					.recommendationsForLifeStyle(surveyDataItem.get("recommendationsForLifeStyle")) //
+					.build();
+
+			surveyData = surveyDataRepository.save(surveyData);
+			return surveyData;
+		}
+
+		return null;
+	}
+
+	private void updateSurveyData(Map<String, Map<String, String>> dataItem, SurveyData surveyData) {
+		Map<String, String> surveyDataItem = dataItem.get("surveyData");
+
+		if (surveyDataItem != null) {
+			surveyData.setPastDiseaseHistory(surveyDataItem.get("pastDiseaseHistory"));
+			surveyData.setNowDrugTreatment(surveyDataItem.get("nowDrugTreatment"));
+			surveyData.setRecommendationsForLifeStyle(surveyDataItem.get("recommendationsForLifeStyle"));
+		}
+	}
+
+	private HepatitisData insertHepatitisData(Map<String, Map<String, String>> dataItem) {
+		Map<String, String> hepatitisDataItem = dataItem.get("hepatitisData");
+
+		if (hepatitisDataItem != null) {
+			HepatitisData hepatitisData = HepatitisData.builder() //
+					.hepatitisbInspection(hepatitisDataItem.get("hepatitisbInspection")) //
+					.hepatitisbSurfaceAntibody(hepatitisDataItem.get("hepatitisbSurfaceAntibody")) //
+					.hepatitisbSurfaceAntigen(hepatitisDataItem.get("hepatitisbSurfaceAntigen")) //
+					.hepatitisbResult(hepatitisDataItem.get("hepatitisbResult")) //
+					.build();
+			hepatitisData = hepatitisDataRepository.save(hepatitisData);
+
+			return hepatitisData;
+		}
+		return null;
+	}
+
+	private void updateHepatitisData(Map<String, Map<String, String>> dataItem, HepatitisData hepatitisData) {
+		Map<String, String> hepatitisDataItem = dataItem.get("hepatitisData");
+
+		if (hepatitisDataItem != null) {
+			hepatitisData.setHepatitisbInspection(hepatitisDataItem.get("hepatitisbInspection"));
+			hepatitisData.setHepatitisbResult(hepatitisDataItem.get("hepatitisbResult"));
+			hepatitisData.setHepatitisbSurfaceAntibody(hepatitisDataItem.get("hepatitisbSurfaceAntibody"));
+			hepatitisData.setHepatitisbSurfaceAntigen(hepatitisDataItem.get("hepatitisbSurfaceAntigen"));
+		}
+	}
+
+	private MentalData insertMentalData(Map<String, Map<String, String>> dataItem) {
+
+		Map<String, String> mentalDataItem = dataItem.get("mentalData");
+
+		if (mentalDataItem != null) {
+			MentalData mentalData = MentalData.builder() //
+					.depressiveDisorderInspection(mentalDataItem.get("depressiveDisorderInspection")) //
+					.depressiveDisorderResult(mentalDataItem.get("depressiveDisorderResult")) //
+					.cognitiveImpairmentInspection(mentalDataItem.get("cognitiveImpairmentInspection")) //
+					.cognitiveImpairmentResult(mentalDataItem.get("cognitiveImpairmentResult")) //
+					.build();
+			mentalData = mentalDataRepository.save(mentalData);
+
+			return mentalData;
+		}
+
+		return null;
+	}
+
+	private void updateMentalData(Map<String, Map<String, String>> dataItem, MentalData mentalData) {
+		Map<String, String> mentalDataItem = dataItem.get("mentalData");
+
+		if (mentalDataItem != null) {
+			mentalData.setDepressiveDisorderInspection(mentalDataItem.get("depressiveDisorderInspection"));
+			mentalData.setDepressiveDisorderResult(mentalDataItem.get("depressiveDisorderResult"));
+			mentalData.setCognitiveImpairmentInspection(mentalDataItem.get("cognitiveImpairmentInspection"));
+			mentalData.setCognitiveImpairmentResult(mentalDataItem.get("cognitiveImpairmentResult"));
+		}
+	}
+
+	private BoneData insertBoneData(Map<String, Map<String, String>> dataItem) {
+		Map<String, String> boneDataItem = dataItem.get("boneData");
+
+		if (boneDataItem != null) {
+			BoneData boneData = BoneData.builder() //
+					.boneDensityInspection(boneDataItem.get("boneDensityInspection")) //
+					.boneDensityValue(boneDataItem.get("boneDensityValue")) //
+					.boneDensityResult(boneDataItem.get("boneDensityResult")) //
+					.build();
+			boneData = boneDataRepository.save(boneData);
+
+			return boneData;
+		}
+		return null;
+	}
+
+	private void updateBoneData(Map<String, Map<String, String>> dataItem, BoneData boneData) {
+		Map<String, String> boneDataItem = dataItem.get("boneData");
+
+		if (boneDataItem != null) {
+			boneData.setBoneDensityInspection(boneDataItem.get("boneDensityInspection"));
+			boneData.setBoneDensityValue(boneDataItem.get("boneDensityValue"));
+			boneData.setBoneDensityResult(boneDataItem.get("boneDensityResult"));
+		}
+	}
+
+	private ElderfunctionData insertElderfunctionData(Map<String, Map<String, String>> dataItem) {
+		Map<String, String> elderfunctionDataItem = dataItem.get("elderfunctionData");
+
+		if (elderfunctionDataItem != null) {
+			ElderfunctionData elderfunctionData = ElderfunctionData.builder() //
+					.physicalFunctionTestForElderInspection(
+							elderfunctionDataItem.get("physicalFunctionTestForElderInspection")) //
+					.physicalFunctionTestForElderResult(elderfunctionDataItem.get("physicalFunctionTestForElderResult")) //
+					.assessmentOfFunctionalStatusOfElderInspection(
+							elderfunctionDataItem.get("assessmentOfFunctionalStatusOfElderInspection")) //
+					.assessmentOfFallingOfElderResult(elderfunctionDataItem.get("assessmentOfFallingOfElderResult")) //
+					.assessmentOfActivitiesForDailyLivingOfElderResult(
+							elderfunctionDataItem.get("assessmentOfActivitiesForDailyLivingOfElderResult")) //
+					.assessmentOfVaccinationOfElderResult(
+							elderfunctionDataItem.get("assessmentOfVaccinationOfElderResult")) //
+					.assessmentOfDysuresiaOfElderResult(elderfunctionDataItem.get("assessmentOfDysuresiaOfElderResult")) //
+					.build();
+			elderfunctionData = elderfunctionDataRepository.save(elderfunctionData);
+
+			return elderfunctionData;
+		}
+
+		return null;
+	}
+
+	private void updateElderfunctionData(Map<String, Map<String, String>> dataItem,
+			ElderfunctionData elderfunctionData) {
+		Map<String, String> elderfunctionDataItem = dataItem.get("elderfunctionData");
+
+		if (elderfunctionDataItem != null) {
+			elderfunctionData.setPhysicalFunctionTestForElderInspection(
+					elderfunctionDataItem.get("physicalFunctionTestForElderInspection"));
+			elderfunctionData.setPhysicalFunctionTestForElderResult(
+					elderfunctionDataItem.get("physicalFunctionTestForElderResult"));
+			elderfunctionData.setAssessmentOfFunctionalStatusOfElderInspection(
+					elderfunctionDataItem.get("assessmentOfFunctionalStatusOfElderInspection"));
+			elderfunctionData
+					.setAssessmentOfFallingOfElderResult(elderfunctionDataItem.get("assessmentOfFallingOfElderResult"));
+			elderfunctionData.setAssessmentOfActivitiesForDailyLivingOfElderResult(
+					elderfunctionDataItem.get("assessmentOfActivitiesForDailyLivingOfElderResult"));
+			elderfunctionData.setAssessmentOfVaccinationOfElderResult(
+					elderfunctionDataItem.get("assessmentOfVaccinationOfElderResult"));
+			elderfunctionData.setAssessmentOfDysuresiaOfElderResult(
+					elderfunctionDataItem.get("assessmentOfDysuresiaOfElderResult"));
+		}
+	}
 }

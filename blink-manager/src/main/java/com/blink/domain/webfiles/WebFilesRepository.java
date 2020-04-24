@@ -19,10 +19,10 @@ public interface WebFilesRepository extends JpaRepository<WebFiles, Long> {
 
 	Optional<WebFiles> findByGroupIdAndFileId(String groupId, Integer fileId);
 
-	@Query("SELECT MAX(wf.fileId) FROM WebFiles wf where wf.groupId = :groupId")
+	@Query(value = "SELECT IFNULL(MAX(wf.file_id), 0) FROM web_files wf WHERE wf.group_id = :groupId", nativeQuery = true)
 	int findMaxFileIdByGroupId(@Param("groupId") String groupId);
 
 	@Modifying
-	@Query(value="DELETE FROM web_files WHERE group_id = :groupId", nativeQuery=true)
+	@Query(value = "DELETE FROM web_files WHERE group_id = :groupId", nativeQuery = true)
 	void deleteByGroupId(@Param("groupId") String groupId);
 }

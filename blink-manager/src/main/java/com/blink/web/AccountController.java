@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.blink.common.CommonResponse;
 import com.blink.common.CommonResultCode;
 import com.blink.service.AccountService;
+import com.blink.service.JoinContactService;
 import com.blink.util.CommonUtils;
 import com.blink.util.JwtUtil;
 import com.blink.web.admin.web.dto.UserSignupRequestDto;
@@ -32,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class AccountController {
 
 	private final AccountService accountService;
+	private final JoinContactService joinContactService;
 
 	private final JwtUtil jwtUtil;
 
@@ -195,6 +197,19 @@ public class AccountController {
 		} else {
 			return ResponseEntity.ok(new CommonResponse(CommonResultCode.AUTH_CODE_NOT_EQUAL));
 		}
+	}
+	
+	@ApiOperation(value = "제휴문의 - 리스트 가져오기")
+	@PostMapping("/question")
+	public ResponseEntity<CommonResponse> saveQuestion(@RequestParam("clinicName") String clinicName,
+			@RequestParam("email") String email,
+			@RequestParam("name") String name,
+			@RequestParam("tel") String tel,
+			@RequestParam("inquiry") String inquiry,
+			@RequestParam("usedProgram") String usedProgram) {
+		
+		joinContactService.saveQuestion(clinicName, email, name, tel, inquiry, usedProgram);
+		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 	}
 }
 	

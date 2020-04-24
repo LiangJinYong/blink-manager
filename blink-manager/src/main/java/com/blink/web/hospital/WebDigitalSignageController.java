@@ -1,6 +1,5 @@
 package com.blink.web.hospital;
 
-import java.security.Principal;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -44,10 +43,10 @@ public class WebDigitalSignageController {
 	
 	@ApiOperation(value = "사아니지 - 해당 병원 질문 조회")
 	@GetMapping("/{hospitalId}")
-	public ResponseEntity<CommonResponse> getQnaList(@PathVariable("hospitalId") Long hospitalId, @RequestParam("title") Optional<String> title,
+	public ResponseEntity<CommonResponse> getQnaList(@PathVariable("hospitalId") Long hospitalId, @RequestParam("searchText") Optional<String> searchText,
 			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period, Pageable pageable) {
 
-		Page<WebDigitalSignageResponseDto> webDigitalSignageList = webDigitalSignageService.getHospitalDigitalSignageList(hospitalId, title.orElse("_"),
+		Page<WebDigitalSignageResponseDto> webDigitalSignageList = webDigitalSignageService.getHospitalDigitalSignageList(hospitalId, searchText.orElse("_"),
 				period.orElse(SearchPeriod.ONEMONTH), pageable);
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, webDigitalSignageList));

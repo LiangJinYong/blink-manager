@@ -56,11 +56,11 @@ public class WebQnaService {
 		webQnaRepository.save(webQna);
 	}
 
-	public Page<WebQnaResponseDto> getHospitalQnaList(Long hospitalId, String title, SearchPeriod period, Pageable pageable) {
+	public Page<WebQnaResponseDto> getHospitalQnaList(Long hospitalId, String searchText, SearchPeriod period, Pageable pageable) {
 		
 		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 
-		Page<WebQnaResponseDto> list = webQnaRepository.findByTitleAndPeriodWithHospital(title, time, hospitalId, pageable);
+		Page<WebQnaResponseDto> list = webQnaRepository.findByTitleAndPeriodWithHospital(searchText, time, hospitalId, pageable);
 
 		List<WebQnaResponseDto> content = list.getContent();
 
@@ -95,11 +95,11 @@ public class WebQnaService {
 		webQna.completeAnswer(answerContent);
 	}
 
-	public WebQnaAdminResponseDto getAdminQnaInfo(String title, SearchPeriod period, Pageable pageable) {
+	public WebQnaAdminResponseDto getAdminQnaInfo(String searchText, SearchPeriod period, Pageable pageable) {
 		
 		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 		
-		Page<WebQnaResponseDto> list = webQnaRepository.findByTitleAndPeriodWithAdmin(title, time, pageable);
+		Page<WebQnaResponseDto> list = webQnaRepository.findByTitleAndPeriodWithAdmin(searchText, time, pageable);
 		List<WebQnaResponseDto> content = list.getContent();
 
 		for (WebQnaResponseDto dto : content) {

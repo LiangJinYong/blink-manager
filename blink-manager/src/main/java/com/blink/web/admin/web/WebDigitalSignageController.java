@@ -39,10 +39,10 @@ public class WebDigitalSignageController {
 	
 	@ApiOperation(value = "사아니지 - 전체 조회")
 	@GetMapping
-	public ResponseEntity<CommonResponse> getQnaList(@RequestParam("title") Optional<String> title,
+	public ResponseEntity<CommonResponse> getQnaList(@RequestParam("searchText") Optional<String> searchText,
 			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period, Pageable pageable) {
 
-		WebDigitalSignageAdminResponseDto webDigitalSignageAdmin = webDigitalSignageService.getAdminDigitalSignageInfo(title.orElse("_"),
+		WebDigitalSignageAdminResponseDto webDigitalSignageAdmin = webDigitalSignageService.getAdminDigitalSignageInfo(searchText.orElse("_"),
 				period.orElse(SearchPeriod.ONEMONTH), pageable);
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, webDigitalSignageAdmin));

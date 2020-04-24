@@ -17,6 +17,7 @@ import com.blink.web.admin.web.dto.hospital.HospitalResponseDto;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+
 @RequiredArgsConstructor
 @RestController("adminHospitailManageController")
 @RequestMapping("/admin/web/hospitals")

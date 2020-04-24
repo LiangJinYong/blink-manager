@@ -19,10 +19,10 @@ public class AppNoticeService {
 
 	private final AppNoticeRepository appNoticeRepository;
 
-	public Page<AppNotice> getNoticeList(String title, SearchPeriod period, Pageable pageable) {
+	public Page<AppNotice> getNoticeList(String searchText, SearchPeriod period, Pageable pageable) {
 		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 		
-		Page<AppNotice> list = appNoticeRepository.findByNameAndPeriod(title, time, pageable);
+		Page<AppNotice> list = appNoticeRepository.findByNameAndPeriod(searchText, time, pageable);
 		return list;
 	}
 

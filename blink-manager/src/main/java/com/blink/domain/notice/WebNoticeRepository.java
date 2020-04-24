@@ -12,7 +12,7 @@ import com.blink.web.admin.web.dto.WebNoticeResponseDto;
 
 public interface WebNoticeRepository extends JpaRepository<WebNotice, Long> {
 	
-	@Query("SELECT new com.blink.web.admin.web.dto.WebNoticeResponseDto(n.id, n.title, n.description, n.createdAt, n.groupId) FROM WebNotice n WHERE title LIKE %:title% AND createdAt >= :time")
-	Page<WebNoticeResponseDto> findByTitleAndPeriod(@Param("title") String title, @Param("time") LocalDateTime time, Pageable pageable);
+	@Query("SELECT new com.blink.web.admin.web.dto.WebNoticeResponseDto(n.id, n.title, n.description, n.createdAt, n.groupId) FROM WebNotice n WHERE title LIKE %:searchText% AND createdAt >= :time")
+	Page<WebNoticeResponseDto> findByTitleAndPeriod(@Param("searchText") String searchText, @Param("time") LocalDateTime time, Pageable pageable);
 	
 }

@@ -56,12 +56,12 @@ public class WebDigitalSignageService {
 		webDigitalSignageRepository.save(webDigitalSignage);
 	}
 
-	public Page<WebDigitalSignageResponseDto> getHospitalDigitalSignageList(Long hospitalId, String title, SearchPeriod period,
+	public Page<WebDigitalSignageResponseDto> getHospitalDigitalSignageList(Long hospitalId, String searchText, SearchPeriod period,
 			Pageable pageable) {
 		
 		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 		
-		Page<WebDigitalSignageResponseDto> list = webDigitalSignageRepository.findByTitleAndPeriodWithHospital(title, time, hospitalId, pageable);
+		Page<WebDigitalSignageResponseDto> list = webDigitalSignageRepository.findByTitleAndPeriodWithHospital(searchText, time, hospitalId, pageable);
 		
 		List<WebDigitalSignageResponseDto> content = list.getContent();
 		
@@ -96,12 +96,12 @@ public class WebDigitalSignageService {
 		digitalSignage.completeAnswer(answerContent);
 	}
 
-	public WebDigitalSignageAdminResponseDto getAdminDigitalSignageInfo(String title, SearchPeriod period,
+	public WebDigitalSignageAdminResponseDto getAdminDigitalSignageInfo(String searchText, SearchPeriod period,
 			Pageable pageable) {
 		
 		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 		
-		Page<WebDigitalSignageResponseDto> list = webDigitalSignageRepository.findByTitleAndPeriodWithAdmin(title, time, pageable);
+		Page<WebDigitalSignageResponseDto> list = webDigitalSignageRepository.findByTitleAndPeriodWithAdmin(searchText, time, pageable);
 		List<WebDigitalSignageResponseDto> content = list.getContent();
 		
 		for(WebDigitalSignageResponseDto dto : content) {

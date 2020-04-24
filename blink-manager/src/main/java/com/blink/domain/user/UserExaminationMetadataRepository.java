@@ -12,4 +12,6 @@ public interface UserExaminationMetadataRepository extends JpaRepository<UserExa
 	Optional<UserExaminationMetadata> findByUserAndExaminationYear(@Param("userData") Optional<UserData> userData,
 			@Param("examinationYear") Integer examinationYear);
 
+	Optional<UserExaminationMetadata> findByUserDataAndExaminationYear(UserData userData, Integer examinationYear);
+
 }

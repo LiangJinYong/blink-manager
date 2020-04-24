@@ -1,79 +1,112 @@
 package com.blink.domain.user;
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.LazyToOne;
+import org.hibernate.annotations.LazyToOneOption;
 
 import com.blink.domain.BaseTimeEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
-@NoArgsConstructor
+@Data
 @Entity
-public class UserExaminationMetadata extends BaseTimeEntity {
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+public class UserExaminationMetadata extends BaseTimeEntity implements Serializable {
 
+	@JsonIgnore
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	private String address;
-	
-	@Column(name="agree_yn", columnDefinition="tinyint")
-	private Integer agreeYN;
-	
+
+	private Integer examinationYear;
+
 	private LocalDate dateExamined;
 
-	@Column(nullable = false, columnDefinition="smallint")
-	private Integer examinationYear;
-	
+	@JsonIgnore
 	private Long hospitalDataId;
-	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name="user_data_id")
-	private UserData userData;
-	
+
+	@Transient
+	private String displayName;
+
+	private Integer agreeYn;
 	private Integer agreeMail;
+	private Integer agreeSms;
+	private Integer agreeVisit;
+
+	private String address;
+
+	@JoinColumn(foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "NONE"))
+	@LazyToOne(LazyToOneOption.NO_PROXY)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	private UserExaminationEntireDataOfOne userExaminationEntireDataOfOne;
+
+	@OneToMany(mappedBy = "userExaminationMetadata")
+	private List<UserExaminationMetadataDetail> userExaminationMetadataDetailList;
 	
-    private Integer agreeSms;
-    
-    private Integer agreeVisit;
-    
-    public void setUserData(UserData userData) {
+	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+	@JoinColumn(name = "user_data_id")
+	private UserData userData;
+
+	@Builder
+	public UserExaminationMetadata(UserData userData, Integer examinationYear, LocalDate dateExamined,
+			Long hospitalDataId, String address, UserExaminationEntireDataOfOne userExaminationEntireDataOfOne) {
 		this.userData = userData;
+		this.examinationYear = examinationYear;
+		this.dateExamined = dateExamined;
+		this.hospitalDataId = hospitalDataId;
+		this.address = address;
+		this.userExaminationEntireDataOfOne = userExaminationEntireDataOfOne;
 	}
 
-    @Builder
-    public UserExaminationMetadata(Integer agreeYN, LocalDate dateExamined, Long hospitalDataId, Integer agreeMail, Integer agreeSms, Integer agreeVisit, Integer examinationYear) {
-    	this.agreeYN = agreeYN;
-    	this.dateExamined = dateExamined;
-    	this.hospitalDataId = hospitalDataId;
-    	this.agreeMail = agreeMail;
-    	this.agreeSms = agreeSms;
-    	this.agreeVisit = agreeVisit;
-    	this.examinationYear = examinationYear;
-    }
-
-	public void update(Integer agreeYn, LocalDate dateExamined, Long hospitalDataId, Integer agreeMail, Integer agreeSms,
-			Integer agreeVisit, Integer examinationYear) {
-		
-		this.agreeYN = agreeYn;
+	@Builder
+	public UserExaminationMetadata(Integer agreeYn, LocalDate dateExamined, Long hospitalDataId, Integer agreeMail,
+			Integer agreeSms, Integer agreeVisit, Integer examinationYear) {
+		this.agreeYn = agreeYn;
 		this.dateExamined = dateExamined;
 		this.hospitalDataId = hospitalDataId;
 		this.agreeMail = agreeMail;
 		this.agreeSms = agreeSms;
 		this.agreeVisit = agreeVisit;
 		this.examinationYear = examinationYear;
-		
+	}
+
+	public void update(Integer agreeYn, LocalDate dateExamined, Long hospitalDataId, Integer agreeMail,
+			Integer agreeSms, Integer agreeVisit, Integer examinationYear) {
+
+		this.agreeYn = agreeYn;
+		this.dateExamined = dateExamined;
+		this.hospitalDataId = hospitalDataId;
+		this.agreeMail = agreeMail;
+		this.agreeSms = agreeSms;
+		this.agreeVisit = agreeVisit;
+		this.examinationYear = examinationYear;
+	}
+
+	public void updateAddress(String address) {
+		this.address = address;
 	}
 }

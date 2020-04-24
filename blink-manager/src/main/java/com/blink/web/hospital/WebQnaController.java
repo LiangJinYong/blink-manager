@@ -41,10 +41,10 @@ public class WebQnaController {
 
 	@ApiOperation(value = "고객센터 - 해당 병원 질문 조회")
 	@GetMapping("/{hospitalId}")
-	public ResponseEntity<CommonResponse> getQnaList(@PathVariable("hospitalId") Long hospitalId, @RequestParam("title") Optional<String> title,
+	public ResponseEntity<CommonResponse> getQnaList(@PathVariable("hospitalId") Long hospitalId, @RequestParam("searchText") Optional<String> searchText,
 			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period, Pageable pageable) {
 		
-		Page<WebQnaResponseDto> webQnaList = webQnaService.getHospitalQnaList(hospitalId, title.orElse("_"),
+		Page<WebQnaResponseDto> webQnaList = webQnaService.getHospitalQnaList(hospitalId, searchText.orElse("_"),
 				period.orElse(SearchPeriod.ONEMONTH), pageable);
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, webQnaList));

@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface AppNoticeRepository extends JpaRepository<AppNotice, Long> {
 
-	@Query("SELECT n FROM AppNotice n WHERE title LIKE %:title% AND createdAt >= :time")
-	Page<AppNotice> findByNameAndPeriod(@Param("title") String title, @Param("time") LocalDateTime time, Pageable pageable);
+	@Query("SELECT n FROM AppNotice n WHERE title LIKE %:searchText% AND createdAt >= :time")
+	Page<AppNotice> findByNameAndPeriod(@Param("searchText") String searchText, @Param("time") LocalDateTime time, Pageable pageable);
 
 }

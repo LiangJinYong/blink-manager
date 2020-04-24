@@ -29,9 +29,9 @@ public class AppNoticeController {
 
 	@ApiOperation(value="공지사항 - 전체 조회")
 	@GetMapping
-	public ResponseEntity<CommonResponse> getNoticeList(@RequestParam("title") Optional<String> title,
+	public ResponseEntity<CommonResponse> getNoticeList(@RequestParam("searchText") Optional<String> searchText,
 			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period, Pageable pageable) {
-		Page<AppNotice> noticeList = appNoticeService.getNoticeList(title.orElse("_"), period.orElse(SearchPeriod.ONEMONTH), pageable);
+		Page<AppNotice> noticeList = appNoticeService.getNoticeList(searchText.orElse("_"), period.orElse(SearchPeriod.ONEMONTH), pageable);
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, noticeList));
 	}

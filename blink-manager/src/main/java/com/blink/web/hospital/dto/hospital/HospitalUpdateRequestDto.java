@@ -13,7 +13,7 @@ public class HospitalUpdateRequestDto {
 	private String employeeName;
 	private String hospitalTel;
 	private String employeeTel;
-	private String agreeSendYn;
+	private Integer agreeSendYn;
 	private String postcode;
 	private String address;
 	private String addressDetail;
@@ -24,13 +24,12 @@ public class HospitalUpdateRequestDto {
 	private Integer signagesExisting;
 	private String groupFileId;
 	private String employeePosition;
-	private MultipartFile file;
 
 	@Builder
 	public HospitalUpdateRequestDto(Long hospitalId, String hospitalName, String employeeName, String hospitalTel,
-			String employeeTel, String agreeSendYn, String postcode, String address, String addressDetail,
+			String employeeTel, Integer agreeSendYn, String postcode, String address, String addressDetail,
 			String employeeEmail, String programInUse, Integer signagesStand, Integer signagesMountable,
-			Integer signagesExisting, String groupFileId, String employeePosition, MultipartFile file) {
+			Integer signagesExisting, String groupFileId, String employeePosition) {
 		this.hospitalId = hospitalId;
 		this.hospitalName = hospitalName;
 		this.employeeName = employeeName;
@@ -47,6 +46,5 @@ public class HospitalUpdateRequestDto {
 		this.signagesExisting = signagesExisting;
 		this.groupFileId = groupFileId;
 		this.employeePosition = employeePosition;
-		this.file = file;
 	}
 }

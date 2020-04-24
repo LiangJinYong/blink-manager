@@ -11,9 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.blink.domain.admin.AdminRepository;
 import com.blink.domain.agreeUser.AgreeUserList;
 import com.blink.domain.agreeUser.AgreeUserListRepository;
+import com.blink.domain.hospital.Hospital;
 import com.blink.domain.hospital.HospitalRepository;
 import com.blink.domain.webfiles.WebFiles;
 import com.blink.domain.webfiles.WebFilesRepository;
@@ -42,10 +42,12 @@ public class AgreeUserService {
 	// ------------------ HOSPITAL ------------------
 	public void registerAgreeUserList(MultipartFile[] files, Long hospitalId) {
 
+		Hospital hospital = hospitalRepository.findById(hospitalId).orElseThrow(() -> new IllegalArgumentException("No such hospital"));
+		
 		String groupId = fileUploadUtils.upload(files, "agreeUserListFiles", FileUploadUserType.WEB, hospitalId, null);
 
 		AgreeUserList agreeUserList = AgreeUserList.builder() //
-				.hospital(hospitalRepository.findById(hospitalId).get()) //
+				.hospital(hospital) //
 				.groupId(groupId) //
 				.build();
 

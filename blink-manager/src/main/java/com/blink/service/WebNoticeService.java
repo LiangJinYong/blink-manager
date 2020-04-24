@@ -31,11 +31,11 @@ public class WebNoticeService {
 	private final WebFilesRepository webFilesRepository;
 	private final FileUploadUtils fileUploadUtils;
 
-	public Page<WebNoticeResponseDto> getNoticeList(String title, SearchPeriod period, Pageable pageable) {
+	public Page<WebNoticeResponseDto> getNoticeList(String searchText, SearchPeriod period, Pageable pageable) {
 
 		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 
-		Page<WebNoticeResponseDto> list = webNoticeRepository.findByTitleAndPeriod(title, time, pageable);
+		Page<WebNoticeResponseDto> list = webNoticeRepository.findByTitleAndPeriod(searchText, time, pageable);
 
 		List<WebNoticeResponseDto> content = list.getContent();
 

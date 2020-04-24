@@ -199,6 +199,7 @@ public class AccountService {
 		} else {
 			String displayName = hospital.getDisplayName();
 			userStatusInfo.put("displayName", displayName);
+			userStatusInfo.put("hospitalId", hospital.getId());
 			
 			boolean accountStatus = user.isAccountStatus();
 			userStatusInfo.put("accountStatus", accountStatus);

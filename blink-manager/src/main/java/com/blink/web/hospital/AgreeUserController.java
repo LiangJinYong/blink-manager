@@ -1,6 +1,5 @@
 package com.blink.web.hospital;
 
-import java.security.Principal;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
@@ -33,8 +32,7 @@ public class AgreeUserController {
 
 	@ApiOperation(value = "동의자 리스트 등록")
 	@PostMapping("/{hospitalId}")
-	public ResponseEntity<CommonResponse> registerAgreeUserList(@PathVariable("hospitalId") Long hospitalId, @RequestParam("file") MultipartFile[] files,
-			Principal principal) {
+	public ResponseEntity<CommonResponse> registerAgreeUserList(@PathVariable("hospitalId") Long hospitalId, @RequestParam("file") MultipartFile[] files) {
 
 		if (files.length > 2) {
 			throw new RuntimeException("The number of uploaded files cannot be more than 2.");
