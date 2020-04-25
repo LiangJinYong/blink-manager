@@ -42,9 +42,9 @@ public class UserExaminationMetadataRequestDto {
 				.agreeYn(agreeYn)
 				.dateExamined(LocalDate.parse(dateExamined, formatter))
 				.hospitalDataId(hospitalDataId)
-				.agreeMail(agreeMail)
-				.agreeSms(agreeSms)
-				.agreeVisit(agreeVisit)
+				.agreeMail(1)
+				.agreeSms(1)
+				.agreeVisit(0)
 				.examinationYear(examinationYear)
 				.build();
 	}

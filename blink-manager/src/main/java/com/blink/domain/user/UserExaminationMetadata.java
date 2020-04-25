@@ -58,6 +58,9 @@ public class UserExaminationMetadata extends BaseTimeEntity implements Serializa
 	private Integer agreeVisit;
 
 	private String address;
+	
+	private Integer consentFormExistYn;
+	private String specialCase;
 
 	@JoinColumn(foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "NONE"))
 	@LazyToOne(LazyToOneOption.NO_PROXY)

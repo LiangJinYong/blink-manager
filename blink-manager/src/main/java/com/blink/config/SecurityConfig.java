@@ -54,11 +54,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		http.cors().configurationSource(corsConfigurationSource()) //
 				.and().csrf().disable().headers().frameOptions().disable() //
-//				.and().authorizeRequests().antMatchers("/**").permitAll() // used for dev
-				.and().authorizeRequests().antMatchers("/admin/**").hasRole("MASTER") //
-				.antMatchers("/hospital/**").hasAnyRole("MASTER", "HOSPITAL") //
-				.antMatchers("/account/**", "/parser/**", "/admin/web/joinContacts/question").permitAll() //
-				.anyRequest().authenticated() //
+				.and().authorizeRequests().antMatchers("/**").permitAll() // used for dev
+//				.and().authorizeRequests().antMatchers("/admin/**").hasRole("MASTER") //
+//				.antMatchers("/hospital/**").hasAnyRole("MASTER", "HOSPITAL") //
+//				.antMatchers("/account/**", "/parser/**", "/admin/web/joinContacts/question").permitAll() //
+//				.anyRequest().authenticated() //
 				.and().exceptionHandling() //
 				.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 

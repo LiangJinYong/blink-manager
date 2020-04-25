@@ -139,7 +139,7 @@ public class ParserService {
 					System.out.println("==> UserExaminationMetadata 미동록");
 					UserExaminationMetadata userExaminationMetadataEntity = userExaminationMetadataDto.toEntity();
 					userExaminationMetadataEntity.setUserData(userData.get());
-
+//110
 					userExaminationMetadataRepository.save(userExaminationMetadataEntity);
 				}
 			} else {

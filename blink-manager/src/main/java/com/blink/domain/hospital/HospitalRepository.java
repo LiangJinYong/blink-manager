@@ -24,6 +24,5 @@ public interface HospitalRepository extends JpaRepository<Hospital, Long> {
 
 	@Query("SELECT new com.blink.web.admin.web.dto.hospital.HospitalDetailResponseDto(h.id, h.displayName, h.name, h.regDate, h.employeeName, h.tel, h.employeeTel, h.agreeSendYn, h.postcode, h.address, h.addressDetail, h.employeeEmail, h.programInUse, h.signagesStand, h.signagesMountable, h.signagesExisting, f.fileName, f.fileKey, CONCAT(f.groupId, '-', f.fileId), h.employeePosition) FROM Hospital h LEFT JOIN WebFiles f ON h.groupId = f.groupId WHERE h.id = :hospitalId")
 	HospitalDetailResponseDto findDetailById(@Param("hospitalId") Long hospitalId);
+
 }
-
-

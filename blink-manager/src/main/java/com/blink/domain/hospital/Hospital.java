@@ -119,7 +119,7 @@ public class Hospital extends BaseTimeEntity {
 		this.groupId = groupId;
 	}
 
-	public void modifyEmaail(String newEmail) {
+	public void modifyEmail(String newEmail) {
 		this.employeeEmail = newEmail;
 	}
 

@@ -242,16 +242,16 @@ public class AccountService {
 		}
 	}
 
-	public void updateEmail(String username, String newEmail) {
-		Admin admin = adminRepo.findByName(username);
+	public void updateEmail(String newEmail, Long hospitalId) {
 		
-		if (admin != null) {
-			admin.modifyEmail(newEmail);
-			
-			Hospital hospital = admin.getHospital();
-			hospital.modifyEmaail(newEmail);
-		} else {
-			throw new RuntimeException("No such hospital");
-		}
+		Hospital hospital = hospitalRepo.findById(hospitalId).orElseThrow(() -> new IllegalArgumentException("No such hospital"));
+		
+		hospital.modifyEmail(newEmail);
+	}
+
+	public void signConfirm(Long hospitalId) {
+		Hospital hospital = hospitalRepo.findById(hospitalId).orElseThrow(() -> new IllegalArgumentException("No such hospital"));
+		
+		hospital.getWebJudge().changeJudgeStatus(JudgeStatus.SIGNWAITING, null);
 	}
 }
