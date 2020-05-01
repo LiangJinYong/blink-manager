@@ -1,11 +1,13 @@
 package com.blink.util;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.blink.config.aws.FileResource;
+import com.blink.domain.sendMailResultWeb.FileInfo;
 import com.blink.domain.webfiles.WebFiles;
 import com.blink.domain.webfiles.WebFilesRepository;
 import com.blink.enumeration.FileUploadUserType;
@@ -36,14 +38,14 @@ public class FileUploadUtils {
 				try {
 					FileResource fileResource = bucketService.upload(Optional.of(uploadDirectory), file);
 
-					String imgUrlKey = fileResource.getKey();
+					String filekey = fileResource.getKey();
 					long fileSize = file.getSize();
 					String filename = file.getOriginalFilename();
 
 					WebFiles webFiles = WebFiles.builder() //
 							.groupId(groupId) //
 							.fileId(fileId) //
-							.fileKey(imgUrlKey) //
+							.fileKey(filekey) //
 							.fileName(filename) //
 							.uploadUserType(fileUploadUserType) //
 							.uploadUserId(userId) //
@@ -65,5 +67,19 @@ public class FileUploadUtils {
 
 		int maxFileId = webFilesRepository.findMaxFileIdByGroupId(groupId);
 		return maxFileId + 1;
+	}
+	
+	public FileInfo uploadPdfFile(MultipartFile file, String hospitalName) {
+		FileResource fileResource;
+		try {
+			fileResource = bucketService.upload(Optional.of("upload/" + hospitalName), file);
+			String filekey = fileResource.getKey();
+			String filename = file.getOriginalFilename();
+			FileInfo fileInfo = new FileInfo(filekey, filename);
+			return fileInfo;
+		} catch (InterruptedException | IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

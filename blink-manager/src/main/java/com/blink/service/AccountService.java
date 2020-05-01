@@ -21,6 +21,8 @@ import com.blink.domain.authCode.UserAuthCode;
 import com.blink.domain.authCode.UserAuthCodeRepository;
 import com.blink.domain.hospital.Hospital;
 import com.blink.domain.hospital.HospitalRepository;
+import com.blink.domain.hospitalStatistics.HospitalStatistics;
+import com.blink.domain.hospitalStatistics.HospitalStatisticsRepository;
 import com.blink.domain.judge.WebJudge;
 import com.blink.domain.judge.WebJudgeRepository;
 import com.blink.domain.webfiles.WebFiles;
@@ -65,6 +67,8 @@ public class AccountService {
 	private final BucketService bucketService;
 
 	private final FeignAuthMTService mtService;
+	
+	private final HospitalStatisticsRepository hospitalStatisticsRepo;
 
 	public Long signupUser(UserSignupRequestDto requestDto, MultipartFile file) {
 		
@@ -95,6 +99,9 @@ public class AccountService {
 				.build();
 
 		webJudgeRepo.save(webJudge);
+		
+		HospitalStatistics hospitalStatistics = HospitalStatistics.builder().hospital(hospital).build();
+		hospitalStatisticsRepo.save(hospitalStatistics);
 
 		try {
 			FileResource fileResource = bucketService.upload(Optional.of("licensePhoto"), file);
@@ -151,7 +158,7 @@ public class AccountService {
 				.phoneNumber(employeeTel) //
 				.build();
 
-//		mtService.sendAuthCodeMT(authCodeMTDto);
+		mtService.sendAuthCodeMT(authCodeMTDto);
 
 		Optional<UserAuthCode> userAuthCode = userAuthCodeRepo.findByPhoneNumber(employeeTel);
 

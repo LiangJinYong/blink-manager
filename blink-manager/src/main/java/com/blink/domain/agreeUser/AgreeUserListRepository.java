@@ -12,11 +12,17 @@ import com.blink.web.hospital.dto.agreeUserList.AgreeUserListResponseDto;
 
 public interface AgreeUserListRepository extends JpaRepository<AgreeUserList, Long> {
 
-	@Query("SELECT new com.blink.web.hospital.dto.agreeUserList.AgreeUserListResponseDto(l.id, l.createdAt, l.groupId) FROM AgreeUserList l WHERE l.createdAt >= :time AND l.hospital.id = :hospitalId")
+	@Query("SELECT new com.blink.web.hospital.dto.agreeUserList.AgreeUserListResponseDto(l.id, l.createdAt, l.groupId, l.count) FROM AgreeUserList l WHERE l.createdAt >= :time AND l.hospital.id = :hospitalId")
 	Page<AgreeUserListResponseDto> findBySearchTextAndPeriodWithHospital(@Param("time") LocalDateTime time,
 			@Param("hospitalId") Long hospitalId, Pageable pageable);
 
-	@Query("SELECT new com.blink.web.hospital.dto.agreeUserList.AgreeUserListResponseDto(l.id, l.createdAt, l.groupId) FROM AgreeUserList l WHERE l.createdAt >= :time")
+	@Query("SELECT new com.blink.web.hospital.dto.agreeUserList.AgreeUserListResponseDto(l.id, l.createdAt, l.groupId, l.count) FROM AgreeUserList l WHERE l.createdAt >= :time")
 	Page<AgreeUserListResponseDto> findBySearchTextAndPeriodWithAdmin(@Param("time")LocalDateTime time, Pageable pageable);
+
+	@Query(value="SELECT SUM(count) FROM web_agree_user_list WHERE hospital_id = :hospitalId", nativeQuery = true)
+	Integer findTotalCountForHospital(@Param("hospitalId") Long hospitalId);
+
+	@Query(value="SELECT SUM(count) FROM web_agree_user_list", nativeQuery = true)
+	Integer findTotalCountForAdmin();
 
 }

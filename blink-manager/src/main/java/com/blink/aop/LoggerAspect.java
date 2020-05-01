@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LoggerAspect {
 	
-	@Around("execution(* com.blink.controller.*Controller.*(..)) or execution(* com.blink.service..*Impl.*(..)) or execution(* com.blink.repository.*.*(..))")
+	@Around("execution(* com.blink.web..*Controller.*(..)) or execution(* com.blink.service..*Service.*(..)) or execution(* com.blink.repository.*.*(..))")
 	public Object logPrint(ProceedingJoinPoint joinPoint) throws Throwable {
 		String type = "";
 		String name = joinPoint.getSignature().getDeclaringTypeName();

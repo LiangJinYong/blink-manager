@@ -20,8 +20,12 @@ public interface UserExaminationMetadataRepository extends JpaRepository<UserExa
 	Optional<UserExaminationMetadata> findByUserDataAndExaminationYear(UserData userData, Integer examinationYear);
 
 	// 수검자 관리
-	@Query("SELECT new com.blink.web.hospital.dto.userExamination.SingleUserExaminationResponseDto(m.id, u.name, u.gender, u.birthday, u.phone, m.dateExamined, m.agreeYn, m.consentFormExistYn, m.address, m.specialCase) FROM UserExaminationMetadata m JOIN m.userData u WHERE m.hospitalDataId = :hospitalId AND u.name LIKE %:searchText% AND m.createdAt > :time")
+	@Query("SELECT new com.blink.web.hospital.dto.userExamination.SingleUserExaminationResponseDto(m.id, u.name, u.gender, u.birthday, u.phone, '', m.dateExamined, m.agreeYn, m.consentFormExistYn, m.address, m.specialCase, u.ssnPartial, m.agreeMail, m.agreeSms, m.agreeVisit) FROM UserExaminationMetadata m JOIN m.userData u WHERE m.hospitalDataId = :hospitalId AND u.name LIKE %:searchText% AND m.createdAt > :time")
 	Page<SingleUserExaminationResponseDto> findBySearchTextAndPeriodWithHospital(@Param("hospitalId") Long hospitalId, @Param("searchText") String searchText,
+			@Param("time") LocalDateTime time, Pageable pageable);
+
+	@Query("SELECT new com.blink.web.hospital.dto.userExamination.SingleUserExaminationResponseDto(m.id, u.name, u.gender, u.birthday, u.phone, h.displayName, m.dateExamined, m.agreeYn, m.consentFormExistYn, m.address, m.specialCase, u.ssnPartial, m.agreeMail, m.agreeSms, m.agreeVisit) FROM UserExaminationMetadata m JOIN m.userData u JOIN Hospital h ON m.hospitalDataId = h.id WHERE m.agreeYn = 1 AND u.name LIKE %:searchText% AND m.createdAt > :time")
+	Page<SingleUserExaminationResponseDto> findBySearchTextAndPeriodWithHospitalWithAdmin(@Param("searchText") String searchText,
 			@Param("time") LocalDateTime time, Pageable pageable);
 
 }

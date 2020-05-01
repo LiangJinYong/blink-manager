@@ -75,4 +75,12 @@ public class UserData extends BaseTimeEntity {
 		this.gender = gender;
 		this.nationality = nationality;
 	}
+	
+	public void updateForUserExamination(String name, LocalDate birthday, Gender gender, String ssnPartial, String phone) {
+		this.name = name;
+		this.birthday = birthday;
+		this.gender = gender;
+		this.ssnPartial = ssnPartial;
+		this.phone = phone;
+	}
 }

@@ -14,8 +14,12 @@ import com.blink.domain.examinationResultDoc.WebExaminationResultDoc;
 import com.blink.domain.examinationResultDoc.WebExaminationResultDocRepository;
 import com.blink.domain.hospital.Hospital;
 import com.blink.domain.hospital.HospitalRepository;
+import com.blink.domain.pdf.PdfWeb;
+import com.blink.domain.pdf.PdfWebRepository;
+import com.blink.domain.sendMailResultWeb.FileInfo;
 import com.blink.domain.webfiles.WebFilesRepository;
 import com.blink.enumeration.FileUploadUserType;
+import com.blink.enumeration.PdfProcessStatus;
 import com.blink.enumeration.SearchPeriod;
 import com.blink.util.CommonUtils;
 import com.blink.util.FileUploadUtils;
@@ -33,15 +37,38 @@ public class WebExaminationResultDocService {
 	private final WebFilesRepository webFilesRepository;
 	private final FileUploadUtils fileUploadUtils;
 	private final HospitalRepository hospitalRepository;
+	private final PdfWebRepository pdfWebRepository;
 	
 	public void registerExaminationResultDocs(MultipartFile[] files, Long hospitalId) {
 
+		MultipartFile[] nonPdfFiles = new MultipartFile[3];
+		MultipartFile pdfFile = null;
+		int index = 0;
+		for(MultipartFile file: files) {
+			if(file.getOriginalFilename().endsWith(".pdf")) {
+				pdfFile = file;
+			} else {
+				nonPdfFiles[index++] = file;
+			}
+		}
+		
 		Hospital hospital = hospitalRepository.findById(hospitalId).orElseThrow(() -> new IllegalArgumentException("No such hospital"));
-		String groupId = fileUploadUtils.upload(files, "examinationResultDocFiles", FileUploadUserType.WEB, hospitalId, null);
+		
+		String hospitalName = hospital.getName();
+		FileInfo fileInfo = fileUploadUtils.uploadPdfFile(pdfFile, hospitalName);
+		PdfWeb pdfWeb = PdfWeb.builder() //
+				.hospital(hospital) //
+				.fileInfo(fileInfo) //
+				.status(PdfProcessStatus.UPLOAD) //
+				.build();
+		pdfWebRepository.save(pdfWeb);
+		
+		String groupId = fileUploadUtils.upload(nonPdfFiles, "examinationResultDocFiles", FileUploadUserType.WEB, hospitalId, null);
 		
 		WebExaminationResultDoc webExaminationResultDoc = WebExaminationResultDoc.builder() //
 		.hospital(hospital) //
 		.groupId(groupId) //
+		.pdfWeb(pdfWeb) //
 		.build();
 		
 		webExaminationResultDocRepository.save(webExaminationResultDoc);

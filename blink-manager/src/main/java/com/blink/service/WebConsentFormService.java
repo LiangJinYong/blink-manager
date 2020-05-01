@@ -70,8 +70,9 @@ public class WebConsentFormService {
 				dto.setFiles(files);
 			}
 		}
-
-		ConsentFormResponseDto responseDto = new ConsentFormResponseDto(0L, consentFormList);
+		
+		Integer totalCount = webConsentFormRepository.findTotalCountForAdmin();
+		ConsentFormResponseDto responseDto = new ConsentFormResponseDto(totalCount, consentFormList);
 		return responseDto;
 	}
 
@@ -92,7 +93,8 @@ public class WebConsentFormService {
 			}
 		}
 
-		ConsentFormResponseDto responseDto = new ConsentFormResponseDto(0L, consentFormList);
+		Integer totalCount = webConsentFormRepository.findTotalCountForHospital(hospitalId);
+		ConsentFormResponseDto responseDto = new ConsentFormResponseDto(totalCount, consentFormList);
 		return responseDto;
 	}
 
@@ -129,7 +131,8 @@ public class WebConsentFormService {
 			}
 		}
 		
-		com.blink.web.hospital.dto.consentForm.ConsentFormResponseDto responseDto = new com.blink.web.hospital.dto.consentForm.ConsentFormResponseDto(0L, consentFormList);
+		Integer totalCount = webConsentFormRepository.findTotalCountForHospital(hospitalId);
+		com.blink.web.hospital.dto.consentForm.ConsentFormResponseDto responseDto = new com.blink.web.hospital.dto.consentForm.ConsentFormResponseDto(totalCount, consentFormList);
 		return responseDto;
 	}
 

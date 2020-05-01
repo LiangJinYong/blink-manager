@@ -16,5 +16,6 @@ public class AgreeUserListResponseDto {
 	private final Long id;
 	private final LocalDateTime createdAt;
 	private final String groupId;
+	private final Integer count;
 	private List<WebFileResponseDto> files = new ArrayList<>();
 }

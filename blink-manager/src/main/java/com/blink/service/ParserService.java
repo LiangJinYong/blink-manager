@@ -1,8 +1,5 @@
 package com.blink.service;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -20,6 +17,8 @@ import com.blink.domain.data.BloodDataRepository;
 import com.blink.domain.data.BoneData;
 import com.blink.domain.data.BoneDataRepository;
 import com.blink.domain.data.CancerData;
+import com.blink.domain.data.CancerDataApp;
+import com.blink.domain.data.CancerDataAppRepository;
 import com.blink.domain.data.CancerDataRepository;
 import com.blink.domain.data.CommentData;
 import com.blink.domain.data.CommentDataRepository;
@@ -45,6 +44,8 @@ import com.blink.domain.user.UserExaminationMetadata;
 import com.blink.domain.user.UserExaminationMetadataDetail;
 import com.blink.domain.user.UserExaminationMetadataDetailRepository;
 import com.blink.domain.user.UserExaminationMetadataRepository;
+import com.blink.enumeration.CancerAnalyzerStatus;
+import com.blink.enumeration.CancerType;
 import com.blink.enumeration.Gender;
 import com.blink.enumeration.InspectionSubType;
 import com.blink.enumeration.InspectionType;
@@ -74,6 +75,7 @@ public class ParserService {
 	private final MentalDataRepository mentalDataRepository;
 	private final BoneDataRepository boneDataRepository;
 	private final ElderfunctionDataRepository elderfunctionDataRepository;
+	private final CancerDataAppRepository cancerDataAppRepository;
 
 	private final UserExaminationEntireDataOfOneRepository userExaminationEntireDataOfOneRepository;
 	private final UserExaminationMetadataDetailRepository userExaminationMetadataDetailRepository;
@@ -110,8 +112,9 @@ public class ParserService {
 					// update
 					UserDataRequestDto dto = user.getUserData();
 					String birthday = dto.getBirthday();
-					
-					userDataBySsn.get().update(dto.getName(), LocalDate.parse(birthday), Gender.values()[dto.getGender()], Nationality.values()[dto.getNationality()]);
+
+					userDataBySsn.get().update(dto.getName(), LocalDate.parse(birthday),
+							Gender.values()[dto.getGender()], Nationality.values()[dto.getNationality()]);
 				}
 
 				System.out.println("==> UserData 등록됨");
@@ -139,7 +142,7 @@ public class ParserService {
 					System.out.println("==> UserExaminationMetadata 미동록");
 					UserExaminationMetadata userExaminationMetadataEntity = userExaminationMetadataDto.toEntity();
 					userExaminationMetadataEntity.setUserData(userData.get());
-//110
+
 					userExaminationMetadataRepository.save(userExaminationMetadataEntity);
 				}
 			} else {
@@ -183,6 +186,30 @@ public class ParserService {
 					UserExaminationMetadata metadataEntity = metadata.get();
 					String userAddress = (String) map.get("userAddress");
 					metadataEntity.updateAddress(userAddress);
+					
+					String agreeYnStr = (String) map.get("agreeYn");
+					
+					if(agreeYnStr != null) {
+						metadataEntity.setAgreeYn(Integer.parseInt(agreeYnStr));
+					}
+					
+					String agreeMailStr = (String) map.get("agreeMail");
+					
+					if(agreeMailStr != null) {
+						metadataEntity.setAgreeMail(Integer.parseInt(agreeMailStr));
+					}
+					
+					String agreeSmsStr = (String) map.get("agreeSms");
+					
+					if(agreeSmsStr != null) {
+						metadataEntity.setAgreeSms(Integer.parseInt(agreeSmsStr));
+					}
+					
+					String agreeVisitStr = (String) map.get("agreeVisit");
+					
+					if(agreeVisitStr != null) {
+						metadataEntity.setAgreeVisit(Integer.parseInt(agreeVisitStr));
+					}
 
 					Optional<UserExaminationMetadataDetail> metadataDetail = userExaminationMetadataDetailRepository
 							.findByMetaDataAndExaminationYearAndType(metadataEntity.getId(), examinationYear,
@@ -198,10 +225,13 @@ public class ParserService {
 					dataOfOne = saveDataOfOne(map, dataOfOne, userData.get());
 
 					metadataEntity.setUserExaminationEntireDataOfOne(dataOfOne);
+
+					saveCancerDataApp(map, dataOfOne);
 				} else {
 					UserExaminationEntireDataOfOne newDataOfOne = saveDataOfOne(map, null, userData.get());
 					UserExaminationMetadata newMetaData = saveMetadata(map, newDataOfOne, userData.get());
 					saveMetadataDetail(map, newMetaData, null);
+					saveCancerDataApp(map, newDataOfOne);
 				}
 			} else {
 				UserData newUserEntity = UserData.builder() //
@@ -218,8 +248,70 @@ public class ParserService {
 				UserExaminationEntireDataOfOne newDataOfOne = saveDataOfOne(map, null, newUserEntity);
 				UserExaminationMetadata newMetaData = saveMetadata(map, newDataOfOne, newUserEntity);
 				saveMetadataDetail(map, newMetaData, null);
+				saveCancerDataApp(map, newDataOfOne);
 			}
 		}
+	}
+
+	private void saveCancerDataApp(Map<String, Object> map, UserExaminationEntireDataOfOne dataOfOne) {
+
+		Map<String, Map<String, Object>> dataOfOneMap = (Map<String, Map<String, Object>>) map
+				.get("userExaminationEntireDataOfOne");
+
+		if (dataOfOneMap != null) {
+			Map<String, Object> cancerDataAppMap = dataOfOneMap.get("cancerDataApp");
+
+			if (cancerDataAppMap != null) {
+				String caseCondition1 = (String) cancerDataAppMap.get("caseCondition1");
+				String caseCondition2 = (String) cancerDataAppMap.get("caseCondition2");
+				String caseCondition3 = (String) cancerDataAppMap.get("caseCondition3");
+				String caseCondition4 = (String) cancerDataAppMap.get("caseCondition4");
+				String title = (String) cancerDataAppMap.get("title");
+				String description = (String) cancerDataAppMap.get("description");
+				String childLeft = (String) cancerDataAppMap.get("childLeft");
+				String childDescription = (String) cancerDataAppMap.get("childDescription");
+				String childRight = (String) cancerDataAppMap.get("childRight");
+				String comment = (String) cancerDataAppMap.get("comment");
+				String postComment = (String) cancerDataAppMap.get("postComment");
+				String preComment = (String) cancerDataAppMap.get("preComment");
+				Object analyzerStatusObj = cancerDataAppMap.get("analyzerStatus");
+				CancerAnalyzerStatus analyzerStatus = null;
+				if (analyzerStatusObj != null) {
+					analyzerStatus = CancerAnalyzerStatus.valueOf((String) analyzerStatusObj);
+				}
+
+				String hadCancer = (String) cancerDataAppMap.get("hadCancer");
+
+				Object typeObj = cancerDataAppMap.get("type");
+
+				CancerType type = null;
+				if (typeObj != null) {
+					type = CancerType.valueOf((String) typeObj);
+				}
+
+				CancerDataApp cancerDataApp = CancerDataApp.builder() //
+						.userExaminationEntireDataOfOne(dataOfOne) //
+						.caseCondition1(caseCondition1) //
+						.caseCondition2(caseCondition2) //
+						.caseCondition3(caseCondition3) //
+						.caseCondition4(caseCondition4) //
+						.title(title) //
+						.description(description) //
+						.childLeft(childLeft) //
+						.childDescription(childDescription) //
+						.childRight(childRight) //
+						.comment(comment) //
+						.postComment(postComment) //
+						.preComment(preComment) //
+						.analyzerStatus(analyzerStatus) //
+						.hadCancer(hadCancer) //
+						.type(type) //
+						.build();
+
+				cancerDataAppRepository.save(cancerDataApp);
+			}
+		}
+
 	}
 
 	private void saveMetadataDetail(Map<String, Object> map, UserExaminationMetadata metadata,
@@ -266,6 +358,13 @@ public class ParserService {
 		LocalDate dateExaminedDate = LocalDate.parse(dateExamined);
 		String examinationYear = (String) map.get("examinationYear");
 		String hospitalDataId = (String) map.get("hospitalDataId");
+		Integer agreeYn = 0;
+		
+		String agreeYnStr = (String) map.get("agreeYn");
+		
+		if (agreeYnStr != null) {
+			agreeYn = Integer.parseInt(agreeYnStr);
+		}
 
 		UserExaminationMetadata userExaminationMetadataEntity = UserExaminationMetadata.builder() //
 				.userData(userData) //
@@ -274,6 +373,10 @@ public class ParserService {
 				.hospitalDataId(Long.parseLong(hospitalDataId)) //
 				.address(address) //
 				.userExaminationEntireDataOfOne(dataOfOne) //
+				.agreeYn(agreeYn)
+				.agreeMail(1) //
+				.agreeSms(1) //
+				.agreeVisit(0) //
 				.build();
 
 		userExaminationMetadataEntity = userExaminationMetadataRepository.save(userExaminationMetadataEntity);

@@ -75,26 +75,20 @@ public class UserExaminationMetadata extends BaseTimeEntity implements Serializa
 	private UserData userData;
 
 	@Builder
-	public UserExaminationMetadata(UserData userData, Integer examinationYear, LocalDate dateExamined,
-			Long hospitalDataId, String address, UserExaminationEntireDataOfOne userExaminationEntireDataOfOne) {
+	public UserExaminationMetadata(Integer agreeYn,UserData userData, Integer examinationYear, LocalDate dateExamined,
+			Long hospitalDataId, String address, UserExaminationEntireDataOfOne userExaminationEntireDataOfOne, String specialCase, Integer agreeMail,
+			Integer agreeSms, Integer agreeVisit) {
+		this.agreeYn = agreeYn;
 		this.userData = userData;
 		this.examinationYear = examinationYear;
 		this.dateExamined = dateExamined;
 		this.hospitalDataId = hospitalDataId;
 		this.address = address;
 		this.userExaminationEntireDataOfOne = userExaminationEntireDataOfOne;
-	}
-
-	@Builder
-	public UserExaminationMetadata(Integer agreeYn, LocalDate dateExamined, Long hospitalDataId, Integer agreeMail,
-			Integer agreeSms, Integer agreeVisit, Integer examinationYear) {
-		this.agreeYn = agreeYn;
-		this.dateExamined = dateExamined;
-		this.hospitalDataId = hospitalDataId;
+		this.specialCase = specialCase;
 		this.agreeMail = agreeMail;
 		this.agreeSms = agreeSms;
 		this.agreeVisit = agreeVisit;
-		this.examinationYear = examinationYear;
 	}
 
 	public void update(Integer agreeYn, LocalDate dateExamined, Long hospitalDataId, Integer agreeMail,
@@ -112,4 +106,12 @@ public class UserExaminationMetadata extends BaseTimeEntity implements Serializa
 	public void updateAddress(String address) {
 		this.address = address;
 	}
+	
+	public void updateForUserExamination(LocalDate dateExamined, Integer examinationYear, Integer agreeYn, String specialCase) {
+		this.dateExamined = dateExamined;
+		this.examinationYear = examinationYear;
+		this.agreeYn = agreeYn;
+		this.specialCase = specialCase;
+	}
+	
 }

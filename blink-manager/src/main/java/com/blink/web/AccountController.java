@@ -199,7 +199,7 @@ public class AccountController {
 		}
 	}
 	
-	@ApiOperation(value = "제휴문의 - 리스트 가져오기")
+	@ApiOperation(value = "제휴문의 등록하기")
 	@PostMapping("/question")
 	public ResponseEntity<CommonResponse> saveQuestion(@RequestParam("clinicName") String clinicName,
 			@RequestParam("email") String email,

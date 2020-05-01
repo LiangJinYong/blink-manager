@@ -27,4 +27,10 @@ public interface WebConsentFormRepository extends JpaRepository<WebConsentForm, 
 	Page<HospitalConsentFormDetailResponseDto> findBySearchTextAndPeriodForHospitalSelf(@Param("hospitalId") Long hospitalId,
 			@Param("time") LocalDateTime time, Pageable pageable);
 
+	@Query("SELECT SUM(f.count) FROM WebConsentForm f WHERE f.hospital.id = :hospitalId")
+	Integer findTotalCountForHospital(@Param("hospitalId") Long hospitalId);
+
+	@Query("SELECT SUM(f.count) FROM WebConsentForm f")
+	Integer findTotalCountForAdmin();
+
 }

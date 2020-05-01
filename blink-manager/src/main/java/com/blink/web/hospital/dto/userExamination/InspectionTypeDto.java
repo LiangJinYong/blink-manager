@@ -12,4 +12,5 @@ public class InspectionTypeDto {
 
 	private final InspectionType inspectionType;
 	private final InspectionSubType inspectionSubType;
+	private final String fileKey;
 }

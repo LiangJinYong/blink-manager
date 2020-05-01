@@ -18,6 +18,7 @@ public enum CommonResultCode {
 	NO_REQUIRED_NOTICE_FOUND(2201, "필수고지사항 데이터가 없습니다."),
 	NO_SUCH_DATA(4000, "해당 데이터가 없습니다."),
 	NO_USER_DATA(4001, "유저정보가 없는 기록이 있습니다."),
+	USER_DATA_ALREADY_EXISTS(4002, "이미 존재하는 유저정보입니다."),
 	INTERNAL_ERROR(5000, "서버 내부 오류"),  ; 
 	
 	private final int resultCode;

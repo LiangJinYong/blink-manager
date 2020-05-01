@@ -1,16 +1,33 @@
 package com.blink.domain.pdf;
 
+import java.util.List;
+
+import javax.persistence.ConstraintMode;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import org.apache.tomcat.jni.FileInfo;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import com.blink.domain.BaseEntity;
+import com.blink.domain.admin.Admin;
+import com.blink.domain.examinationResultDoc.WebExaminationResultDoc;
+import com.blink.domain.hospital.Hospital;
+import com.blink.domain.sendMailResultWeb.FileInfo;
+import com.blink.domain.sendMailResultWeb.SendMailResultWeb;
+import com.blink.enumeration.PdfProcessStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,7 +44,31 @@ public class PdfWeb extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JoinColumn(name = "hospital_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "NONE"))
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"employeeName", "employeeEmail", "employeeTel", "role", "regDate", "isDelete", "name", "address", "createdAt", "updatedAt"})
+    private Hospital hospital;
+
+    @JoinColumn(name = "hospital_user_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "NONE"))
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Admin hospitalUser;
+
     @Embedded
     private FileInfo fileInfo;
 
+    @Enumerated(EnumType.ORDINAL)
+    private PdfProcessStatus status;
+
+    @OneToOne(mappedBy = "pdfWeb")
+    private WebExaminationResultDoc webExaminationResultDoc;
+    
+    @OneToMany(mappedBy = "pdfWeb")
+    private List<SendMailResultWeb> sendMailResultWebList;
+    
+    @Builder
+    public PdfWeb(Hospital hospital, FileInfo fileInfo, PdfProcessStatus status) {
+    	this.hospital = hospital;
+    	this.fileInfo = fileInfo;
+    	this.status = status;
+    }
 }

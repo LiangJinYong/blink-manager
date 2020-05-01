@@ -33,6 +33,8 @@ public class AgreeUserList extends BaseTimeEntity {
 	@Column(length = 45)
 	private String groupId;
 	
+	private Integer count;
+	
 	@Builder
 	public AgreeUserList(Hospital hospital, String groupId) {
 		this.hospital = hospital;

@@ -116,7 +116,6 @@ auth:
 
             
 ---
-
 spring:
     auth-code-mt:
         host: http://211.233.76.241:2189
@@ -127,9 +126,76 @@ spring:
       multipart:
         max-file-size: 250MB
         max-request-size: 250MB
-          
+    
     datasource:
         url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_db_makeit?characterEncoding=utf-8&serverTimezone=UTC
+        username: admin
+        password: 1nf0bank
+        driverClassName: com.mysql.cj.jdbc.Driver
+        platform: mysql
+        initialization-mode: always
+        hikari:
+            connection-timeout: 5000
+            validation-timeout: 300000
+            minimum-idle: 5
+            maximum-pool-size: 5
+            max-lifetime: 6000
+    mail:
+        host: smart.whoismail.net
+        port: 587
+        username: help@blink.bio
+        password: bhealth1!
+        protocol: smtp
+        tls: false
+    cloud:
+        aws:
+            credentials:
+                accessKey: AKIAZ72TXLIUEE2X2I75
+                secretKey: 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
+            s3:
+                bucket: blink-develop
+            region:
+                static: ap-northeast-2        
+    jpa:
+        database: MYSQL
+        generate-ddl: false
+        show-sql: true
+        hibernate:
+            ddl-auto: none
+            naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+        properties:
+          hibernate:
+            use-new-id-generator-mappings: false
+            enable_lazy_load_no_trans: true
+            format_sql: true
+            use_sql_comments : true
+            dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+            default_batch_fetch_size: 100
+            
+auth:
+    code:
+        length: 4
+        expire:
+            second: 600
+
+---
+
+server:
+  port: 8081
+
+spring:
+    auth-code-mt:
+        host: http://211.233.76.241:2189
+    blink-remote:
+        host: http://15.165.22.0:8000/bioage/
+    profiles: dev2   
+    servlet:
+      multipart:
+        max-file-size: 250MB
+        max-request-size: 250MB
+    
+    datasource:
+        url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_db_product_makeit?characterEncoding=utf-8&serverTimezone=UTC
         username: admin
         password: 1nf0bank
         driverClassName: com.mysql.cj.jdbc.Driver

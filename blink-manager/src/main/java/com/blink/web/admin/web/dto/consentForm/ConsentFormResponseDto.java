@@ -9,6 +9,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ConsentFormResponseDto {
 
-	private final Long consentFormCount;
+	private final Integer consentFormCount;
 	private final Page<AdminConsentFormDetailResponseDto> consentFormList;
 }

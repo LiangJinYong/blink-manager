@@ -9,5 +9,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AgreeUserResponseDto {
 
+	private final Integer totalCount;
 	private final Page<AgreeUserListResponseDto> agreeUserLists;
 }

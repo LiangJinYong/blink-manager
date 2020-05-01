@@ -17,11 +17,17 @@ public class SingleUserExaminationResponseDto {
 	private final Gender gender;
 	private final LocalDate birthday;
 	private final String phone;
+	private final String hospitalName;
 	private final LocalDate dateExamined;
 	private final Integer agreeYn;
 	private final Integer consentFormExistYn;
 	private final String address;
 	private final String specialCase;
+	private final String ssnPartial;
+	private final Integer agreeMail;
+	private final Integer agreeSms;
+	private final Integer agreeVisit;
+	
 	
 	private List<InspectionTypeDto> inspectionTypeList;
 }

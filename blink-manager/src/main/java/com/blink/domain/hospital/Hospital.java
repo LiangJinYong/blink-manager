@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -18,9 +19,11 @@ import com.blink.domain.admin.Admin;
 import com.blink.domain.agreeUser.AgreeUserList;
 import com.blink.domain.consentForm.WebConsentForm;
 import com.blink.domain.examinationResultDoc.WebExaminationResultDoc;
+import com.blink.domain.hospitalStatistics.HospitalStatistics;
 import com.blink.domain.judge.WebJudge;
 import com.blink.domain.qna.WebQna;
 import com.blink.enumeration.Role;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -69,7 +72,7 @@ public class Hospital extends BaseTimeEntity {
 
 	private String programInUse;
 
-	@OneToOne(mappedBy = "hospital")
+	@OneToOne(fetch = FetchType.LAZY, mappedBy = "hospital")
 	private Admin admin;
 
 	@Column(length = 45, nullable = false)
@@ -81,7 +84,7 @@ public class Hospital extends BaseTimeEntity {
 
 	private Integer signagesExisting;
 
-	@OneToOne(mappedBy = "hospital")
+	@OneToOne(fetch = FetchType.LAZY, mappedBy = "hospital")
 	private WebJudge webJudge;
 
 	@OneToMany(mappedBy = "hospital")
@@ -89,12 +92,16 @@ public class Hospital extends BaseTimeEntity {
 
 	@OneToMany(mappedBy = "hospital")
 	private List<AgreeUserList> agreeUserLists;
-	
+
 	@OneToMany(mappedBy = "hospital")
 	private List<WebExaminationResultDoc> webExaminationResultDocList;
-	
+
 	@OneToMany(mappedBy = "hospital")
 	private List<WebConsentForm> webConsentFormList;
+	
+	
+	@OneToOne(fetch = FetchType.LAZY, mappedBy = "hospital")
+	private HospitalStatistics hospitalStatistics;
 
 	public void assignGroupId(String groupId) {
 		this.groupId = groupId;
@@ -140,7 +147,7 @@ public class Hospital extends BaseTimeEntity {
 		this.signagesMountable = signagesMountable;
 		this.signagesExisting = signagesExisting;
 	}
-	
+
 	public void setDelete() {
 		this.isDelete = 1;
 	}

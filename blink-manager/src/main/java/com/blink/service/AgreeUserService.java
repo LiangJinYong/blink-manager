@@ -42,8 +42,9 @@ public class AgreeUserService {
 	// ------------------ HOSPITAL ------------------
 	public void registerAgreeUserList(MultipartFile[] files, Long hospitalId) {
 
-		Hospital hospital = hospitalRepository.findById(hospitalId).orElseThrow(() -> new IllegalArgumentException("No such hospital"));
-		
+		Hospital hospital = hospitalRepository.findById(hospitalId)
+				.orElseThrow(() -> new IllegalArgumentException("No such hospital"));
+
 		String groupId = fileUploadUtils.upload(files, "agreeUserListFiles", FileUploadUserType.WEB, hospitalId, null);
 
 		AgreeUserList agreeUserList = AgreeUserList.builder() //
@@ -72,7 +73,9 @@ public class AgreeUserService {
 			}
 		}
 
-		AgreeUserResponseDto responseDto = new AgreeUserResponseDto(agreeUserLists);
+		Integer totalCount = agreeUserListRepository.findTotalCountForHospital(hospitalId);
+
+		AgreeUserResponseDto responseDto = new AgreeUserResponseDto(totalCount, agreeUserLists);
 
 		return responseDto;
 	}
@@ -140,8 +143,9 @@ public class AgreeUserService {
 			}
 		}
 
+		Integer totalCount = agreeUserListRepository.findTotalCountForAdmin();
 		com.blink.web.admin.web.dto.agreeUserList.AgreeUserResponseDto responseDto = new com.blink.web.admin.web.dto.agreeUserList.AgreeUserResponseDto(
-				agreeUserLists);
+				totalCount, agreeUserLists);
 
 		return responseDto;
 	}

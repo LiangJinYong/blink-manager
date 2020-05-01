@@ -7,11 +7,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DashboardHospitalResponseDto {
 
+	private final Long hospitalId;
 	private final String hospitalName;
 	private final Long examinationCount;
 	private final Long examinationUserCount;
-	private final Long agreeCount;
-	private final Long unagreeCount;
-	private final Double agreePercent;
+	private final Long agreeYCount;
+	private final Long agreeNCount;
 	private final Boolean sendAgreeYn;
 }

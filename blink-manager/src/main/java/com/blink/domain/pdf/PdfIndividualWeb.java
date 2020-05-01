@@ -12,9 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import org.apache.tomcat.jni.FileInfo;
-
 import com.blink.domain.BaseEntity;
+import com.blink.domain.sendMailResultWeb.FileInfo;
 import com.blink.domain.user.UserData;
 import com.blink.enumeration.InspectionSubType;
 import com.blink.enumeration.InspectionType;
