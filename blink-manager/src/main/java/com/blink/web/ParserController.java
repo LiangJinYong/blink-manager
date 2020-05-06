@@ -9,12 +9,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.blink.common.CommonResponse;
 import com.blink.common.CommonResultCode;
 import com.blink.service.ParserService;
 import com.blink.web.admin.web.dto.UserParserRequestDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,12 +42,42 @@ public class ParserController {
 	}
 	
 	@PostMapping("/registerExaminationData")
-	public ResponseEntity insertEntireUserData(@RequestBody List<Map<String, Object>> param) {
+	public ResponseEntity registerExaminationData(@RequestBody List<Map<String, Object>> param) {
 
 		Map<String, Object> result = new HashMap<String, Object>();
 
 		parserService.entireSave(param);
 
+		result.put("resultCode", 200);
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+	
+	@PostMapping("/registerPdfFiles")
+	public ResponseEntity registerPdfFiles(@RequestParam("data") String param, @RequestParam("file") MultipartFile[] files) throws Exception {
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		
+		List<Map<String, String>> dataList = mapper.readValue(param, List.class);
+		
+		parserService.registerPdfFiles(dataList, files);
+		
+		result.put("resultCode", 200);
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+	
+	@PostMapping("/registerJsonFiles")
+	public ResponseEntity registerJsonFiles(@RequestParam("data") String param, @RequestParam("file") MultipartFile[] files) throws Exception {
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		
+		List<Map<String, String>> dataList = mapper.readValue(param, List.class);
+		
+		parserService.registerJsonFiles(dataList, files);
+		
 		result.put("resultCode", 200);
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}

@@ -12,7 +12,9 @@ public enum InspectionSubType {
     reportCancerLiver("간암상반기"),
     reportCancerLiverSecond("간암하반기"),
     reportCancerLung("폐암"),
-    reportCancerColonSecond("대장암2차");
+    reportCancerColonSecond("대장암2차"),
+    reportFirstOutpatient("1차문진"),
+    reportCancerOutpatient("암문진");
 
     private String name;
 

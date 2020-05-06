@@ -38,10 +38,10 @@ public class WebConsentFormController {
 			@RequestParam("receiveType") ReceiveType receiveType,
 			@RequestParam(name = "receiveTypeText", required = false) String receiveTypeText,
 			@RequestParam("consentYear") String consentYear, @RequestParam("consentMonth") String consentMonth,
-			@RequestParam("file") MultipartFile[] files) {
+			@RequestParam("count") Long count, @RequestParam("file") MultipartFile[] files) {
 
 		webConsentFormService.registerConsentForm(receiveDate, receiveType, receiveTypeText, consentYear, consentMonth,
-				files);
+				count, files);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 	}
 
@@ -53,7 +53,7 @@ public class WebConsentFormController {
 
 		ConsentFormResponseDto result = webConsentFormService.getConsentForms(searchText.orElse("_"),
 				period.orElse(SearchPeriod.ONEMONTH), pageable);
-		
+
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}
 
@@ -64,9 +64,9 @@ public class WebConsentFormController {
 			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period,
 			Pageable pageable) {
 
-		ConsentFormResponseDto result = webConsentFormService.getConsentFormsForHospital(hospitalId, searchText.orElse("_"),
-				period.orElse(SearchPeriod.ONEMONTH), pageable);
-		
+		ConsentFormResponseDto result = webConsentFormService.getConsentFormsForHospital(hospitalId,
+				searchText.orElse("_"), period.orElse(SearchPeriod.ONEMONTH), pageable);
+
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}
 }

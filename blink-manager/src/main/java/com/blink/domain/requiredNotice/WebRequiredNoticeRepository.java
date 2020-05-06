@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface WebRequiredNoticeRepository extends JpaRepository<WebRequiredNotice, Long> {
 
-	@Query("select n from WebRequiredNotice n where n.version = (select max(n2.version) from WebRequiredNotice n2)")
+	@Query("SELECT n FROM WebRequiredNotice n WHERE n.id = (SELECT MAX(n2.id) FROM WebRequiredNotice n2)")
 	Optional<WebRequiredNotice> findRecentRequiredNotice();
 }

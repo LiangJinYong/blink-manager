@@ -36,7 +36,7 @@ public class WebDigitalSignageService {
 	private final HospitalRepository hospitalRepository;
 
 	// ------------------ HOSPITAL ------------------
-	public void registerQuestion(Long hospitalId, SignageType signageType, int signageNoticeStyle, String title, String questionContent,
+	public void registerQuestion(Long hospitalId, SignageType signageType, Integer signageNoticeStyle, String title, String questionContent,
 			MultipartFile[] files) {
 		
 		String questionGroupId = fileUploadUtils.upload(files, "webDigitalSignageFiles", FileUploadUserType.WEB, hospitalId, null);

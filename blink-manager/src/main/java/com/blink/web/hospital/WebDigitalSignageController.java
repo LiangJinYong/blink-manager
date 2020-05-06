@@ -33,7 +33,7 @@ public class WebDigitalSignageController {
 	@ApiOperation(value = "사아니지 - 질문 등록")
 	@PostMapping("/question/{hospitalId}")
 	public ResponseEntity<CommonResponse> registerQuestion(@PathVariable("hospitalId") Long hospitalId, @RequestParam("signageType") SignageType signageType,
-			@RequestParam(name = "signageNoticeStyle", required = false) int signageNoticeStyle,
+			@RequestParam(name = "signageNoticeStyle", required = false) Integer signageNoticeStyle,
 			@RequestParam("title") String title, @RequestParam("questionContent") String questionContent,
 			@RequestParam(name = "file", required = false) MultipartFile[] files) {
 		

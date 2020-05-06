@@ -50,7 +50,7 @@ public class WebConsentForm extends BaseTimeEntity {
 
 	@Builder
 	public WebConsentForm(Hospital hospital, LocalDate receiveDate, ReceiveType receiveType, String receiveTypeText, String consentYear,
-			String consentMonth, String groupId) {
+			String consentMonth, String groupId, Long count) {
 		this.hospital = hospital;
 		this.receiveDate = receiveDate;
 		this.receiveType = receiveType;
@@ -58,6 +58,7 @@ public class WebConsentForm extends BaseTimeEntity {
 		this.consentYear = consentYear;
 		this.consentMonth = consentMonth;
 		this.groupId = groupId;
+		this.count = count;
 	}
 
 	/*

@@ -9,5 +9,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserExaminationResponseDto {
 
+	private final Integer totalUserExaminationCount;
+	private final Integer firstExaminationCount;
+	private final Integer secondExaminationCount;
+	private final Integer thirdExaminationCount;
+	private final Integer nonexistConsetFormCount;
+	
 	private final Page<SingleUserExaminationResponseDto> userExaminationList;
 }

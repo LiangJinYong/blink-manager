@@ -11,6 +11,7 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.blink.domain.data.BloodData;
 import com.blink.domain.data.BloodDataRepository;
@@ -36,6 +37,13 @@ import com.blink.domain.data.SurveyData;
 import com.blink.domain.data.SurveyDataRepository;
 import com.blink.domain.data.UrineData;
 import com.blink.domain.data.UrineDataRepository;
+import com.blink.domain.json.JsonIndividualApi;
+import com.blink.domain.json.JsonIndividualApiRepository;
+import com.blink.domain.pdf.PdfIndividualWeb;
+import com.blink.domain.pdf.PdfIndividualWebRepository;
+import com.blink.domain.pdf.PdfWeb;
+import com.blink.domain.pdf.PdfWebRepository;
+import com.blink.domain.sendMailResultWeb.FileInfo;
 import com.blink.domain.user.UserData;
 import com.blink.domain.user.UserDataRepository;
 import com.blink.domain.user.UserExaminationEntireDataOfOne;
@@ -50,6 +58,7 @@ import com.blink.enumeration.Gender;
 import com.blink.enumeration.InspectionSubType;
 import com.blink.enumeration.InspectionType;
 import com.blink.enumeration.Nationality;
+import com.blink.util.FileUploadUtils;
 import com.blink.web.admin.web.dto.UserDataRequestDto;
 import com.blink.web.admin.web.dto.UserExaminationMetadataRequestDto;
 import com.blink.web.admin.web.dto.UserParserRequestDto;
@@ -79,6 +88,12 @@ public class ParserService {
 
 	private final UserExaminationEntireDataOfOneRepository userExaminationEntireDataOfOneRepository;
 	private final UserExaminationMetadataDetailRepository userExaminationMetadataDetailRepository;
+
+	private final PdfWebRepository pdfWebRepository;
+	private final PdfIndividualWebRepository pdfIndividualWebRepository;
+	private final JsonIndividualApiRepository jsonIndividualApiRepository;
+
+	private final FileUploadUtils fileUploadUtils;
 
 	public List<Map<String, Object>> save(List<UserParserRequestDto> userList) {
 
@@ -186,28 +201,28 @@ public class ParserService {
 					UserExaminationMetadata metadataEntity = metadata.get();
 					String userAddress = (String) map.get("userAddress");
 					metadataEntity.updateAddress(userAddress);
-					
+
 					String agreeYnStr = (String) map.get("agreeYn");
-					
-					if(agreeYnStr != null) {
+
+					if (agreeYnStr != null) {
 						metadataEntity.setAgreeYn(Integer.parseInt(agreeYnStr));
 					}
-					
+
 					String agreeMailStr = (String) map.get("agreeMail");
-					
-					if(agreeMailStr != null) {
+
+					if (agreeMailStr != null) {
 						metadataEntity.setAgreeMail(Integer.parseInt(agreeMailStr));
 					}
-					
+
 					String agreeSmsStr = (String) map.get("agreeSms");
-					
-					if(agreeSmsStr != null) {
+
+					if (agreeSmsStr != null) {
 						metadataEntity.setAgreeSms(Integer.parseInt(agreeSmsStr));
 					}
-					
+
 					String agreeVisitStr = (String) map.get("agreeVisit");
-					
-					if(agreeVisitStr != null) {
+
+					if (agreeVisitStr != null) {
 						metadataEntity.setAgreeVisit(Integer.parseInt(agreeVisitStr));
 					}
 
@@ -289,26 +304,35 @@ public class ParserService {
 					type = CancerType.valueOf((String) typeObj);
 				}
 
-				CancerDataApp cancerDataApp = CancerDataApp.builder() //
-						.userExaminationEntireDataOfOne(dataOfOne) //
-						.caseCondition1(caseCondition1) //
-						.caseCondition2(caseCondition2) //
-						.caseCondition3(caseCondition3) //
-						.caseCondition4(caseCondition4) //
-						.title(title) //
-						.description(description) //
-						.childLeft(childLeft) //
-						.childDescription(childDescription) //
-						.childRight(childRight) //
-						.comment(comment) //
-						.postComment(postComment) //
-						.preComment(preComment) //
-						.analyzerStatus(analyzerStatus) //
-						.hadCancer(hadCancer) //
-						.type(type) //
-						.build();
+				Optional<CancerDataApp> cancerDataApp = cancerDataAppRepository
+						.findByTypeAndUserExaminationEntireDataOfOne(type, dataOfOne);
 
-				cancerDataAppRepository.save(cancerDataApp);
+				if (!cancerDataApp.isPresent()) {
+					CancerDataApp cancerDataAppEntity = CancerDataApp.builder() //
+							.userExaminationEntireDataOfOne(dataOfOne) //
+							.caseCondition1(caseCondition1) //
+							.caseCondition2(caseCondition2) //
+							.caseCondition3(caseCondition3) //
+							.caseCondition4(caseCondition4) //
+							.title(title) //
+							.description(description) //
+							.childLeft(childLeft) //
+							.childDescription(childDescription) //
+							.childRight(childRight) //
+							.comment(comment) //
+							.postComment(postComment) //
+							.preComment(preComment) //
+							.analyzerStatus(analyzerStatus) //
+							.hadCancer(hadCancer) //
+							.type(type) //
+							.build();
+
+					cancerDataAppRepository.save(cancerDataAppEntity);
+				} else {
+					cancerDataApp.get().update(caseCondition1, caseCondition2, caseCondition3, caseCondition4, title,
+							description, childLeft, childDescription, childRight, comment, postComment, preComment,
+							analyzerStatus, hadCancer);
+				}
 			}
 		}
 
@@ -359,9 +383,9 @@ public class ParserService {
 		String examinationYear = (String) map.get("examinationYear");
 		String hospitalDataId = (String) map.get("hospitalDataId");
 		Integer agreeYn = 0;
-		
+
 		String agreeYnStr = (String) map.get("agreeYn");
-		
+
 		if (agreeYnStr != null) {
 			agreeYn = Integer.parseInt(agreeYnStr);
 		}
@@ -373,8 +397,7 @@ public class ParserService {
 				.hospitalDataId(Long.parseLong(hospitalDataId)) //
 				.address(address) //
 				.userExaminationEntireDataOfOne(dataOfOne) //
-				.agreeYn(agreeYn)
-				.agreeMail(1) //
+				.agreeYn(agreeYn).agreeMail(1) //
 				.agreeSms(1) //
 				.agreeVisit(0) //
 				.build();
@@ -979,6 +1002,120 @@ public class ParserService {
 					elderfunctionDataItem.get("assessmentOfVaccinationOfElderResult"));
 			elderfunctionData.setAssessmentOfDysuresiaOfElderResult(
 					elderfunctionDataItem.get("assessmentOfDysuresiaOfElderResult"));
+		}
+	}
+
+	public void registerPdfFiles(List<Map<String, String>> dataList, MultipartFile[] files) {
+
+		for (int i = 0; i < dataList.size(); i++) {
+
+			Map<String, String> data = dataList.get(i);
+
+			Integer inspectionTypeIndex = Integer.parseInt(data.get("inspectionType"));
+			InspectionType inspectionType = InspectionType.values()[inspectionTypeIndex];
+
+			Integer inspectionSubTypeIndex = Integer.parseInt(data.get("inspectionSubType"));
+			InspectionSubType inspectionSubType = InspectionSubType.values()[inspectionSubTypeIndex];
+
+			Long pdfWebId = Long.parseLong(data.get("pdfWebId"));
+			PdfWeb pdfWeb = null;
+			Optional<PdfWeb> pdfWebOptional = pdfWebRepository.findById(pdfWebId);
+
+			if (pdfWebOptional.isPresent()) {
+				pdfWeb = pdfWebOptional.get();
+			}
+
+			String phone = data.get("phone");
+			String ssnPartial = data.get("ssnPartial");
+
+			UserData userData = null;
+			Optional<UserData> userDataOptional = userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
+
+			if (userDataOptional.isPresent()) {
+				userData = userDataOptional.get();
+			}
+			
+			Optional<PdfIndividualWeb> pdfOptional = pdfIndividualWebRepository.findByUserDataAndPdfWebAndInspectionTypeAndInspectionSubType(userData, pdfWeb, inspectionType, inspectionSubType);
+			
+			if (!pdfOptional.isPresent()) {
+				
+				FileInfo fileInfo = fileUploadUtils.uploadIndividualFile(files[i]);
+				
+				PdfIndividualWeb pdfIndividualWeb = PdfIndividualWeb.builder() //
+						.inspectionType(inspectionType) //
+						.inspectionSubType(inspectionSubType) //
+						.pdfWeb(pdfWeb) //
+						.userData(userData) //
+						.fileInfo(fileInfo) //
+						.build();
+				
+				PdfIndividualWeb pdfEntity = pdfIndividualWebRepository.save(pdfIndividualWeb);
+				
+				Integer examinationYear = Integer.parseInt(data.get("dateExaminedYear"));
+				Optional<UserExaminationMetadata> metadata = userExaminationMetadataRepository
+						.findByUserAndExaminationYear(Optional.of(userData), examinationYear);
+				
+				if (metadata.isPresent()) {
+					List<UserExaminationMetadataDetail> metadataDetailList = metadata.get()
+							.getUserExaminationMetadataDetailList();
+					for (UserExaminationMetadataDetail detail : metadataDetailList) {
+						if (inspectionType.equals(detail.getInspectionType())
+								&& inspectionSubTypeIndex.equals(detail.getInspectionSubType())) {
+							detail.setPdfIndividualWeb(pdfEntity);
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public void registerJsonFiles(List<Map<String, String>> dataList, MultipartFile[] files) {
+		for (int i = 0; i < dataList.size(); i++) {
+
+			Map<String, String> data = dataList.get(i);
+
+			Integer inspectionTypeIndex = Integer.parseInt(data.get("inspectionType"));
+			InspectionType inspectionType = InspectionType.values()[inspectionTypeIndex];
+
+			Integer inspectionSubTypeIndex = Integer.parseInt(data.get("inspectionSubType"));
+			InspectionSubType inspectionSubType = InspectionSubType.values()[inspectionSubTypeIndex];
+
+			String phone = data.get("phone");
+			String ssnPartial = data.get("ssnPartial");
+
+			UserData userData = null;
+			Optional<UserData> userDataOptional = userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
+
+			if (userDataOptional.isPresent()) {
+				userData = userDataOptional.get();
+			}
+
+			Integer examinationYear = Integer.parseInt(data.get("dateExaminedYear"));
+			
+			UserExaminationMetadata metadata = null;
+			Optional<UserExaminationMetadata> metadataOptional = userExaminationMetadataRepository.findByUserDataAndExaminationYear(userData, examinationYear);
+			
+			if (metadataOptional.isPresent()) {
+				metadata = metadataOptional.get();
+			}
+			
+			Optional<JsonIndividualApi> jsonOptional = jsonIndividualApiRepository.findByUserDataAndInspectionTypeAndInspectionSubType(userData, inspectionType, inspectionSubType);
+			
+			if (!jsonOptional.isPresent()) {
+				
+				FileInfo fileInfo = fileUploadUtils.uploadIndividualFile(files[i]);
+				
+				JsonIndividualApi jsonIndividualApi = JsonIndividualApi.builder() //
+						.inspectionType(inspectionType) //
+						.inspectionSubType(inspectionSubType) //
+						.userData(userData) //
+						.userExaminationMetadata(metadata) //
+						.fileInfo(fileInfo) //
+						.build();
+				
+				jsonIndividualApiRepository.save(jsonIndividualApi);
+			}
 		}
 	}
 }

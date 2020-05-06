@@ -64,7 +64,7 @@ spring:
     blink-remote:
          host: http://15.165.22.0:8000/bioage/
     datasource:
-        url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_db_makeit?characterEncoding=utf-8&serverTimezone=UTC
+        url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_db_product_makeit?characterEncoding=utf-8&serverTimezone=UTC
         username: admin
         password: 1nf0bank
         driverClassName: com.mysql.cj.jdbc.Driver
@@ -107,7 +107,21 @@ spring:
             use_sql_comments : true
             dialect: org.hibernate.dialect.MySQL5InnoDBDialect
             default_batch_fetch_size: 100
-
+scheduler:
+  datasource:
+    url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_stats_scheduler_db_product_makeit?characterEncoding=utf-8&serverTimezone=UTC
+    username: admin
+    password: 1nf0bank
+    driverClassName: com.mysql.cj.jdbc.Driver
+    platform: mysql
+    initialization-mode: always
+    hikari:
+      connection-timeout: 5000
+      validation-timeout: 5000
+      minimum-idle: 1
+      maximum-pool-size: 1
+      max-lifetime: 6000
+      
 auth:
     code:
         length: 4
@@ -161,7 +175,7 @@ spring:
         generate-ddl: false
         show-sql: true
         hibernate:
-            ddl-auto: none
+            ddl-auto: update
             naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
         properties:
           hibernate:
@@ -228,7 +242,7 @@ spring:
         generate-ddl: false
         show-sql: true
         hibernate:
-            ddl-auto: none
+            ddl-auto: update
             naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
         properties:
           hibernate:
@@ -238,6 +252,20 @@ spring:
             use_sql_comments : true
             dialect: org.hibernate.dialect.MySQL5InnoDBDialect
             default_batch_fetch_size: 100
+scheduler:
+  datasource:
+    url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_stats_scheduler_db_product_makeit?characterEncoding=utf-8&serverTimezone=UTC
+    username: admin
+    password: 1nf0bank
+    driverClassName: com.mysql.cj.jdbc.Driver
+    platform: mysql
+    initialization-mode: always
+    hikari:
+      connection-timeout: 5000
+      validation-timeout: 5000
+      minimum-idle: 1
+      maximum-pool-size: 1
+      max-lifetime: 6000
             
 auth:
     code:
@@ -246,20 +274,24 @@ auth:
             second: 600
             
 ---
-
+server:
+  port: 5000
+  
 spring:
     auth-code-mt:
         host: http://211.233.76.241:2189
     blink-remote:
         host: http://15.165.22.0:8000/bioage/
-    profiles: product    
+    profiles: prod   
     
     servlet:
       multipart:
         max-file-size: 250MB
         max-request-size: 250MB    
     datasource:
-        url: jdbc:mysql://blink-product-database.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_product?characterEncoding=utf-8&serverTimezone=UTC
+        #url: jdbc:mysql://blink-product-database.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_product?characterEncoding=utf-8&serverTimezone=UTC
+        #url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_db_product_makeit?characterEncoding=utf-8&serverTimezone=UTC
+        url: jdbc:mysql://blink-product-database.cluster-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_product?characterEncoding=utf-8&serverTimezone=UTC
         username: blinkdb
         password: blinkdbpw
         driverClassName: com.mysql.cj.jdbc.Driver
@@ -292,7 +324,7 @@ spring:
         generate-ddl: false
         show-sql: true
         hibernate:
-            ddl-auto: none
+            ddl-auto: update
             naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
         properties:
           hibernate:

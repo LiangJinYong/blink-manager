@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -54,5 +55,14 @@ public class PdfIndividualWeb extends BaseEntity {
 
     @Embedded
     private FileInfo fileInfo;
+    
+    @Builder
+    public PdfIndividualWeb(InspectionType inspectionType, InspectionSubType inspectionSubType, PdfWeb pdfWeb, UserData userData, FileInfo fileInfo) {
+    	this.inspectionType = inspectionType;
+    	this.inspectionSubType = inspectionSubType;
+    	this.pdfWeb = pdfWeb;
+    	this.userData = userData;
+    	this.fileInfo = fileInfo;
+    }
 
 }

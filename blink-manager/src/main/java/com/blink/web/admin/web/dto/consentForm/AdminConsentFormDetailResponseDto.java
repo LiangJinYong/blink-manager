@@ -25,6 +25,8 @@ public class AdminConsentFormDetailResponseDto {
 	private final String consentMonth;
 	private final Long count;
 	private final String groupId;
+	private final Long hospitalId;
+	private final String username;
 	
 	private List<WebFileResponseDto> files = new ArrayList<>();
 }

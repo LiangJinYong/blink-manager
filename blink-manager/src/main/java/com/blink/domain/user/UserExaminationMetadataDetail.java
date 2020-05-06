@@ -17,6 +17,7 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.BatchSize;
 
+import com.blink.domain.json.JsonIndividualApi;
 import com.blink.domain.pdf.PdfIndividualWeb;
 import com.blink.enumeration.InspectionSubType;
 import com.blink.enumeration.InspectionType;
@@ -62,7 +63,7 @@ public class UserExaminationMetadataDetail implements Serializable {
     @ManyToOne(fetch =FetchType.LAZY, cascade = {CascadeType.ALL})
     @JoinColumn(foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "NONE"))
     private PdfIndividualWeb pdfIndividualWeb;
-
+    
     @NonNull
     @Column(columnDefinition = "date comment '검진일'")
     private LocalDate dateExamined;

@@ -12,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.blink.domain.hospital.Hospital;
 import com.blink.domain.hospital.HospitalRepository;
+import com.blink.domain.user.UserExaminationMetadataDetailRepository;
+import com.blink.domain.user.UserExaminationMetadataRepository;
 import com.blink.domain.webfiles.WebFiles;
 import com.blink.domain.webfiles.WebFilesRepository;
 import com.blink.enumeration.FileUploadUserType;
@@ -34,15 +36,20 @@ public class HospitalService {
 	private final WebFilesRepository webFilesRepository;
 	private final BucketService bucketService;
 	private final FileUploadUtils fileUploadUtils;
+	private final UserExaminationMetadataDetailRepository userExaminationMetadataDetailRepository;
 
 	// ------------------ ADMIN ------------------
 	public HospitalResponseDto getHospitalList(String searchText, SearchPeriod period, Pageable pageable) {
 
 		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 
+		Integer hospitalCount = hospitalRepository.findHospitalCount();
+		Integer diagnoseCount = userExaminationMetadataDetailRepository.findDiagnoseCount();
+		String mostExaminationHospitalName = userExaminationMetadataDetailRepository.findMostExaminationHospitalName();
+				
 		Page<HospitalDetailResponseDto> hospitalList = hospitalRepository.findBySearchTextAndPeriod(searchText, time,
 				pageable);
-		HospitalResponseDto responseDto = new HospitalResponseDto(0, 0, "xxx", hospitalList);
+		HospitalResponseDto responseDto = new HospitalResponseDto(hospitalCount, diagnoseCount, mostExaminationHospitalName, hospitalList);
 
 		return responseDto;
 	}

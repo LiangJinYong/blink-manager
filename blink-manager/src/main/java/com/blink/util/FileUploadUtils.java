@@ -82,4 +82,18 @@ public class FileUploadUtils {
 		}
 		return null;
 	}
+	
+	public FileInfo uploadIndividualFile(MultipartFile file) {
+		FileResource fileResource;
+		try {
+			fileResource = bucketService.upload(Optional.of("upload"), file);
+			String filekey = fileResource.getKey();
+			String filename = file.getOriginalFilename();
+			FileInfo fileInfo = new FileInfo(filekey, filename);
+			return fileInfo;
+		} catch (InterruptedException | IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

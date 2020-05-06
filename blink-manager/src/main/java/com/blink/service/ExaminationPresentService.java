@@ -1,6 +1,8 @@
 package com.blink.service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import javax.transaction.Transactional;
 
@@ -27,8 +29,9 @@ public class ExaminationPresentService {
 			Pageable pageable) {
 
 		LocalDateTime time = CommonUtils.getSearchPeriod(period);
+		ZonedDateTime zonedTime = time.atZone(ZoneId.of("Asia/Seoul"));
 		
-		Page<ExaminatinPresentHospitalResponseDto> examinatinPresentHospitalList = examinationPresentRepository.findBySearchTextAndPeriod(hospitalId, time, pageable);
+		Page<ExaminatinPresentHospitalResponseDto> examinatinPresentHospitalList = examinationPresentRepository.findBySearchTextAndPeriod(hospitalId, zonedTime, pageable);
 		
 		ExaminatinPresentResponseDto responseDto = new ExaminatinPresentResponseDto(examinatinPresentHospitalList);
 		

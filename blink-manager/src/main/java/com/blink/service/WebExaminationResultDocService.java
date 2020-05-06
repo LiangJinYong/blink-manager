@@ -2,6 +2,7 @@ package com.blink.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -86,6 +87,16 @@ public class WebExaminationResultDocService {
 		for(WebExaminationResultDocResponseDto dto : content) {
 			String groupId = dto.getGroupId();
 			List<WebFileResponseDto> examinationResultDocFiles = webFilesRepository.findByGroupId(groupId);
+			
+			Optional<WebExaminationResultDoc> webExaminationResultDoc = webExaminationResultDocRepository.findById(dto.getId());
+			
+			PdfWeb pdfWeb = webExaminationResultDoc.get().getPdfWeb();
+			
+			if (pdfWeb != null) {
+				WebFileResponseDto pdfFileDto = new WebFileResponseDto(pdfWeb.getFileInfo().getFilekey(), pdfWeb.getFileInfo().getFilename(), null);
+				examinationResultDocFiles.add(pdfFileDto);
+			}
+			
 			dto.setFiles(examinationResultDocFiles);
 		}
 		

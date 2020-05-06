@@ -37,7 +37,7 @@ public class WebConsentFormService {
 	private final HospitalRepository hospitalRepository;
 
 	public void registerConsentForm(LocalDate receiveDate, ReceiveType receiveType, String receiveTypeText,
-			String consentYear, String consentMonth, MultipartFile[] files) {
+			String consentYear, String consentMonth, Long count, MultipartFile[] files) {
 
 		String groupId = fileUploadUtils.upload(files, "webConsentFormFiles", FileUploadUserType.WEB, 0L, null);
 
@@ -48,6 +48,7 @@ public class WebConsentFormService {
 				.consentYear(consentYear) //
 				.consentMonth(consentMonth) //
 				.groupId(groupId) //
+				.count(count) //
 				.build();
 
 		webConsentFormRepository.save(webConsentForm);
@@ -98,7 +99,7 @@ public class WebConsentFormService {
 		return responseDto;
 	}
 
-	public void registerConsentFormForHospital(Long hospitalId, String consentYear, String consentMonth,
+	public void registerConsentFormForHospital(Long hospitalId, String consentYear, String consentMonth, Long count,
 			MultipartFile[] files) {
 
 		String groupId = fileUploadUtils.upload(files, "webConsentFormFiles", FileUploadUserType.WEB, hospitalId, null);
@@ -108,6 +109,7 @@ public class WebConsentFormService {
 				.consentYear(consentYear) //
 				.consentMonth(consentMonth) //
 				.groupId(groupId) //
+				.count(count) //
 				.build(); 
 
 		webConsentFormRepository.save(webConsentForm);

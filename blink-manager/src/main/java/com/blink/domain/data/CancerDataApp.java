@@ -103,4 +103,25 @@ public class CancerDataApp implements Serializable {
 		this.hadCancer = hadCancer;
 		this.type = type;
 	}
+
+	public void update(String caseCondition1, String caseCondition2, String caseCondition3, String caseCondition4,
+			String title, String description, String childLeft, String childDescription, String childRight,
+			String comment, String postComment, String preComment, CancerAnalyzerStatus analyzerStatus,
+			String hadCancer) {
+		this.caseCondition1 = caseCondition1;
+		this.caseCondition2 = caseCondition2;
+		this.caseCondition3 = caseCondition3;
+		this.caseCondition4 = caseCondition4;
+		this.title = title;
+		this.description = description;
+		this.childLeft = childLeft;
+		this.childDescription = childDescription;
+		this.childRight = childRight;
+		this.comment = comment;
+		this.postComment = postComment;
+		this.preComment = preComment;
+		this.analyzerStatus = analyzerStatus;
+		this.hadCancer = hadCancer;
+
+	}
 }

@@ -32,7 +32,7 @@ public class WebDigitalSignage extends BaseTimeEntity {
 	private SignageType signageType;
 	
 	@Column(columnDefinition="int(2)")
-	private int signageNoticeStyle;
+	private Integer signageNoticeStyle;
 	
 	private String title;
 
@@ -56,7 +56,7 @@ public class WebDigitalSignage extends BaseTimeEntity {
 	private Hospital hospital;
 	
 	@Builder
-	public WebDigitalSignage(Hospital hospital, SignageType signageType, int signageNoticeStyle, String title, String questionContent) {
+	public WebDigitalSignage(Hospital hospital, SignageType signageType, Integer signageNoticeStyle, String title, String questionContent) {
 		this.hospital = hospital;
 		this.signageType = signageType;
 		this.signageNoticeStyle = signageNoticeStyle;

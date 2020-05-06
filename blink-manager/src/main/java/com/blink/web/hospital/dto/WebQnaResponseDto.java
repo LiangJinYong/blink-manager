@@ -23,6 +23,7 @@ public class WebQnaResponseDto {
 	private final String questionGroupId;
 	private final String answerGroupId;
 	private final String hospitalName;
+	private final String username;
 	private List<WebFileResponseDto> questionFiles = new ArrayList<>();
 	private List<WebFileResponseDto> answerFiles = new ArrayList<>();
 }

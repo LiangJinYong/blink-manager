@@ -17,6 +17,7 @@ import com.blink.domain.user.UserExaminationMetadata;
 import com.blink.domain.user.UserExaminationMetadataDetailRepository;
 import com.blink.domain.user.UserExaminationMetadataRepository;
 import com.blink.enumeration.Gender;
+import com.blink.enumeration.InspectionType;
 import com.blink.enumeration.SearchPeriod;
 import com.blink.util.CommonUtils;
 import com.blink.web.hospital.dto.userExamination.InspectionTypeDto;
@@ -49,8 +50,14 @@ public class WebUserExaminationService {
 					.findInspectionTypeByMetadata(dto.getUserExaminationId());
 			dto.setInspectionTypeList(inspectionTypeList);
 		}
+		
+		Integer totalUserExaminationCount = metadataRepository.findUserExaminationCountForHospital(hospitalId);
+		Integer firstExaminationCount = detailRepository.findExaminationCountByInspectionForHospital(hospitalId, InspectionType.first);
+		Integer secondExaminationCount = detailRepository.findExaminationCountByInspectionForHospital(hospitalId, InspectionType.second);
+		Integer thirdExaminationCount = detailRepository.findExaminationCountByInspectionForHospital(hospitalId, InspectionType.cancer);
+		Integer nonexistConsetFormCount = metadataRepository.findNonexistConsetFormCountForHospital(hospitalId);
 
-		UserExaminationResponseDto responseDto = new UserExaminationResponseDto(list);
+		UserExaminationResponseDto responseDto = new UserExaminationResponseDto(totalUserExaminationCount, firstExaminationCount, secondExaminationCount, thirdExaminationCount, nonexistConsetFormCount, list);
 
 		return responseDto;
 	}
@@ -69,8 +76,14 @@ public class WebUserExaminationService {
 					.findInspectionTypeByMetadata(dto.getUserExaminationId());
 			dto.setInspectionTypeList(inspectionTypeList);
 		}
+		
+		Integer totalUserExaminationCount = metadataRepository.findUserExaminationCountForAdmin();
+		Integer firstExaminationCount = detailRepository.findExaminationCountByInspectionForAdmin(InspectionType.first);
+		Integer secondExaminationCount = detailRepository.findExaminationCountByInspectionForAdmin(InspectionType.second);
+		Integer thirdExaminationCount = detailRepository.findExaminationCountByInspectionForAdmin(InspectionType.cancer);
+		Integer nonexistConsetFormCount = metadataRepository.findNonexistConsetFormCountForAdmin();
 
-		UserExaminationResponseDto responseDto = new UserExaminationResponseDto(list);
+		UserExaminationResponseDto responseDto = new UserExaminationResponseDto(totalUserExaminationCount, firstExaminationCount, secondExaminationCount, thirdExaminationCount, nonexistConsetFormCount, list);
 
 		return responseDto;
 	}

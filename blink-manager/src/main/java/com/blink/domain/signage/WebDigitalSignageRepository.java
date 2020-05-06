@@ -12,11 +12,11 @@ import com.blink.web.hospital.dto.WebDigitalSignageResponseDto;
 
 public interface WebDigitalSignageRepository extends JpaRepository<WebDigitalSignage, Long> {
 
-	@Query("SELECT new com.blink.web.hospital.dto.WebDigitalSignageResponseDto(s.id, s.signageType, s.title, s.createdAt, s.answerYn, s.questionContent, s.answerContent, s.questionGroupId, s.answerGroupId, h.displayName) FROM WebDigitalSignage s JOIN s.hospital h WHERE title LIKE %:searchText% AND s.createdAt >= :time AND s.hospital.id = :hospitalId")
+	@Query("SELECT new com.blink.web.hospital.dto.WebDigitalSignageResponseDto(s.id, s.signageType, s.signageNoticeStyle, s.title, s.createdAt, s.answerYn, s.questionContent, s.answerContent, s.questionGroupId, s.answerGroupId, h.displayName, h.name) FROM WebDigitalSignage s JOIN s.hospital h WHERE title LIKE %:searchText% AND s.createdAt >= :time AND s.hospital.id = :hospitalId")
 	Page<WebDigitalSignageResponseDto> findByTitleAndPeriodWithHospital(@Param("searchText") String searchText, @Param("time") LocalDateTime time,
 			@Param("hospitalId") Long hospitalId, Pageable pageable);
 
-	@Query("SELECT new com.blink.web.hospital.dto.WebDigitalSignageResponseDto(s.id, s.signageType, s.title, s.createdAt, s.answerYn, s.questionContent, s.answerContent, s.questionGroupId, s.answerGroupId, h.displayName) FROM WebDigitalSignage s JOIN s.hospital h WHERE title LIKE %:searchText% AND s.createdAt >= :time")
+	@Query("SELECT new com.blink.web.hospital.dto.WebDigitalSignageResponseDto(s.id, s.signageType, s.signageNoticeStyle, s.title, s.createdAt, s.answerYn, s.questionContent, s.answerContent, s.questionGroupId, s.answerGroupId, h.displayName, h.name) FROM WebDigitalSignage s JOIN s.hospital h WHERE title LIKE %:searchText% AND s.createdAt >= :time")
 	Page<WebDigitalSignageResponseDto> findByTitleAndPeriodWithAdmin(@Param("searchText") String searchText, @Param("time") LocalDateTime time,
 			Pageable pageable);
 

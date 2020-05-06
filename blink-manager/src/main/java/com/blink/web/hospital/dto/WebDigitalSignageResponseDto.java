@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class WebDigitalSignageResponseDto {
 	private final Long id;
 	private final SignageType signageType;
+	private final Integer signageNoticeStyle;
 	private final String title;
 	private final LocalDateTime createdAt;
 	private final boolean answerYn;
@@ -23,6 +24,7 @@ public class WebDigitalSignageResponseDto {
 	private final String questionGroupId;
 	private final String answerGroupId;
 	private final String hospitalName;
+	private final String username;
 	private List<WebFileResponseDto> questionFiles = new ArrayList<>();
 	private List<WebFileResponseDto> answerFiles = new ArrayList<>();
 
