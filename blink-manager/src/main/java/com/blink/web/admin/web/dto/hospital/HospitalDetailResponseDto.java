@@ -29,4 +29,5 @@ public class HospitalDetailResponseDto {
 	private final String fileKey;
 	private final String groupFileId;
 	private final String employeePosition;
+	private LocalDateTime regDate2;
 }

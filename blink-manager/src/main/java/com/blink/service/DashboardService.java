@@ -1,8 +1,8 @@
 package com.blink.service;
 
-import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -10,13 +10,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.blink.domain.hospital.Hospital;
 import com.blink.domain.hospital.HospitalRepository;
-import com.blink.domain.hospitalStatistics.HospitalStatistics;
 import com.blink.domain.hospitalStatistics.HospitalStatisticsRepository;
 import com.blink.domain.user.UserExaminationMetadataDetailRepository;
 import com.blink.domain.user.UserExaminationMetadataRepository;
 import com.blink.enumeration.SearchPeriod;
-import com.blink.util.CommonUtils;
+import com.blink.service.StatisticsService.PieChartResult;
 import com.blink.web.admin.web.dto.dashboard.DashboardResponseDto;
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +30,8 @@ public class DashboardService {
 	private final UserExaminationMetadataDetailRepository detailRepository;
 	private final UserExaminationMetadataRepository metadataRepository;
 	private final HospitalStatisticsRepository hospitalStatisticsRepository;
+	
+	private final StatisticsService statisticsService;
 	
 	public DashboardResponseDto getDashboardData(String searchText, SearchPeriod period, Pageable pageable) {
 	
@@ -48,16 +50,22 @@ public class DashboardService {
 		return responseDto;
 	}
 
-	public HospitalStatistics getDashboardDataWithHospital(Long hospitalId) {
+	public Map<String, Object> getDashboardDataWithHospital(Long hospitalId) {
 
-		Optional<HospitalStatistics> statistics = hospitalStatisticsRepository.findByHospitalId(hospitalId);
+		Map<String, Object> result = new HashMap<String, Object>();
 		
-		HospitalStatistics result;
-		if (statistics.isPresent()) {
-			result = statistics.get();
-		} else {
-			result = new HospitalStatistics();
-		}
+		Hospital hospital = hospitalRepository.findById(hospitalId).orElseThrow(() -> new IllegalArgumentException("No such hospital"));
+		
+		String hospitalName = hospital.getName();
+		
+		List<PieChartResult> ageGrChartResults = statisticsService.findAgeGroupChartResult(hospitalName);
+		result.put("ageGroupChartResult", ageGrChartResults);
+		
+		List<PieChartResult> genderGroupChartResult = statisticsService.findGenderGroupChartResult(hospitalName);
+		result.put("genderGroupChartResult", genderGroupChartResult);
+		
+		List<PieChartResult> inspectionTypeGroupChartResult = statisticsService.findInspectionTypeGroupChartResult(hospitalName);
+		result.put("inspectionTypeGroupChartResult", inspectionTypeGroupChartResult);
 		
 		return result;
 	}

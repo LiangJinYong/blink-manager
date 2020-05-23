@@ -146,11 +146,13 @@ public class AccountController {
 				return ResponseEntity.ok(new CommonResponse(CommonResultCode.ACCOUNT_INFO_NONEXIST));
 			}
 		}
-		String token = jwtUtil.generateToken(username);
-		result.put("token", token);
 		
 		Map<String, Object> userStatus = accountService.getUserStatusInfo(username);
 		result.putAll(userStatus);
+		
+		String role = (String) userStatus.get("role");
+		String token = jwtUtil.generateToken(username, role);
+		result.put("token", token);
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}

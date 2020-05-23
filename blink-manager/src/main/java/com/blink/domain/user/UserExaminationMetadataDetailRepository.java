@@ -20,7 +20,7 @@ public interface UserExaminationMetadataDetailRepository extends JpaRepository<U
 			@Param("inspectionType") Integer inspectionType, @Param("inspectionSubType") Integer inspectionSubType);
 
 	// 수검자 관리
-	@Query("SELECT new com.blink.web.hospital.dto.userExamination.InspectionTypeDto(d.inspectionType, d.inspectionSubType, w.fileInfo.filekey) FROM UserExaminationMetadataDetail d JOIN d.pdfIndividualWeb w WHERE d.userExaminationMetadata.id = :userExaminationId")
+	@Query("SELECT new com.blink.web.hospital.dto.userExamination.InspectionTypeDto(d.inspectionType, d.inspectionSubType, w.fileInfo.filekey, w.fileInfo.filename) FROM UserExaminationMetadataDetail d LEFT JOIN d.pdfIndividualWeb w WHERE d.userExaminationMetadata.id = :userExaminationId")
 	List<InspectionTypeDto> findInspectionTypeByMetadata(@Param("userExaminationId") Long userExaminationId);
 
 	@Query("SELECT COUNT(d.id) FROM UserExaminationMetadataDetail d")

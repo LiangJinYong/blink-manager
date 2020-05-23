@@ -1,6 +1,7 @@
 package com.blink.domain.user;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -10,7 +11,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.blink.web.admin.web.dto.business.SingleBusinessResponseDto;
 import com.blink.web.hospital.dto.userExamination.SingleUserExaminationResponseDto;
 
 public interface UserExaminationMetadataRepository extends JpaRepository<UserExaminationMetadata, Long> {
@@ -43,12 +43,14 @@ public interface UserExaminationMetadataRepository extends JpaRepository<UserExa
 	Integer findNonexistConsetFormCountForAdmin();
 
 	// 업무관리
-	@Query(value = "SELECT h.id FROM user_examination_metadata m INNER JOIN hospital h ON m.hospital_data_id = h.id where h.display_name LIKE %:searchText% AND DATE(m.created_at) = :searchDate GROUP BY h.id", nativeQuery = true)
-	Page<BigInteger> findBusinessHospitalIds(@Param("searchText") String searchText,
-			@Param("searchDate") String searchDate, Pageable pageable);
+	@Query("SELECT h.id FROM UserExaminationMetadata m INNER JOIN Hospital h ON m.hospitalDataId = h.id WHERE h.displayName LIKE %:searchText% AND DATE(m.createdAt) = DATE(:searchDate) GROUP BY h.id")
+	Page<Long> findBusinessHospitalIds(@Param("searchText") String searchText,
+			@Param("searchDate") LocalDateTime searchDate, Pageable pageable);
 
-	@Query(value = "SELECT COUNT(*) FROM user_examination_metadata WHERE DATE(created_at)  = :searchDate AND hospital_data_id = :hospitalId AND agree_yn = :agreeYn", nativeQuery = true)
-	Integer findAgreeYnCount(@Param("searchDate") String searchDate, @Param("hospitalId") Long hospitalId,
+	@Query("SELECT COUNT(*) FROM UserExaminationMetadata m WHERE DATE(m.createdAt) = DATE(:searchDate) AND m.hospitalDataId = :hospitalId AND m.agreeYn = :agreeYn")
+	Integer findAgreeYnCount(@Param("searchDate") LocalDateTime searchDate, @Param("hospitalId") Long hospitalId,
 			@Param("agreeYn") Integer agreeYn);
 
+	@Query("SELECT COUNT(*) FROM UserExaminationMetadata m WHERE DATE(m.createdAt)  = DATE(:searchDate) AND m.agreeYn = :agreeYn")
+	Integer findTotalAgreeYnCount(@Param("searchDate") LocalDateTime searchLocalDate, @Param("agreeYn") Integer agreeYn);
 }

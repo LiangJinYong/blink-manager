@@ -8,7 +8,9 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.convert.Jsr310Converters;
 import org.springframework.data.jpa.datatables.repository.DataTablesRepositoryFactoryBean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableScheduling
 @EnableFeignClients
 @EnableJpaRepositories(repositoryFactoryBeanClass = DataTablesRepositoryFactoryBean.class)
 @EntityScan(basePackageClasses = { Jsr310Converters.class }, basePackages = { "com.blink" })

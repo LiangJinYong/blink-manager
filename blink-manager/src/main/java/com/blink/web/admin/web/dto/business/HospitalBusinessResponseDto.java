@@ -7,10 +7,9 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @RequiredArgsConstructor
-public class BusinessResponseDto {
+public class HospitalBusinessResponseDto {
 
 	private final Integer totalAgreeYCount;
 	private final Integer totalAgreeNCount;
-	private final Integer totalSentCount;
-	private final Page<SingleBusinessResponseDto> businessList;
+	private final Page<SingleHospitalBusinessResponseDto> hospitalBusinessList;
 }

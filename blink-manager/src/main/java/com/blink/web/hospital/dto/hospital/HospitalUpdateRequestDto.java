@@ -24,12 +24,13 @@ public class HospitalUpdateRequestDto {
 	private Integer signagesExisting;
 	private String groupFileId;
 	private String employeePosition;
+	private String password;
 
 	@Builder
 	public HospitalUpdateRequestDto(Long hospitalId, String hospitalName, String employeeName, String hospitalTel,
 			String employeeTel, Integer agreeSendYn, String postcode, String address, String addressDetail,
 			String employeeEmail, String programInUse, Integer signagesStand, Integer signagesMountable,
-			Integer signagesExisting, String groupFileId, String employeePosition) {
+			Integer signagesExisting, String groupFileId, String employeePosition, String password) {
 		this.hospitalId = hospitalId;
 		this.hospitalName = hospitalName;
 		this.employeeName = employeeName;
@@ -46,5 +47,6 @@ public class HospitalUpdateRequestDto {
 		this.signagesExisting = signagesExisting;
 		this.groupFileId = groupFileId;
 		this.employeePosition = employeePosition;
+		this.password = password;
 	}
 }

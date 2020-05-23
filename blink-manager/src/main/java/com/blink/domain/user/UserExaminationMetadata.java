@@ -58,7 +58,7 @@ public class UserExaminationMetadata extends BaseTimeEntity implements Serializa
 	private Integer agreeVisit;
 
 	private String address;
-	
+
 	private Integer consentFormExistYn;
 	private String specialCase;
 
@@ -67,17 +67,17 @@ public class UserExaminationMetadata extends BaseTimeEntity implements Serializa
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private UserExaminationEntireDataOfOne userExaminationEntireDataOfOne;
 
-	@OneToMany(mappedBy = "userExaminationMetadata")
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "userExaminationMetadata")
 	private List<UserExaminationMetadataDetail> userExaminationMetadataDetailList;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
 	@JoinColumn(name = "user_data_id")
 	private UserData userData;
 
 	@Builder
-	public UserExaminationMetadata(Integer agreeYn,UserData userData, Integer examinationYear, LocalDate dateExamined,
-			Long hospitalDataId, String address, UserExaminationEntireDataOfOne userExaminationEntireDataOfOne, String specialCase, Integer agreeMail,
-			Integer agreeSms, Integer agreeVisit) {
+	public UserExaminationMetadata(Integer agreeYn, UserData userData, Integer examinationYear, LocalDate dateExamined,
+			Long hospitalDataId, String address, UserExaminationEntireDataOfOne userExaminationEntireDataOfOne,
+			String specialCase, Integer agreeMail, Integer agreeSms, Integer agreeVisit) {
 		this.agreeYn = agreeYn;
 		this.userData = userData;
 		this.examinationYear = examinationYear;
@@ -106,12 +106,16 @@ public class UserExaminationMetadata extends BaseTimeEntity implements Serializa
 	public void updateAddress(String address) {
 		this.address = address;
 	}
-	
-	public void updateForUserExamination(LocalDate dateExamined, Integer examinationYear, Integer agreeYn, String specialCase) {
+
+	public void updateForUserExamination(LocalDate dateExamined, Integer examinationYear, Integer agreeYn,
+			String specialCase, Integer agreeMail, Integer agreeSms, Integer agreeVisit) {
 		this.dateExamined = dateExamined;
 		this.examinationYear = examinationYear;
 		this.agreeYn = agreeYn;
 		this.specialCase = specialCase;
+		this.agreeMail = agreeMail;
+		this.agreeSms = agreeSms;
+		this.agreeVisit = agreeVisit;
 	}
-	
+
 }

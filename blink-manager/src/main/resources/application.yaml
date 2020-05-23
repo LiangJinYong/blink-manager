@@ -64,7 +64,7 @@ spring:
     blink-remote:
          host: http://15.165.22.0:8000/bioage/
     datasource:
-        url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_db_product_makeit?characterEncoding=utf-8&serverTimezone=UTC
+        url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_db_makeit?characterEncoding=utf-8&serverTimezone=UTC
         username: admin
         password: 1nf0bank
         driverClassName: com.mysql.cj.jdbc.Driver
@@ -77,11 +77,11 @@ spring:
             maximum-pool-size: 5
             max-lifetime: 6000
     mail:
-        host: smart.whoismail.net
-        port: 587
-        username: help@blink.bio
-        password: bhealth1!
-        protocol: smtp
+        host: smtp.daum.net
+        port: 465
+        username: cs@blinkhealthcare.co.kr
+        password: bhealthadmin1!
+        protocol: smtps
         tls: false
     cloud:
         aws:
@@ -155,11 +155,11 @@ spring:
             maximum-pool-size: 5
             max-lifetime: 6000
     mail:
-        host: smart.whoismail.net
-        port: 587
-        username: help@blink.bio
-        password: bhealth1!
-        protocol: smtp
+        host: smtp.daum.net
+        port: 465
+        username: cs@blinkhealthcare.co.kr
+        password: bhealthadmin1!
+        protocol: smtps
         tls: false
     cloud:
         aws:
@@ -222,11 +222,11 @@ spring:
             maximum-pool-size: 5
             max-lifetime: 6000
     mail:
-        host: smart.whoismail.net
-        port: 587
-        username: help@blink.bio
-        password: bhealth1!
-        protocol: smtp
+        host: smtp.daum.net
+        port: 465
+        username: cs@blinkhealthcare.co.kr
+        password: bhealthadmin1!
+        protocol: smtps
         tls: false
     cloud:
         aws:
@@ -289,8 +289,6 @@ spring:
         max-file-size: 250MB
         max-request-size: 250MB    
     datasource:
-        #url: jdbc:mysql://blink-product-database.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_product?characterEncoding=utf-8&serverTimezone=UTC
-        #url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_db_product_makeit?characterEncoding=utf-8&serverTimezone=UTC
         url: jdbc:mysql://blink-product-database.cluster-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_product?characterEncoding=utf-8&serverTimezone=UTC
         username: blinkdb
         password: blinkdbpw
@@ -301,14 +299,14 @@ spring:
             connection-timeout: 5000
             validation-timeout: 300000
             minimum-idle: 5
-            maximum-pool-size: 5
+            maximum-pool-size: 15
             max-lifetime: 6000
     mail:
-        host: smart.whoismail.net
-        port: 587
-        username: help@blink.bio
-        password: bhealth1!
-        protocol: smtp
+        host: smtp.daum.net
+        port: 465
+        username: cs@blinkhealthcare.co.kr
+        password: bhealthadmin1!
+        protocol: smtps
         tls: false
     cloud:
         aws:
@@ -324,7 +322,7 @@ spring:
         generate-ddl: false
         show-sql: true
         hibernate:
-            ddl-auto: update
+            ddl-auto: none
             naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
         properties:
           hibernate:

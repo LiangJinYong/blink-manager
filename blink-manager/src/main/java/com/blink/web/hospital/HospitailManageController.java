@@ -47,6 +47,7 @@ public class HospitailManageController {
 			@RequestParam(name = "signagesExisting", required = false) Integer signagesExisting,
 			@RequestParam(name = "groupFileId", required = false) String groupFileId,
 			@RequestParam("employeePosition") String employeePosition,
+			@RequestParam(name = "password", required = false) String password,
 			@RequestParam(name = "file", required = false) MultipartFile[] files) {
 
 		HospitalUpdateRequestDto requestDto = HospitalUpdateRequestDto.builder() //
@@ -66,6 +67,7 @@ public class HospitailManageController {
 				.signagesExisting(signagesExisting) //
 				.employeePosition(employeePosition) //
 				.groupFileId(groupFileId)
+				.password(password)
 				.build();
 
 		hospitalService.updateHospitalDetail(requestDto, files);

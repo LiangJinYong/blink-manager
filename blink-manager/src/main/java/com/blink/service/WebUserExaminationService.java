@@ -9,15 +9,20 @@ import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.blink.common.CommonResponse;
+import com.blink.common.CommonResultCode;
 import com.blink.domain.user.UserData;
 import com.blink.domain.user.UserDataRepository;
+import com.blink.domain.user.UserExaminationEntireDataOfOne;
 import com.blink.domain.user.UserExaminationMetadata;
 import com.blink.domain.user.UserExaminationMetadataDetailRepository;
 import com.blink.domain.user.UserExaminationMetadataRepository;
 import com.blink.enumeration.Gender;
 import com.blink.enumeration.InspectionType;
+import com.blink.enumeration.Nationality;
 import com.blink.enumeration.SearchPeriod;
 import com.blink.util.CommonUtils;
 import com.blink.web.hospital.dto.userExamination.InspectionTypeDto;
@@ -105,12 +110,15 @@ public class WebUserExaminationService {
 	public void registerUserExamination(Long hospitalId, String name, LocalDate birthday, Gender gender,
 			String ssnPartial, String phone, LocalDate dateExamined, Integer agreeYn, String specialCase, Integer agreeMail, Integer agreeSms, Integer agreeVisit) {
 
+		Nationality nationality = getNationalityBySsnPartial(ssnPartial);
+		
 		UserData userData = UserData.builder() //
 				.name(name) //
 				.birthday(birthday) //
 				.gender(gender) //
 				.ssnPartial(ssnPartial) //
 				.phone(phone) //
+				.nationality(nationality)
 				.build();
 
 		userData = userDataRepository.save(userData);
@@ -132,14 +140,53 @@ public class WebUserExaminationService {
 	}
 
 	public void updateUserExamination(Long userExaminationId, String name, LocalDate birthday, Gender gender,
-			String ssnPartial, String phone, LocalDate dateExamined, Integer agreeYn, String specialCase) {
+			String ssnPartial, String phone, LocalDate dateExamined, Integer agreeYn, String specialCase, Integer agreeMail, Integer agreeSms, Integer agreeVisit) {
+		
+		Nationality nationality = getNationalityBySsnPartial(ssnPartial);
 		
 		UserExaminationMetadata metadata = metadataRepository.findById(userExaminationId).orElseThrow(() -> new IllegalArgumentException("No such examination data"));
 		
 		int examinationYear = dateExamined.getYear();
-		metadata.updateForUserExamination(dateExamined, examinationYear, agreeYn, specialCase);
+		metadata.updateForUserExamination(dateExamined, examinationYear, agreeYn, specialCase, agreeMail, agreeSms, agreeVisit);
 		
-		metadata.getUserData().updateForUserExamination(name, birthday, gender, ssnPartial, phone);
+		metadata.getUserData().updateForUserExamination(name, birthday, gender, ssnPartial, phone, nationality);
+	}
+
+	public ResponseEntity<CommonResponse> deleteUserData(Long userExaminationId) {
+		
+		UserExaminationMetadata examinationMetadata = metadataRepository.findById(userExaminationId).orElseThrow(() -> new IllegalArgumentException("No such examination data"));
+		
+		UserExaminationEntireDataOfOne dataOfOne = examinationMetadata.getUserExaminationEntireDataOfOne();
+		
+		if (dataOfOne != null) {
+			return ResponseEntity.ok(new CommonResponse(CommonResultCode.METADATA_ENTIRE_DATA_OF_ONE_NOT_EXISTS));
+		}
+		
+		UserData userData = examinationMetadata.getUserData();
+		
+		if (userData == null) {
+			return ResponseEntity.ok(new CommonResponse(CommonResultCode.NO_USER_DATA));
+		}
+		
+		userDataRepository.deleteById(userData.getId());
+		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
+	}
+	
+	private Nationality getNationalityBySsnPartial(String ssnPartial) {
+		
+		String lastNumber = ssnPartial.substring(ssnPartial.length() - 1);
+		
+		Nationality nationality = Nationality.Native;
+		
+		switch (lastNumber) {
+		case "5":
+		case "6":
+		case "7":
+		case "8":	
+			nationality = Nationality.Foreigner;
+		}
+		
+		return nationality;
 	}
 
 }

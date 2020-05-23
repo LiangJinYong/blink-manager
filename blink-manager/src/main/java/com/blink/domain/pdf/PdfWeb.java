@@ -15,11 +15,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 import com.blink.domain.BaseEntity;
 import com.blink.domain.admin.Admin;
-import com.blink.domain.examinationResultDoc.WebExaminationResultDoc;
 import com.blink.domain.hospital.Hospital;
 import com.blink.domain.sendMailResultWeb.FileInfo;
 import com.blink.domain.sendMailResultWeb.SendMailResultWeb;
@@ -59,9 +57,6 @@ public class PdfWeb extends BaseEntity {
     @Enumerated(EnumType.ORDINAL)
     private PdfProcessStatus status;
 
-    @OneToOne(mappedBy = "pdfWeb")
-    private WebExaminationResultDoc webExaminationResultDoc;
-    
     @OneToMany(mappedBy = "pdfWeb")
     private List<SendMailResultWeb> sendMailResultWebList;
     

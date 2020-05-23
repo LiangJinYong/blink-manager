@@ -249,12 +249,20 @@ public class ParserService {
 					saveCancerDataApp(map, newDataOfOne);
 				}
 			} else {
+				
+				String birthday = userDataMap.get("birthday");
+				String gender = userDataMap.get("gender");
+				String nationality = userDataMap.get("nationality");
+				
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		        LocalDate birthdayDate = LocalDate.parse(birthday, formatter);
+				
 				UserData newUserEntity = UserData.builder() //
 						.name("") //
-						.nationality(Nationality.Native) //
+						.nationality(Nationality.values()[Integer.parseInt(nationality)]) //
 						.phone(phone) //
-						.birthday(LocalDate.now()) //
-						.gender(Gender.MALE) //
+						.birthday(birthdayDate) //
+						.gender(Gender.values()[Integer.parseInt(gender)]) //
 						.ssnPartial(ssnPartial) //
 						.build();
 
@@ -1116,6 +1124,22 @@ public class ParserService {
 				
 				jsonIndividualApiRepository.save(jsonIndividualApi);
 			}
+		}
+	}
+
+	public void deleteUserData(Long userDataId) {
+		
+		userDataRepository.deleteById(userDataId);
+	}
+
+	public void updateUserMetadata(Long userExaminationId) {
+		UserExaminationMetadata metadata = userExaminationMetadataRepository.findById(userExaminationId).orElseThrow(() -> new IllegalArgumentException("No such metadata"));
+		
+		Integer agreeYn = metadata.getAgreeYn();
+		
+		if (agreeYn.equals(1)) {
+			metadata.setUserExaminationEntireDataOfOne(null);
+			metadata.setAddress("");
 		}
 	}
 }

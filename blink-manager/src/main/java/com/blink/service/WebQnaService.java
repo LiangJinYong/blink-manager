@@ -10,8 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.blink.domain.admin.Admin;
-import com.blink.domain.admin.AdminRepository;
 import com.blink.domain.hospital.HospitalRepository;
 import com.blink.domain.qna.WebQna;
 import com.blink.domain.qna.WebQnaRepository;

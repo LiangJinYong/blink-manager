@@ -1,5 +1,6 @@
 package com.blink.domain.sendMailResultWeb;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.blink.domain.hospital.Hospital;
 import com.blink.web.hospital.dto.sendMailResultWeb.SendMailResultWebResponseDto;
 
 public interface SendMailResultWebRepository extends JpaRepository<SendMailResultWeb, Long> {
@@ -20,5 +22,12 @@ public interface SendMailResultWebRepository extends JpaRepository<SendMailResul
 
 	@Query(value = "SELECT id pdfWebId, filename FROM pdf_web WHERE hospital_id = :hospitalId ORDER BY id DESC", nativeQuery = true)
 	List<Map<Long, String>> findPdfInfoList(@Param("hospitalId") Long hospitalId);
+
+	// 업무 관리
+	@Query("SELECT SUM(w.sentCount) FROM SendMailResultWeb w WHERE w.sentDate = :searchLocalDate AND w.hospital = :hospital")
+	Integer findSentCountBySentDateAndHospital(@Param("searchLocalDate") LocalDate searchLocalDate, @Param("hospital") Hospital hospital);
+
+	@Query("SELECT SUM(w.sentCount) FROM SendMailResultWeb w WHERE w.sentDate = :searchLocalDate")
+	Integer findTotalSentCount(@Param("searchLocalDate") LocalDate searchLocalDate);
 
 }

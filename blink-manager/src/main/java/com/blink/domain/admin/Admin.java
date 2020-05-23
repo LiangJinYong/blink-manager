@@ -80,6 +80,10 @@ public class Admin extends BaseTimeEntity {
 		this.password = tempPassword;
 	}
 	
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
 	public void modifyEmail(String newEmail) {
 		this.email = newEmail;
 	}

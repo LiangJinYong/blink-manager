@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -71,10 +72,20 @@ public class WebUserExaminationController {
 			@RequestParam("gender") Gender gender, @RequestParam("ssnPartial") String ssnPartial,
 			@RequestParam("phone") String phone,
 			@DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam("dateExamined") LocalDate dateExamined,
-			@RequestParam("agreeYn") Integer agreeYn, @RequestParam("specialCase") String specialCase) {
+			@RequestParam("agreeYn") Integer agreeYn, @RequestParam("specialCase") String specialCase,
+			@RequestParam("agreeMail") Integer agreeMail, @RequestParam("agreeSms") Integer agreeSms,
+			@RequestParam("agreeVisit") Integer agreeVisit) {
 
 		webUserExaminationService.updateUserExamination(userExaminationId, name, birthday, gender, ssnPartial, phone,
-				dateExamined, agreeYn, specialCase);
+				dateExamined, agreeYn, specialCase, agreeMail, agreeSms, agreeVisit);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
+	}
+	
+	@ApiOperation(value = "수검자 데이터 삭제")
+	@DeleteMapping("/{userExaminationId}")
+	public ResponseEntity<CommonResponse> deleteUserData(@PathVariable("userExaminationId") Long userExaminationId) {
+		ResponseEntity<CommonResponse> result = webUserExaminationService.deleteUserData(userExaminationId);
+		
+		return result;
 	}
 }

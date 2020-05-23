@@ -201,6 +201,9 @@ public class AccountService {
 
 		Hospital hospital = user.getHospital();
 		
+		String role = user.getRoleId().toString();
+		userStatusInfo.put("role", role);
+		
 		if (user.getRoleId() == Role.MASTER) {
 			userStatusInfo.put("displayName", adminDisplayName);
 		} else {
