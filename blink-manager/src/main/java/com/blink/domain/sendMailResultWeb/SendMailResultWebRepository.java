@@ -16,7 +16,7 @@ import com.blink.web.hospital.dto.sendMailResultWeb.SendMailResultWebResponseDto
 
 public interface SendMailResultWebRepository extends JpaRepository<SendMailResultWeb, Long> {
 
-	@Query("SELECT new com.blink.web.hospital.dto.sendMailResultWeb.SendMailResultWebResponseDto(w.id, w.fileInfo.filekey, w.fileInfo.filename, w.createdAt, w.sentDate, w.sentCount, w.totalCount) FROM SendMailResultWeb w WHERE w.createdAt > :time AND w.hospital.id = :hospitalId")
+	@Query("SELECT new com.blink.web.hospital.dto.sendMailResultWeb.SendMailResultWebResponseDto(w.id, w.fileInfo.filekey, w.fileInfo.filename, w.createdAt, w.sentDate, w.uploadDate, w.sentCount) FROM SendMailResultWeb w WHERE w.createdAt > :time AND w.hospital.id = :hospitalId")
 	Page<SendMailResultWebResponseDto> findBySearchTextAndPeriod(@Param("time") LocalDateTime time,
 			@Param("hospitalId") Long hospitalId, Pageable pageable);
 
@@ -29,5 +29,9 @@ public interface SendMailResultWebRepository extends JpaRepository<SendMailResul
 
 	@Query("SELECT SUM(w.sentCount) FROM SendMailResultWeb w WHERE w.sentDate = :searchLocalDate")
 	Integer findTotalSentCount(@Param("searchLocalDate") LocalDate searchLocalDate);
+
+	// 통계
+	@Query("SELECT COALESCE(SUM(w.sentCount), 0) FROM SendMailResultWeb w WHERE DATE(w.createdAt) = DATE(:yesterday) AND w.hospital.id = :hospitalId")
+	Integer findSentCountSum(@Param("yesterday") LocalDate yesterday, @Param("hospitalId") Long hospitalId);
 
 }

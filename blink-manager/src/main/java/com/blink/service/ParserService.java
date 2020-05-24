@@ -694,7 +694,7 @@ public class ParserService {
 					.ldlCholesterol(bloodDataItem.get("ldlCholesterol")) //
 					.renalDiseaseResult(bloodDataItem.get("renalDiseaseResult")) //
 					.creatinine(bloodDataItem.get("creatinine")) //
-					.eGfr(bloodDataItem.get("egfr")) //
+					.eGfr(bloodDataItem.get("eGfr")) //
 					.liverDiseaseResult(bloodDataItem.get("liverDiseaseResult")) //
 					.alt(bloodDataItem.get("alt")) //
 					.ast(bloodDataItem.get("ast")) //

@@ -1,8 +1,8 @@
 package com.blink.domain.user;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -43,7 +43,7 @@ public interface UserExaminationMetadataRepository extends JpaRepository<UserExa
 	Integer findNonexistConsetFormCountForAdmin();
 
 	// 업무관리
-	@Query("SELECT h.id FROM UserExaminationMetadata m INNER JOIN Hospital h ON m.hospitalDataId = h.id WHERE h.displayName LIKE %:searchText% AND DATE(m.createdAt) = DATE(:searchDate) GROUP BY h.id")
+	@Query("SELECT h.id FROM UserExaminationMetadata m INNER JOIN Hospital h ON m.hospitalDataId = h.id WHERE h.displayName LIKE %:searchText% AND m.createdAt >= :searchDate GROUP BY h.id")
 	Page<Long> findBusinessHospitalIds(@Param("searchText") String searchText,
 			@Param("searchDate") LocalDateTime searchDate, Pageable pageable);
 
@@ -53,4 +53,15 @@ public interface UserExaminationMetadataRepository extends JpaRepository<UserExa
 
 	@Query("SELECT COUNT(*) FROM UserExaminationMetadata m WHERE DATE(m.createdAt)  = DATE(:searchDate) AND m.agreeYn = :agreeYn")
 	Integer findTotalAgreeYnCount(@Param("searchDate") LocalDateTime searchLocalDate, @Param("agreeYn") Integer agreeYn);
+
+	// 통계
+	@Query("SELECT COUNT(*) FROM UserExaminationMetadata m WHERE DATE(m.createdAt) = DATE(:yesterday) AND m.hospitalDataId = :hospitalId AND m.agreeYn = :agreeYn")
+	Integer findAgreeYnCount(@Param("yesterday") LocalDate yesterday, @Param("hospitalId") Long hospitalId, @Param("agreeYn") Integer agreeYn);
+
+	@Query("SELECT COUNT(*) FROM UserExaminationMetadata m WHERE DATE(m.createdAt) = DATE(:yesterday) AND m.hospitalDataId = :hospitalId")
+	Integer findExamineeCount(@Param("yesterday") LocalDate yesterday, @Param("hospitalId") Long hospitalId);
+	
+	@Query("SELECT m.userData.id FROM UserExaminationMetadata m WHERE DATE(m.createdAt) = DATE(:yesterday) AND m.hospitalDataId = :hospitalId")
+	List<Long> findUserDataIdListByHospitalDataIdAndCreatedAt(@Param("hospitalId") Long hospitalId, @Param("yesterday") LocalDate yesterday);
+
 }

@@ -18,7 +18,7 @@ public interface WebExaminationResultDocRepository extends JpaRepository<WebExam
 	Page<WebExaminationResultDocResponseDto> findBySearchTextAndPeriodWithHospital(@Param("time") LocalDateTime time, @Param("hospitalId") Long hospitalId,
 			Pageable pageable);
 
-	@Query("SELECT new com.blink.web.admin.web.dto.business.SingleHospitalBusinessResponseDto(d.id, d.groupId) FROM WebExaminationResultDoc d WHERE DATE(d.createdAt) = DATE(:date) AND d.hospital = :hospital")
+	@Query("SELECT new com.blink.web.admin.web.dto.business.SingleHospitalBusinessResponseDto(d.id, d.groupId) FROM WebExaminationResultDoc d WHERE d.createdAt >= :date AND d.hospital = :hospital ORDER BY d.createdAt DESC")
 	Page<SingleHospitalBusinessResponseDto> findByCreatedAtAndHospital(@Param("date") LocalDateTime date, @Param("hospital") Hospital hospital,
 			Pageable pageable);
 	

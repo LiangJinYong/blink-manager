@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,11 +45,11 @@ public class SendMailResultWebController {
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}
-	
+
 	@ApiOperation(value = "발송 관리 - 등록화면 진입")
 	@GetMapping("/addUI/{hospitalId}")
 	public ResponseEntity<CommonResponse> addUI(@PathVariable("hospitalId") Long hospitalId) {
-		
+
 		List<Map<Long, String>> result = sendMailResultWebService.getPdfInfoList(hospitalId);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}
@@ -56,11 +57,19 @@ public class SendMailResultWebController {
 	@ApiOperation(value = "발송 관리 - 등록")
 	@PostMapping("/{hospitalId}")
 	public ResponseEntity<CommonResponse> registerSendMailResultWeb(@PathVariable("hospitalId") Long hospitalId,
-			@RequestParam("pdfWebId") Long pdfWebId, @RequestParam("totalCount") Integer totalCount, @RequestParam("sentCount") Integer sentCount,
+			@RequestParam("sentCount") Integer sentCount,
 			@DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam("sentDate") LocalDate sentDate,
-			@RequestParam("file") MultipartFile file) {
+			@RequestParam("uploadDate") LocalDate uploadDate, @RequestParam("file") MultipartFile file) {
 
-		sendMailResultWebService.registerSendMailResultWeb(pdfWebId, hospitalId, totalCount, sentCount, sentDate, file);
+		sendMailResultWebService.registerSendMailResultWeb(hospitalId, sentCount, sentDate, uploadDate, file);
+		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
+	}
+
+	@ApiOperation(value = "발송 관리 - 등록")
+	@DeleteMapping("/{sendMailResultWebId}")
+	public ResponseEntity<CommonResponse> deleteSendMailResultWeb(
+			@PathVariable("sendMailResultWebId") Long sendMailResultWebId) {
+		sendMailResultWebService.deleteSendMailResultWeb(sendMailResultWebId);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 	}
 }

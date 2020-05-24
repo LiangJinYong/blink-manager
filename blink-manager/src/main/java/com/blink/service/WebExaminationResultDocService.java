@@ -23,6 +23,7 @@ import com.blink.domain.webfiles.WebFilesRepository;
 import com.blink.enumeration.FileUploadUserType;
 import com.blink.enumeration.PdfProcessStatus;
 import com.blink.enumeration.SearchPeriod;
+import com.blink.service.aws.BucketService;
 import com.blink.util.CommonUtils;
 import com.blink.util.FileUploadUtils;
 import com.blink.web.admin.web.dto.WebFileResponseDto;
@@ -40,6 +41,7 @@ public class WebExaminationResultDocService {
 	private final FileUploadUtils fileUploadUtils;
 	private final HospitalRepository hospitalRepository;
 	private final PdfWebRepository pdfWebRepository;
+	private final BucketService bucketService;
 
 	public void registerExaminationResultDocs(MultipartFile[] files, Long hospitalId) {
 
@@ -100,6 +102,22 @@ public class WebExaminationResultDocService {
 		}
 		
 		return examinationResultDocList;
+	}
+
+	public void deleteExaminationResultDoc(Long webExaminationResultDocId) {
+
+		WebExaminationResultDoc resultDoc = webExaminationResultDocRepository.findById(webExaminationResultDocId).orElseThrow(() -> new IllegalArgumentException("NO shuch examination result doc"));
+		
+		String groupId = resultDoc.getGroupId();
+		
+		List<WebFileResponseDto> examinationResultDocFiles = webFilesRepository.findByGroupId(groupId);
+		
+		for(WebFileResponseDto dto : examinationResultDocFiles) {
+			String fileKey = dto.getFileKey();
+			bucketService.delete(fileKey);
+		}
+		
+		webExaminationResultDocRepository.deleteById(webExaminationResultDocId);
 	}
 
 }

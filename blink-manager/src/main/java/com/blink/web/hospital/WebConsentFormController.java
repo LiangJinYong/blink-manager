@@ -30,13 +30,14 @@ public class WebConsentFormController {
 
 	@ApiOperation(value = "동의서 등록")
 	@PostMapping("/{hospitalId}")
-	public ResponseEntity<CommonResponse> registerConsentForm(@PathVariable("hospitalId") Long hospitalId, @RequestParam("consentYear") String consentYear, @RequestParam("consentMonth") String consentMonth, @RequestParam("count") Long count,
-			@RequestParam("file") MultipartFile[] files) {
-		
+	public ResponseEntity<CommonResponse> registerConsentForm(@PathVariable("hospitalId") Long hospitalId,
+			@RequestParam("consentYear") String consentYear, @RequestParam("consentMonth") String consentMonth,
+			@RequestParam("count") Long count, @RequestParam("file") MultipartFile[] files) {
+
 		webConsentFormService.registerConsentFormForHospital(hospitalId, consentYear, consentMonth, count, files);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 	}
-	
+
 	@ApiOperation(value = "해당 병원의 동의서 리스트 가져오기")
 	@GetMapping("/{hospitalId}")
 	ResponseEntity<CommonResponse> getConsentFormsForHospital(@PathVariable("hospitalId") Long hospitalId,
@@ -44,9 +45,9 @@ public class WebConsentFormController {
 			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period,
 			Pageable pageable) {
 
-		ConsentFormResponseDto result = webConsentFormService.getConsentFormsForHospitalSelf(hospitalId, searchText.orElse("_"),
-				period.orElse(SearchPeriod.ONEMONTH), pageable);
-		
+		ConsentFormResponseDto result = webConsentFormService.getConsentFormsForHospitalSelf(hospitalId,
+				searchText.orElse("_"), period.orElse(SearchPeriod.ONEMONTH), pageable);
+
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}
 }

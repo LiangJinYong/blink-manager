@@ -32,15 +32,15 @@ public class WebConsentFormController {
 	private final WebConsentFormService webConsentFormService;
 
 	@ApiOperation(value = "동의서 등록")
-	@PostMapping
-	public ResponseEntity<CommonResponse> registerConsentForm(
+	@PostMapping("/{hospitalId}")
+	public ResponseEntity<CommonResponse> registerConsentForm(@PathVariable("hospitalId") Long hospitalId,
 			@DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam("receiveDate") LocalDate receiveDate,
 			@RequestParam("receiveType") ReceiveType receiveType,
 			@RequestParam(name = "receiveTypeText", required = false) String receiveTypeText,
 			@RequestParam("consentYear") String consentYear, @RequestParam("consentMonth") String consentMonth,
 			@RequestParam("count") Long count, @RequestParam("file") MultipartFile[] files) {
 
-		webConsentFormService.registerConsentForm(receiveDate, receiveType, receiveTypeText, consentYear, consentMonth,
+		webConsentFormService.registerConsentForm(hospitalId, receiveDate, receiveType, receiveTypeText, consentYear, consentMonth,
 				count, files);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 	}

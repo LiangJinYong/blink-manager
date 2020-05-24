@@ -42,6 +42,7 @@ public class BusinessManageService {
 		
 		final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		LocalDateTime date = LocalDate.parse(searchDate, formatter).atStartOfDay();
+		date = date.minusDays(3);
 		
 		Page<Long> hospitalIds = metadataRepository.findBusinessHospitalIds(searchText, date, pageable);
 		
@@ -77,6 +78,7 @@ public class BusinessManageService {
 		
 		final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		LocalDateTime date = LocalDate.parse(searchDate, formatter).atStartOfDay();
+		date = date.minusDays(3);
 		
 		Hospital hospital = hospitalRepository.findById(hospitalId).orElseThrow(() -> new IllegalArgumentException("No such hospital"));
 		Page<SingleHospitalBusinessResponseDto> singleHospitalBusinessPage = webExaminationResultDocRepository.findByCreatedAtAndHospital(date, hospital, pageable);

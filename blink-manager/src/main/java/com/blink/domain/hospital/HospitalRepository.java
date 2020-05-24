@@ -41,5 +41,9 @@ public interface HospitalRepository extends JpaRepository<Hospital, Long> {
 	
 	@Query("SELECT COUNT(h.id) FROM Hospital h WHERE h.isDelete = 0")
 	public Integer findHospitalCount();
+	
+	// 통계
+	@Query("SELECT h.id FROM Hospital h where h.isDelete = 0")
+	public List<Long> findAllValidHospitalIds();
 
 }

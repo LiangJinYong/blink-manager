@@ -1,5 +1,6 @@
 package com.blink.domain.user;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.blink.enumeration.InspectionSubType;
 import com.blink.enumeration.InspectionType;
 import com.blink.web.hospital.dto.userExamination.InspectionTypeDto;
 
@@ -35,5 +37,13 @@ public interface UserExaminationMetadataDetailRepository extends JpaRepository<U
 
 	@Query("SELECT COUNT(d.id) FROM UserExaminationMetadataDetail d WHERE d.inspectionType = :type")
 	Integer findExaminationCountByInspectionForAdmin(@Param("type") InspectionType type);
+
+	// 통계
+	@Query("SELECT COUNT(*) FROM UserExaminationMetadataDetail d JOIN d.userExaminationMetadata m WHERE DATE(m.createdAt) = DATE(:yesterday) AND m.hospitalDataId = :hospitalId")
+	Integer findExaminationCount(@Param("yesterday") LocalDate yesterday, @Param("hospitalId") Long hospitalId);
+
+	@Query("SELECT COUNT(*) FROM UserExaminationMetadataDetail d JOIN d.userExaminationMetadata m WHERE DATE(m.createdAt) = DATE(:yesterday) AND m.hospitalDataId = :hospitalId AND d.inspectionType = :inspectionType AND d.inspectionSubType = :inspectionSubType")
+	Integer findExaminationCount(@Param("yesterday") LocalDate yesterday, @Param("hospitalId") Long hospitalId, @Param("inspectionType") InspectionType inspectionType,
+			@Param("inspectionSubType") InspectionSubType inspectionSubType);
 
 }

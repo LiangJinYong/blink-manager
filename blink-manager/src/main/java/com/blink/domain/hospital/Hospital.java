@@ -22,8 +22,8 @@ import com.blink.domain.examinationResultDoc.WebExaminationResultDoc;
 import com.blink.domain.hospitalStatistics.HospitalStatistics;
 import com.blink.domain.judge.WebJudge;
 import com.blink.domain.qna.WebQna;
+import com.blink.domain.sign.WebSign;
 import com.blink.enumeration.Role;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -99,6 +99,8 @@ public class Hospital extends BaseTimeEntity {
 	@OneToMany(mappedBy = "hospital")
 	private List<WebConsentForm> webConsentFormList;
 	
+	@OneToMany(mappedBy = "hospital")
+	private List<WebSign> webSign;
 	
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "hospital")
 	private HospitalStatistics hospitalStatistics;

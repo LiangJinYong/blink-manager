@@ -64,7 +64,7 @@ spring:
     blink-remote:
          host: http://15.165.22.0:8000/bioage/
     datasource:
-        url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_db_makeit?characterEncoding=utf-8&serverTimezone=UTC
+        url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_db_makeit?characterEncoding=utf-8&serverTimezone=Asia/Seoul
         username: admin
         password: 1nf0bank
         driverClassName: com.mysql.cj.jdbc.Driver
@@ -109,7 +109,7 @@ spring:
             default_batch_fetch_size: 100
 scheduler:
   datasource:
-    url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_stats_scheduler_db_product_makeit?characterEncoding=utf-8&serverTimezone=UTC
+    url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_stats_scheduler_db_product_makeit?characterEncoding=utf-8&serverTimezone=Asia/Seoul
     username: admin
     password: 1nf0bank
     driverClassName: com.mysql.cj.jdbc.Driver
@@ -142,7 +142,7 @@ spring:
         max-request-size: 250MB
     
     datasource:
-        url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_db_makeit?characterEncoding=utf-8&serverTimezone=UTC
+        url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_db_makeit?characterEncoding=utf-8&serverTimezone=Asia/Seoul
         username: admin
         password: 1nf0bank
         driverClassName: com.mysql.cj.jdbc.Driver
@@ -209,7 +209,7 @@ spring:
         max-request-size: 250MB
     
     datasource:
-        url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_db_product_makeit?characterEncoding=utf-8&serverTimezone=UTC
+        url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_db_product_makeit?characterEncoding=utf-8&serverTimezone=Asia/Seoul
         username: admin
         password: 1nf0bank
         driverClassName: com.mysql.cj.jdbc.Driver
@@ -254,7 +254,7 @@ spring:
             default_batch_fetch_size: 100
 scheduler:
   datasource:
-    url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_stats_scheduler_db_product_makeit?characterEncoding=utf-8&serverTimezone=UTC
+    url: jdbc:mysql://blink-develop.cluster-ro-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_stats_scheduler_db_product_makeit?characterEncoding=utf-8&serverTimezone=Asia/Seoul
     username: admin
     password: 1nf0bank
     driverClassName: com.mysql.cj.jdbc.Driver
@@ -289,7 +289,7 @@ spring:
         max-file-size: 250MB
         max-request-size: 250MB    
     datasource:
-        url: jdbc:mysql://blink-product-database.cluster-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_product?characterEncoding=utf-8&serverTimezone=UTC
+        url: jdbc:mysql://blink-product-database.cluster-c5xlbu29akak.ap-northeast-2.rds.amazonaws.com:3306/blink_product?characterEncoding=utf-8&serverTimezone=Asia/Seoul
         username: blinkdb
         password: blinkdbpw
         driverClassName: com.mysql.cj.jdbc.Driver

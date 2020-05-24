@@ -17,7 +17,6 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.BatchSize;
 
-import com.blink.domain.json.JsonIndividualApi;
 import com.blink.domain.pdf.PdfIndividualWeb;
 import com.blink.enumeration.InspectionSubType;
 import com.blink.enumeration.InspectionType;

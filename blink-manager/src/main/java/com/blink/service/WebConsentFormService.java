@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.blink.domain.consentForm.WebConsentForm;
 import com.blink.domain.consentForm.WebConsentFormRepository;
+import com.blink.domain.hospital.Hospital;
 import com.blink.domain.hospital.HospitalRepository;
 import com.blink.domain.webfiles.WebFilesRepository;
 import com.blink.enumeration.FileUploadUserType;
@@ -36,12 +37,16 @@ public class WebConsentFormService {
 	private final FileUploadUtils fileUploadUtils;
 	private final HospitalRepository hospitalRepository;
 
-	public void registerConsentForm(LocalDate receiveDate, ReceiveType receiveType, String receiveTypeText,
-			String consentYear, String consentMonth, Long count, MultipartFile[] files) {
+	public void registerConsentForm(Long hospitalId, LocalDate receiveDate, ReceiveType receiveType,
+			String receiveTypeText, String consentYear, String consentMonth, Long count, MultipartFile[] files) {
+
+		Hospital hospital = hospitalRepository.findById(hospitalId)
+				.orElseThrow(() -> new IllegalArgumentException("No such hospital"));
 
 		String groupId = fileUploadUtils.upload(files, "webConsentFormFiles", FileUploadUserType.WEB, 0L, null);
 
 		WebConsentForm webConsentForm = WebConsentForm.builder() //
+				.hospital(hospital) //
 				.receiveDate(receiveDate) //
 				.receiveType(receiveType) //
 				.receiveTypeText(receiveTypeText) //
@@ -71,7 +76,7 @@ public class WebConsentFormService {
 				dto.setFiles(files);
 			}
 		}
-		
+
 		Integer totalCount = webConsentFormRepository.findTotalCountForAdmin();
 		ConsentFormResponseDto responseDto = new ConsentFormResponseDto(totalCount, consentFormList);
 		return responseDto;
@@ -110,21 +115,24 @@ public class WebConsentFormService {
 				.consentMonth(consentMonth) //
 				.groupId(groupId) //
 				.count(count) //
-				.build(); 
+				.receiveDate(LocalDate.now()) //
+				.receiveType(ReceiveType.WEBPAGE) //
+				.build();
 
 		webConsentFormRepository.save(webConsentForm);
 	}
 
 	public com.blink.web.hospital.dto.consentForm.ConsentFormResponseDto getConsentFormsForHospitalSelf(Long hospitalId,
 			String searchText, SearchPeriod period, Pageable pageable) {
-		
+
 		LocalDateTime time = CommonUtils.getSearchPeriod(period);
-		
-		Page<HospitalConsentFormDetailResponseDto> consentFormList = webConsentFormRepository.findBySearchTextAndPeriodForHospitalSelf(hospitalId, time, pageable);
-			
+
+		Page<HospitalConsentFormDetailResponseDto> consentFormList = webConsentFormRepository
+				.findBySearchTextAndPeriodForHospitalSelf(hospitalId, time, pageable);
+
 		List<HospitalConsentFormDetailResponseDto> content = consentFormList.getContent();
-		
-		for(HospitalConsentFormDetailResponseDto dto: content) {
+
+		for (HospitalConsentFormDetailResponseDto dto : content) {
 			String groupId = dto.getGroupId();
 			if (groupId != null) {
 
@@ -132,9 +140,10 @@ public class WebConsentFormService {
 				dto.setFiles(files);
 			}
 		}
-		
+
 		Integer totalCount = webConsentFormRepository.findTotalCountForHospital(hospitalId);
-		com.blink.web.hospital.dto.consentForm.ConsentFormResponseDto responseDto = new com.blink.web.hospital.dto.consentForm.ConsentFormResponseDto(totalCount, consentFormList);
+		com.blink.web.hospital.dto.consentForm.ConsentFormResponseDto responseDto = new com.blink.web.hospital.dto.consentForm.ConsentFormResponseDto(
+				totalCount, consentFormList);
 		return responseDto;
 	}
 

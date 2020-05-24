@@ -15,8 +15,8 @@ public class SendMailResultWebResponseDto {
 	private final String filename;
 	private final LocalDateTime createdAt;
 	private final LocalDate sendDate;
+	private final LocalDate uploadDate;
 	private final Integer sentCount;
-	private final Integer totalCount;
 	
 	private String sendStatus;
 }

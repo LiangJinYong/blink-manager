@@ -1,7 +1,5 @@
 package com.blink.domain.pdf;
 
-import java.util.List;
-
 import javax.persistence.ConstraintMode;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -14,13 +12,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 import com.blink.domain.BaseEntity;
 import com.blink.domain.admin.Admin;
 import com.blink.domain.hospital.Hospital;
 import com.blink.domain.sendMailResultWeb.FileInfo;
-import com.blink.domain.sendMailResultWeb.SendMailResultWeb;
 import com.blink.enumeration.PdfProcessStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -57,9 +53,6 @@ public class PdfWeb extends BaseEntity {
     @Enumerated(EnumType.ORDINAL)
     private PdfProcessStatus status;
 
-    @OneToMany(mappedBy = "pdfWeb")
-    private List<SendMailResultWeb> sendMailResultWebList;
-    
     @Builder
     public PdfWeb(Hospital hospital, FileInfo fileInfo, PdfProcessStatus status) {
     	this.hospital = hospital;

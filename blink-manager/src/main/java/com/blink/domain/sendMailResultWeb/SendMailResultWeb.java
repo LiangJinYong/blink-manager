@@ -50,8 +50,7 @@ public class SendMailResultWeb extends BaseTimeEntity {
 	    @Column(columnDefinition = "int default 0 comment '발송수량'")
 	    private Integer sentCount;
 	    
-	    @Column(columnDefinition = "int default 0 comment '총수량'")
-	    private Integer totalCount;
+	    private LocalDate uploadDate;
 
 	    @JsonIgnore
 	    @JoinColumn(name = "hospital_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "NONE"))
@@ -64,17 +63,12 @@ public class SendMailResultWeb extends BaseTimeEntity {
 	    @ManyToOne(fetch = FetchType.LAZY)
 	    private Admin admin;
 	    
-	    @ManyToOne
-	    @JoinColumn(name="pdf_web_id")
-	    private PdfWeb pdfWeb;
-	    
 	    @Builder
-	    public SendMailResultWeb(FileInfo fileInfo, LocalDate sentDate, Integer sentCount, Integer totalCount, Hospital hospital, PdfWeb pdfWeb) {
+	    public SendMailResultWeb(FileInfo fileInfo, LocalDate sentDate, Integer sentCount, Hospital hospital, LocalDate uploadDate) {
 	    	this.fileInfo = fileInfo;
 	    	this.sentDate = sentDate;
 	    	this.sentCount = sentCount;
-	    	this.totalCount = totalCount;
 	    	this.hospital = hospital;
-	    	this.pdfWeb = pdfWeb;
+	    	this.uploadDate = uploadDate;
 	    }
 }

@@ -20,7 +20,9 @@ public enum CommonResultCode {
 	NO_USER_DATA(4001, "유저정보가 없는 기록이 있습니다."),
 	USER_DATA_ALREADY_EXISTS(4002, "이미 존재하는 유저정보입니다."),
 	METADATA_ENTIRE_DATA_OF_ONE_NOT_EXISTS(4003, "검진 데이터 이미 존재하여 삭제할수 없습니다."),
-	INTERNAL_ERROR(5000, "서버 내부 오류"),   ; 
+	ALREADY_10_SIGNS_EXIST(4004, "하나의 병원의 사인 기록은 최대 10건입니다."),
+	ALREADY_EXIST_BY_DOCTOR(4005, "해당 의사가 등록한 사인이 이미 존재합니다."),
+	INTERNAL_ERROR(5000, "서버 내부 오류"); 
 	
 	private final int resultCode;
 	private final String resultMessage;

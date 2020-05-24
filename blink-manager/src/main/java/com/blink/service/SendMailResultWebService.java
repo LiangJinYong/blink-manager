@@ -20,6 +20,7 @@ import com.blink.domain.sendMailResultWeb.FileInfo;
 import com.blink.domain.sendMailResultWeb.SendMailResultWeb;
 import com.blink.domain.sendMailResultWeb.SendMailResultWebRepository;
 import com.blink.enumeration.SearchPeriod;
+import com.blink.service.aws.BucketService;
 import com.blink.util.CommonUtils;
 import com.blink.util.FileUploadUtils;
 import com.blink.web.hospital.dto.sendMailResultWeb.SendMailResultWebResponseDto;
@@ -35,6 +36,7 @@ public class SendMailResultWebService {
 	private final SendMailResultWebRepository sendMailResultWebRepository;
 	private final FileUploadUtils fileUploadUtils;
 	private final PdfWebRepository pdfWebRepository;
+	private final BucketService bucketService;
 
 	public Page<SendMailResultWebResponseDto> getSendMailResultWeb(String searchText, SearchPeriod period,
 			Pageable pageable, Long hospitalId) {
@@ -46,7 +48,7 @@ public class SendMailResultWebService {
 		return sendMailResultWebList;
 	}
 
-	public void registerSendMailResultWeb(Long pdfWebId, Long hospitalId, Integer totalCount, Integer sentCount, LocalDate sentDate,
+	public void registerSendMailResultWeb(Long hospitalId, Integer sentCount, LocalDate sentDate, LocalDate uploadDate,
 			MultipartFile file) {
 
 		Hospital hospital = hospitalRepository.findById(hospitalId)
@@ -56,15 +58,12 @@ public class SendMailResultWebService {
 
 		FileInfo fileInfo = fileUploadUtils.uploadPdfFile(file, hospitalName);
 
-		PdfWeb pdfWeb = pdfWebRepository.findById(pdfWebId).orElseThrow(() -> new IllegalArgumentException("No such pdf web"));
-		
 		SendMailResultWeb sendMailResultWeb = SendMailResultWeb.builder() //
 				.fileInfo(fileInfo) //
 				.sentDate(sentDate) //
 				.sentCount(sentCount) //
-				.totalCount(totalCount) //
+				.uploadDate(uploadDate) //
 				.hospital(hospital) //
-				.pdfWeb(pdfWeb) //
 				.build();
 
 		sendMailResultWebRepository.save(sendMailResultWeb);
@@ -73,6 +72,16 @@ public class SendMailResultWebService {
 	public List<Map<Long, String>> getPdfInfoList(Long hospitalId) {
 		List<Map<Long, String>> pdfInfoList = sendMailResultWebRepository.findPdfInfoList(hospitalId);
 		return pdfInfoList;
+	}
+
+	public void deleteSendMailResultWeb(Long sendMailResultWebId) {
+	
+		SendMailResultWeb sendMailResultWeb = sendMailResultWebRepository.findById(sendMailResultWebId).orElseThrow(() -> new IllegalArgumentException("No such send mail result record"));
+		
+		String filekey = sendMailResultWeb.getFileInfo().getFilekey();
+		bucketService.delete(filekey);
+		
+		sendMailResultWebRepository.deleteById(sendMailResultWebId);
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.blink.domain.consentForm;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Page;
@@ -32,5 +33,9 @@ public interface WebConsentFormRepository extends JpaRepository<WebConsentForm, 
 
 	@Query("SELECT SUM(f.count) FROM WebConsentForm f")
 	Integer findTotalCountForAdmin();
+
+	// 통계
+	@Query("SELECT COALESCE(SUM(f.count), 0) FROM WebConsentForm f WHERE DATE(f.createdAt) = DATE(:yesterday) AND f.hospital.id = :hospitalId")
+	Integer findConsentFormCountSum(@Param("yesterday") LocalDate yesterday, @Param("hospitalId") Long hospitalId);
 
 }
