@@ -51,6 +51,9 @@ public class WebDigitalSignage extends BaseTimeEntity {
 	@Column(columnDefinition = "bit(1)")
 	private boolean answerYn;
 	
+	@Column(columnDefinition = "bit(1)")
+	private boolean readAnswerYn;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "hospital_id")
 	private Hospital hospital;

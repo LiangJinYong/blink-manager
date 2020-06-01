@@ -39,13 +39,12 @@ public class JoinContactController {
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}
 
-	@ApiOperation(value = "제휴문의 - 답변(처음 답변 혹은 답변수정 공통 사용)", notes = "방문시간 형식 yyyy-MM-ddTHH:mm:ss")	
+	@ApiOperation(value = "제휴문의 - 답변(처음 답변 혹은 답변수정 공통 사용)", notes = "방문시간 형식 yyyy-MM-ddTHH:mm:ss")
 	@PostMapping("/answer")
 	public ResponseEntity<CommonResponse> saveAnswer(@RequestParam("joinContactId") Long joinContactId,
 			@RequestParam("answerContent") String answerContent, @RequestParam("visitReserveYn") boolean visitReserveYn,
-			@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-			@RequestParam("visitDate") LocalDateTime visitDate,
-			@RequestParam("visitAim") VisitAim visitAim) {
+			@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") @RequestParam(name = "visitDate", required = false) LocalDateTime visitDate,
+			@RequestParam(name = "visitAim", required = false) VisitAim visitAim) {
 
 		joinContactService.saveAnswer(joinContactId, answerContent, visitReserveYn, visitDate, visitAim);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));

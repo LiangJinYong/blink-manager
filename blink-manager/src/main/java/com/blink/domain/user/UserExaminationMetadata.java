@@ -91,16 +91,15 @@ public class UserExaminationMetadata extends BaseTimeEntity implements Serializa
 		this.agreeVisit = agreeVisit;
 	}
 
-	public void update(Integer agreeYn, LocalDate dateExamined, Long hospitalDataId, Integer agreeMail,
-			Integer agreeSms, Integer agreeVisit, Integer examinationYear) {
+	public void update(LocalDate dateExamined, Long hospitalDataId, Integer examinationYear, Integer agreeYn, Integer agreeMail, Integer agreeSms, Integer agreeVisit) {
 
-		this.agreeYn = agreeYn;
 		this.dateExamined = dateExamined;
 		this.hospitalDataId = hospitalDataId;
+		this.examinationYear = examinationYear;
+		this.agreeYn = agreeYn;
 		this.agreeMail = agreeMail;
 		this.agreeSms = agreeSms;
 		this.agreeVisit = agreeVisit;
-		this.examinationYear = examinationYear;
 	}
 
 	public void updateAddress(String address) {
@@ -116,6 +115,12 @@ public class UserExaminationMetadata extends BaseTimeEntity implements Serializa
 		this.agreeMail = agreeMail;
 		this.agreeSms = agreeSms;
 		this.agreeVisit = agreeVisit;
+	}
+
+	public void update(LocalDate dateExamined,  Long hospitalDataId, Integer examinationYear) {
+		this.dateExamined = dateExamined;
+		this.hospitalDataId = hospitalDataId;
+		this.examinationYear = examinationYear;
 	}
 
 }

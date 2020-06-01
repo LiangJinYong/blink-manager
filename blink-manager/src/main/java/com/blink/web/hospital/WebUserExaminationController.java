@@ -36,11 +36,11 @@ public class WebUserExaminationController {
 	@GetMapping("/{hospitalId}")
 	public ResponseEntity<CommonResponse> getUserExamination(@PathVariable("hospitalId") Long hospitalId,
 			@RequestParam("searchText") Optional<String> searchText,
-			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period,
+			@RequestParam(name = "period", defaultValue = "ONEYEAR") Optional<SearchPeriod> period,
 			Pageable pageable) {
 
 		UserExaminationResponseDto result = webUserExaminationService.getUserExamination(hospitalId,
-				searchText.orElse("_"), period.orElse(SearchPeriod.ONEMONTH), pageable);
+				searchText.orElse("_"), period.orElse(SearchPeriod.ONEYEAR), pageable);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}
 

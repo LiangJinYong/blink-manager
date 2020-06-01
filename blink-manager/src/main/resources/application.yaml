@@ -337,4 +337,13 @@ auth:
     code:
         length: 4
         expire:
-            second: 600            
+            second: 600
+            
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: error
+        type:
+          descriptor:
+            sql: trace

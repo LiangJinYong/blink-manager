@@ -38,7 +38,7 @@ public class ParserController {
 		if (result.size() == 0) {
 			return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 		}
-		return ResponseEntity.ok(new CommonResponse(CommonResultCode.NO_USER_DATA, result));
+		return ResponseEntity.ok(new CommonResponse(CommonResultCode.USER_DATA_ALREADY_EXISTS, result));
 	}
 	
 	@PostMapping("/registerExaminationData")

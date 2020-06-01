@@ -17,7 +17,7 @@ public enum CommonResultCode {
 	ACCOUNT_PASSWORD_INCORRECT(2014, "비밀번호가 틀렸습니다."),
 	NO_REQUIRED_NOTICE_FOUND(2201, "필수고지사항 데이터가 없습니다."),
 	NO_SUCH_DATA(4000, "해당 데이터가 없습니다."),
-	NO_USER_DATA(4001, "유저정보가 없는 기록이 있습니다."),
+	NO_USER_DATA(4001, "해당 유저의 정보가 없습니다."),
 	USER_DATA_ALREADY_EXISTS(4002, "이미 존재하는 유저정보입니다."),
 	METADATA_ENTIRE_DATA_OF_ONE_NOT_EXISTS(4003, "검진 데이터 이미 존재하여 삭제할수 없습니다."),
 	ALREADY_10_SIGNS_EXIST(4004, "하나의 병원의 사인 기록은 최대 10건입니다."),

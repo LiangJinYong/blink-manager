@@ -21,7 +21,7 @@ public class CommonUtils {
 	}
 
 	public static LocalDateTime getSearchPeriod(SearchPeriod period) {
-		LocalDateTime time = LocalDateTime.now().minusDays(7);
+		LocalDateTime time = LocalDateTime.now();
 
 		switch (period) {
 		case ONEDAY:

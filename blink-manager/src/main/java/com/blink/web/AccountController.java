@@ -90,14 +90,14 @@ public class AccountController {
 			@RequestParam("hospitalTel") String hospitalTel, //
 			@RequestParam("postcode") String postcode, //
 			@RequestParam("address") String address, //
-			@RequestParam("addressDetail") String addressDetail, //
+			@RequestParam(name = "addressDetail", required = false) String addressDetail, //
 			@RequestParam("employeeName") String employeeName, //
 			@RequestParam("employeePosition") String employeePosition, //
 			@RequestParam("employeeTel") String employeeTel, //
 			@RequestParam("employeeEmail") String employeeEmail, //
 			@RequestParam("agreeSendYn") Integer agreeSendYn, //
 			@RequestParam("programInUse") String programInUse, //
-			@RequestParam("licensePhoto") MultipartFile file) {
+			@RequestParam(name = "licensePhoto", required = false) MultipartFile file) {
 
 		UserSignupRequestDto requestDto = UserSignupRequestDto.builder().username(username) //
 				.password(password) //
@@ -114,11 +114,11 @@ public class AccountController {
 				.programInUse(programInUse) //
 				.build();
 		try {
-			
-			if(!accountService.isSignupAble(employeeTel)) {
+
+			if (!accountService.isSignupAble(employeeTel)) {
 				return ResponseEntity.ok(new CommonResponse(CommonResultCode.AUTH_CODE_NOT_CHECKED));
 			}
-			
+
 			accountService.signupUser(requestDto, file);
 			return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 		} catch (Exception e) {
@@ -129,14 +129,15 @@ public class AccountController {
 
 	@ApiOperation(value = "로그인")
 	@PostMapping("/login")
-	public ResponseEntity<CommonResponse> login(@RequestParam("username") String username, @RequestParam("password") String password) throws Exception {
+	public ResponseEntity<CommonResponse> login(@RequestParam("username") String username,
+			@RequestParam("password") String password) throws Exception {
 
 		Map<String, Object> result = new HashMap<>();
 
 		try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 			accountService.resetLoginTryCount(username);
-			
+
 		} catch (Exception e) {
 			if (accountService.userExists(username)) {
 				int loginTryCount = accountService.increaseLoginTryCount(username);
@@ -146,35 +147,37 @@ public class AccountController {
 				return ResponseEntity.ok(new CommonResponse(CommonResultCode.ACCOUNT_INFO_NONEXIST));
 			}
 		}
-		
+
 		Map<String, Object> userStatus = accountService.getUserStatusInfo(username);
 		result.putAll(userStatus);
-		
+
 		String role = (String) userStatus.get("role");
 		String token = jwtUtil.generateToken(username, role);
 		result.put("token", token);
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}
-	
+
 	@ApiOperation("아이디/비밀번호 찾기 - 계정 유효성 체크")
 	@GetMapping("/valid")
-	public ResponseEntity<CommonResponse> isAccountValid(@RequestParam("employeeName") String employeeName, @RequestParam("employeeTel") String employeeTel) {
-		
-		if(!accountService.isAccountValid(employeeName, employeeTel)) {
+	public ResponseEntity<CommonResponse> isAccountValid(@RequestParam("employeeName") String employeeName,
+			@RequestParam("employeeTel") String employeeTel) {
+
+		if (!accountService.isAccountValid(employeeName, employeeTel)) {
 			return ResponseEntity.ok(new CommonResponse(CommonResultCode.ACCOUNT_INFO_NONEXIST));
 		} else {
 			accountService.sendAuthCode(employeeTel);
 			return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 		}
 	}
-	
+
 	@ApiOperation("아이디 찾기")
 	@GetMapping("/findID")
-	public ResponseEntity<CommonResponse> findID(@RequestParam("employeeTel") String employeeTel, @RequestParam(value = "authCode") Integer authCode) {
-		
+	public ResponseEntity<CommonResponse> findID(@RequestParam("employeeTel") String employeeTel,
+			@RequestParam(value = "authCode") Integer authCode) {
+
 		Map<String, Object> result = new HashMap<>();
-		
+
 		if (accountService.checkAuthCode(employeeTel, authCode)) {
 			String username = accountService.getUsername(employeeTel);
 			result.put("userID", username);
@@ -183,15 +186,16 @@ public class AccountController {
 			return ResponseEntity.ok(new CommonResponse(CommonResultCode.AUTH_CODE_NOT_EQUAL));
 		}
 	}
-	
+
 	@ApiOperation("비밀번호 찾기")
 	@GetMapping("/findPassword")
-	public ResponseEntity<CommonResponse> findPassword(@RequestParam("employeeTel") String employeeTel, @RequestParam(value = "authCode") Integer authCode) {
-		
+	public ResponseEntity<CommonResponse> findPassword(@RequestParam("employeeTel") String employeeTel,
+			@RequestParam(value = "authCode") Integer authCode) {
+
 		Map<String, Object> result = new HashMap<>();
-		
+
 		if (accountService.checkAuthCode(employeeTel, authCode)) {
-			
+
 			String tempPassword = CommonUtils.getRamdomPassword(6);
 			result.put("tempPassword", tempPassword);
 			accountService.updatePassword(employeeTel, tempPassword);
@@ -200,18 +204,14 @@ public class AccountController {
 			return ResponseEntity.ok(new CommonResponse(CommonResultCode.AUTH_CODE_NOT_EQUAL));
 		}
 	}
-	
+
 	@ApiOperation(value = "제휴문의 등록하기")
 	@PostMapping("/question")
 	public ResponseEntity<CommonResponse> saveQuestion(@RequestParam("clinicName") String clinicName,
-			@RequestParam("email") String email,
-			@RequestParam("name") String name,
-			@RequestParam("tel") String tel,
-			@RequestParam("inquiry") String inquiry,
-			@RequestParam("usedProgram") String usedProgram) {
-		
+			@RequestParam("email") String email, @RequestParam("name") String name, @RequestParam("tel") String tel,
+			@RequestParam("inquiry") String inquiry, @RequestParam("usedProgram") String usedProgram) {
+
 		joinContactService.saveQuestion(clinicName, email, name, tel, inquiry, usedProgram);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 	}
 }
-	

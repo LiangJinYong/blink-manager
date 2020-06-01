@@ -91,7 +91,7 @@ public class WebExaminationResultDocService {
 		
 		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 		
-		Page<WebExaminationResultDocResponseDto> examinationResultDocList = webExaminationResultDocRepository.findBySearchTextAndPeriodWithHospital(time, hospitalId, pageable);
+		Page<WebExaminationResultDocResponseDto> examinationResultDocList = webExaminationResultDocRepository.findBySearchTextAndPeriodWithHospital(searchText, time, hospitalId, pageable);
 		
 		List<WebExaminationResultDocResponseDto> content = examinationResultDocList.getContent();
 		

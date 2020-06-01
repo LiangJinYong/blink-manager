@@ -64,7 +64,7 @@ public class WebConsentFormService {
 		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 
 		Page<AdminConsentFormDetailResponseDto> consentFormList = webConsentFormRepository
-				.findBySearchTextAndPeriodForAdmin(time, pageable);
+				.findBySearchTextAndPeriodForAdmin(searchText, time, pageable);
 
 		List<AdminConsentFormDetailResponseDto> content = consentFormList.getContent();
 

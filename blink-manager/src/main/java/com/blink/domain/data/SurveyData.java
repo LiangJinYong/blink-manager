@@ -37,9 +37,16 @@ public class SurveyData implements Serializable {
     private String recommendationsForLifeStyle;
     
     @Builder
-    public SurveyData(String pastDiseaseHistory, String nowDrugTreatment, String recommendationsForLifeStyle) {
+    public SurveyData(String pastDiseaseHistory, String nowDrugTreatment, String recommendationsForLifeStyle, String smokerCategory, String levelOfNicotineDependence, String drinkingCategory, String exerciseStatus, String nutritionStatus, String obesityStatus, String drugTreatment) {
     	this.pastDiseaseHistory = pastDiseaseHistory;
     	this.nowDrugTreatment = nowDrugTreatment;
     	this.recommendationsForLifeStyle = recommendationsForLifeStyle;
+    	this.smokerCategory = smokerCategory;
+    	this.levelOfNicotineDependence = levelOfNicotineDependence;
+    	this.drinkingCategory = drinkingCategory;
+    	this.exerciseStatus = exerciseStatus;
+    	this.nutritionStatus = nutritionStatus;
+    	this.obesityStatus = obesityStatus;
+    	this.drugTreatment = drugTreatment;
     }
 }

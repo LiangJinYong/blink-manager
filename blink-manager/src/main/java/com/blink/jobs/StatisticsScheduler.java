@@ -46,6 +46,10 @@ public class StatisticsScheduler {
 	@Scheduled(cron = "0 0 1 * * *")
 	public void dailyStatistics() {
 		LocalDate yesterday = LocalDate.now().minusDays(1L);
+		Integer year = yesterday.getYear();
+		Integer month = yesterday.getMonthValue();
+		Integer dayOfWeek = yesterday.getDayOfWeek().getValue();
+		
 		List<Long> hospitalIds = hospitalRepository.findAllValidHospitalIds();
 
 		for (Long hospitalId : hospitalIds) {
@@ -75,6 +79,9 @@ public class StatisticsScheduler {
 			StatisticsDailyHospital hospitalStatisticsEntity = StatisticsDailyHospital.builder() //
 					.date(yesterday) //
 					.hospital(hospital) //
+					.year(year) //
+					.month(month) //
+					.dayOfWeek(dayOfWeek) //
 					.agreeNCount(agreeNCount) //
 					.agreeYCount(agreeYCount) //
 					.examinationCount(examinationCount) //

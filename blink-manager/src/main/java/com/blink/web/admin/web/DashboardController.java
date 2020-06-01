@@ -1,5 +1,6 @@
 package com.blink.web.admin.web;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
@@ -28,10 +29,19 @@ public class DashboardController {
 	@ApiOperation(value = "대시보드 데이터 가져오기")
 	@GetMapping
 	public ResponseEntity<CommonResponse> getDashboardData(@RequestParam("searchText") Optional<String> searchText,
-			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period, Pageable pageable) {
+			@RequestParam(name = "period", defaultValue = "ONEYEAR") Optional<SearchPeriod> period, Pageable pageable) {
 		
 		DashboardResponseDto result = dashboardService.getDashboardData(searchText.orElse("_"),
-				period.orElse(SearchPeriod.ONEMONTH), pageable);
+				period.orElse(SearchPeriod.ONEYEAR), pageable);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}
+	
+	@ApiOperation(value = "고객센터, 디지털 사이니지, 제휴문의에 답변하는 않는 기록이 있는지 표시")
+	@GetMapping("/markUnprocessed")
+	public ResponseEntity<CommonResponse> markUnprocessed() {
+		
+		Map<String, Boolean> result = dashboardService.getUnprocessedData();
+		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
+	}
+	
 }

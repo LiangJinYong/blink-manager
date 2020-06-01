@@ -39,13 +39,13 @@ public class UserExaminationMetadataRequestDto {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		
 		return UserExaminationMetadata.builder()
-				.agreeYn(agreeYn)
 				.dateExamined(LocalDate.parse(dateExamined, formatter))
 				.hospitalDataId(hospitalDataId)
-				.agreeMail(1)
-				.agreeSms(1)
-				.agreeVisit(0)
 				.examinationYear(examinationYear)
+				.agreeYn(agreeYn)
+				.agreeMail(agreeMail)
+				.agreeSms(agreeSms)
+				.agreeVisit(agreeVisit)
 				.build();
 	}
 }

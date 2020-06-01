@@ -67,21 +67,22 @@ public class AccountService {
 	private final BucketService bucketService;
 
 	private final FeignAuthMTService mtService;
-	
+
 	private final HospitalStatisticsRepository hospitalStatisticsRepo;
 
 	public Long signupUser(UserSignupRequestDto requestDto, MultipartFile file) {
-		
+
 		// image upload
 		String groupId = webFilesRepo.findFileGroupId("fileGroup");
 
 		Hospital hospital = requestDto.toHospitalEntity(requestDto.getHospitalName(), requestDto.getHospitalTel(),
 				requestDto.getPostcode(), requestDto.getAddress(), requestDto.getAddressDetail(),
 				requestDto.getEmployeeName(), requestDto.getEmployeePosition(), requestDto.getEmployeeTel(),
-				requestDto.getEmployeeEmail(), requestDto.getAgreeSendYn(), requestDto.getProgramInUse());
+				requestDto.getEmployeeEmail(), requestDto.getAgreeSendYn(), requestDto.getProgramInUse(),
+				requestDto.getSignagesStand(), requestDto.getSignagesMountable(), requestDto.getSignagesExisting());
 
 		hospital.assignGroupId(groupId);
-		
+
 		hospital = hospitalRepo.save(hospital);
 
 		Admin admin = requestDto.toAdminEntity(requestDto.getUsername(),
@@ -89,7 +90,7 @@ public class AccountService {
 		admin.setHospital(hospital);
 
 		admin = adminRepo.save(admin);
-		
+
 		Optional<UserAuthCode> userAuthCode = userAuthCodeRepo.findByPhoneNumber(requestDto.getEmployeeTel());
 		userAuthCode.get().setSignupYn(true);
 
@@ -99,7 +100,7 @@ public class AccountService {
 				.build();
 
 		webJudgeRepo.save(webJudge);
-		
+
 		HospitalStatistics hospitalStatistics = HospitalStatistics.builder().hospital(hospital).build();
 		hospitalStatisticsRepo.save(hospitalStatistics);
 
@@ -118,7 +119,7 @@ public class AccountService {
 					.uploadUserId(hospital.getId()) //
 					.fileSize(fileSize) //
 					.build();
-			
+
 			webFilesRepo.save(webFiles);
 
 		} catch (InterruptedException | IOException e) {
@@ -200,24 +201,24 @@ public class AccountService {
 		Admin user = adminRepo.findByName(username);
 
 		Hospital hospital = user.getHospital();
-		
+
 		String role = user.getRoleId().toString();
 		userStatusInfo.put("role", role);
-		
+
 		if (user.getRoleId() == Role.MASTER) {
 			userStatusInfo.put("displayName", adminDisplayName);
 		} else {
 			String displayName = hospital.getDisplayName();
 			userStatusInfo.put("displayName", displayName);
 			userStatusInfo.put("hospitalId", hospital.getId());
-			
+
 			boolean accountStatus = user.isAccountStatus();
 			userStatusInfo.put("accountStatus", accountStatus);
-			
+
 			if (!accountStatus) {
 				JudgeStatus judgeStatus = hospital.getWebJudge().getJudgeStatus();
 				userStatusInfo.put("judgeStatus", judgeStatus);
-				
+
 				if (judgeStatus.equals(JudgeStatus.DENIED)) {
 					userStatusInfo.put("rejectMsg", hospital.getWebJudge().getRejectMsg());
 				} else if (judgeStatus.equals(JudgeStatus.APPROVED)) {
@@ -242,7 +243,7 @@ public class AccountService {
 	}
 
 	public void updatePassword(String employeeTel, String tempPassword) {
-		
+
 		List<Hospital> list = hospitalRepo.findByEmployeeTel(employeeTel);
 		if (list.size() > 0) {
 			Admin admin = list.get(0).getAdmin();
@@ -253,15 +254,33 @@ public class AccountService {
 	}
 
 	public void updateEmail(String newEmail, Long hospitalId) {
-		
-		Hospital hospital = hospitalRepo.findById(hospitalId).orElseThrow(() -> new IllegalArgumentException("No such hospital"));
-		
+
+		Hospital hospital = hospitalRepo.findById(hospitalId)
+				.orElseThrow(() -> new IllegalArgumentException("No such hospital"));
+
 		hospital.modifyEmail(newEmail);
 	}
 
 	public void signConfirm(Long hospitalId) {
-		Hospital hospital = hospitalRepo.findById(hospitalId).orElseThrow(() -> new IllegalArgumentException("No such hospital"));
-		
+		Hospital hospital = hospitalRepo.findById(hospitalId)
+				.orElseThrow(() -> new IllegalArgumentException("No such hospital"));
+
 		hospital.getWebJudge().changeJudgeStatus(JudgeStatus.SIGNWAITING, null);
+	}
+
+	public void signupUserByAdmin(UserSignupRequestDto requestDto) {
+		Hospital hospital = requestDto.toHospitalEntity(requestDto.getHospitalName(), requestDto.getHospitalTel(),
+				requestDto.getPostcode(), requestDto.getAddress(), requestDto.getAddressDetail(),
+				requestDto.getEmployeeName(), requestDto.getEmployeePosition(), requestDto.getEmployeeTel(),
+				requestDto.getEmployeeEmail(), requestDto.getAgreeSendYn(), requestDto.getProgramInUse(),
+				requestDto.getSignagesStand(), requestDto.getSignagesMountable(), requestDto.getSignagesExisting());
+
+		hospital = hospitalRepo.save(hospital);
+
+		Admin admin = requestDto.toAdminEntity(requestDto.getUsername(),
+				passwordEncoder.encode(requestDto.getPassword()), requestDto.getEmployeeEmail());
+		admin.setHospital(hospital);
+		admin.setAccountStatus(true);
+		adminRepo.save(admin);
 	}
 }

@@ -79,6 +79,8 @@ public class WebDigitalSignageService {
 			}
 		}
 		
+		webDigitalSignageRepository.updateReadAnswerStatus(hospitalId);
+		
 		return list;
 	}
 	
@@ -120,8 +122,8 @@ public class WebDigitalSignageService {
 		
 		long totalCount = list.getTotalElements();
 		
-		int waitingCount = webDigitalSignageRepository.findByAnswerYn(false);
-		int completedCount = webDigitalSignageRepository.findByAnswerYn(true);
+		int waitingCount = webDigitalSignageRepository.findCountByAnswerYn(false);
+		int completedCount = webDigitalSignageRepository.findCountByAnswerYn(true);
 		
 		WebDigitalSignageAdminResponseDto responseDto = new WebDigitalSignageAdminResponseDto(list, totalCount, waitingCount, completedCount);
 		return responseDto;

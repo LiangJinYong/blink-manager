@@ -14,8 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.blink.domain.hospital.Hospital;
 import com.blink.domain.hospital.HospitalRepository;
-import com.blink.domain.pdf.PdfWeb;
-import com.blink.domain.pdf.PdfWebRepository;
 import com.blink.domain.sendMailResultWeb.FileInfo;
 import com.blink.domain.sendMailResultWeb.SendMailResultWeb;
 import com.blink.domain.sendMailResultWeb.SendMailResultWebRepository;
@@ -35,7 +33,6 @@ public class SendMailResultWebService {
 	private final HospitalRepository hospitalRepository;
 	private final SendMailResultWebRepository sendMailResultWebRepository;
 	private final FileUploadUtils fileUploadUtils;
-	private final PdfWebRepository pdfWebRepository;
 	private final BucketService bucketService;
 
 	public Page<SendMailResultWebResponseDto> getSendMailResultWeb(String searchText, SearchPeriod period,

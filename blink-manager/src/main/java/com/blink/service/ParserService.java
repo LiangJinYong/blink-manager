@@ -98,7 +98,70 @@ public class ParserService {
 	public List<Map<String, Object>> save(List<UserParserRequestDto> userList) {
 
 		List<Map<String, Object>> result = new ArrayList<>();
+		
+		for (UserParserRequestDto user : userList) {
+			UserDataRequestDto userDataDto = user.getUserData();
+			UserExaminationMetadataRequestDto userExaminationMetadataDto = user.getUserExaminationMetadata();
+			
+			String phone = userDataDto.getPhone();
+			String ssnPartial = userDataDto.getSsnPartial();
+			
+			List<UserData> userDataList= userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
+			
+			if (userDataList.size() > 0) {
+				Integer count = userDataRepository.findUserDataCountByPhoneAndSsnPartial(phone, ssnPartial);
+				
+				if (count == 1) {
+					Integer examinationYear = userExaminationMetadataDto.getExaminationYear();
+					
+					Optional<UserExaminationMetadata> userExaminationMetadataOptional = userExaminationMetadataRepository
+							.findByUserAndExaminationYear(userDataList.get(0), examinationYear);
+					
+					if (userExaminationMetadataOptional.isPresent()) {
+						UserExaminationMetadata metadata = userExaminationMetadataOptional.get();
+						Long hospitalDataId = userExaminationMetadataDto.getHospitalDataId();
+						
+						String dateExamined = userExaminationMetadataDto.getDateExamined();
+						DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+						
+						Integer agreeYn = metadata.getAgreeYn();
+						Integer agreeMail = metadata.getAgreeMail();
+						Integer agreeSms = metadata.getAgreeSms();
+						Integer agreeVisit = metadata.getAgreeVisit();
+						
+						if ((agreeYn != null && agreeYn == 0) && (agreeMail != null && agreeMail == 1) && (agreeSms != null && agreeSms == 1) && (agreeVisit != null && agreeVisit == 0)) {
+							// update all
+							metadata.update(LocalDate.parse(dateExamined, formatter), hospitalDataId, examinationYear, agreeYn, agreeMail, agreeSms, agreeVisit);
+						} else {
+							// update all except agreeYn, agreeMail, agreeSms, agreeVisit
+							metadata.update(LocalDate.parse(dateExamined, formatter), hospitalDataId, examinationYear);
+						}
+					} else {
+						UserExaminationMetadata userExaminationMetadataEntity = userExaminationMetadataDto.toEntity();
+						userExaminationMetadataEntity.setUserData(userDataList.get(0));
 
+						userExaminationMetadataRepository.save(userExaminationMetadataEntity);
+					}
+				} else if (count > 1) {
+					Map<String, Object> existedMultipleUsers = new HashMap<>();
+					existedMultipleUsers.put("phone", phone);
+					existedMultipleUsers.put("ssnPartial", ssnPartial);
+					
+					result.add(existedMultipleUsers);
+					continue;
+				}
+			} else {
+				UserData userDataEntity = userDataDto.toEntity();
+				userDataEntity = userDataRepository.save(userDataEntity);
+
+				UserExaminationMetadata userExaminationMetadataEntity = userExaminationMetadataDto.toEntity();
+				userExaminationMetadataEntity.setUserData(userDataEntity);
+
+				userExaminationMetadataRepository.save(userExaminationMetadataEntity);
+			}
+		}
+
+		/*
 		for (UserParserRequestDto user : userList) {
 			UserDataRequestDto userDataDto = user.getUserData();
 			UserExaminationMetadataRequestDto userExaminationMetadataDto = user.getUserExaminationMetadata();
@@ -113,7 +176,6 @@ public class ParserService {
 
 			if (userData != null && userData.isPresent()) {
 
-				// 이름으로 한번 체크
 				Optional<UserData> userDataBySsn = userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
 
 				// 없으면
@@ -122,7 +184,7 @@ public class ParserService {
 					map.put("phone", phone);
 					map.put("ssnPartial", ssnPartial);
 
-					result.add(map);
+					userDataRepository.save(userDataDto.toEntity());
 				} else {
 					// update
 					UserDataRequestDto dto = user.getUserData();
@@ -140,6 +202,11 @@ public class ParserService {
 
 				if (userExaminationMetadata.isPresent()) {
 					System.out.println("==> UserExaminationMetadata 업데이트");
+					UserExaminationMetadata userExaminationMetadataEntity = userExaminationMetadata.get();
+					Integer agreeYnDB = userExaminationMetadataEntity.getAgreeYn();
+					Integer agreeMailDB = userExaminationMetadataEntity.getAgreeMail();
+					Integer agreeSmsDB = userExaminationMetadataEntity.getAgreeSms();
+					Integer agreeVisitDB = userExaminationMetadataEntity.getAgreeVisit();
 					// 기록 등록됨 -> 업데이트
 					Integer agreeYn = userExaminationMetadataDto.getAgreeYn();
 					String dateExamined = userExaminationMetadataDto.getDateExamined();
@@ -149,9 +216,14 @@ public class ParserService {
 					Integer agreeVisit = userExaminationMetadataDto.getAgreeVisit();
 					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-					userExaminationMetadata.get().update(agreeYn, LocalDate.parse(dateExamined, formatter),
-							hospitalDataId, agreeMail, agreeSms, agreeVisit, examinationYear);
-
+					if (!(agreeYnDB == 0 && agreeMailDB == 1 && agreeSmsDB == 1 && agreeVisitDB == 0)) {
+						userExaminationMetadataEntity.update(LocalDate.parse(dateExamined, formatter),
+								hospitalDataId, examinationYear);
+					} else {
+						userExaminationMetadataEntity.update(LocalDate.parse(dateExamined, formatter),
+								hospitalDataId, examinationYear, agreeYn, agreeMail, agreeSms, agreeVisit);
+					}
+					
 				} else {
 					// 기록 미동록
 					System.out.println("==> UserExaminationMetadata 미동록");
@@ -173,6 +245,7 @@ public class ParserService {
 			}
 		}
 
+		 */
 		return result;
 	}
 
@@ -185,47 +258,47 @@ public class ParserService {
 			String phone = userDataMap.get("phone");
 			String ssnPartial = userDataMap.get("ssnPartial");
 
-			Optional<UserData> userData = userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
+			List<UserData> userData = userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
 
-			if (userData.isPresent()) {
+			if (userData.size() > 0) {
 				Integer examinationYear = Integer.parseInt((String) map.get("examinationYear"));
 				Integer inspectionType = Integer.parseInt((String) map.get("inspectionType"));
 				Integer inspectionSubType = Integer.parseInt((String) map.get("inspectionSubType"));
 
 				// DB에 해당 연도에 존재하는 metadata
 				Optional<UserExaminationMetadata> metadata = userExaminationMetadataRepository
-						.findByUserDataAndExaminationYear(userData.get(), examinationYear);
+						.findByUserDataAndExaminationYear(userData.get(0), examinationYear);
 
 				if (metadata.isPresent()) {
 					// update address
 					UserExaminationMetadata metadataEntity = metadata.get();
 					String userAddress = (String) map.get("userAddress");
 					metadataEntity.updateAddress(userAddress);
-
-					String agreeYnStr = (String) map.get("agreeYn");
-
-					if (agreeYnStr != null) {
-						metadataEntity.setAgreeYn(Integer.parseInt(agreeYnStr));
+					
+					Map<String, Object> userExaminationMetadata = (Map<String, Object>) map.get("userExaminationMetadata");
+					String dateExamined = (String) userExaminationMetadata.get("dateExamined");
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+					
+					String hospitalDataId = (String) map.get("hospitalDataId");
+					
+					Integer agreeYnParam = (Integer) userExaminationMetadata.get("agreeYn");
+					Integer agreeMailParam = (Integer) userExaminationMetadata.get("agreeMail");
+					Integer agreeSmsParam = (Integer) userExaminationMetadata.get("agreeSms");
+					Integer agreeVisitParam = (Integer) userExaminationMetadata.get("agreeVisit");
+					
+					Integer agreeYn = metadataEntity.getAgreeYn();
+					Integer agreeMail = metadataEntity.getAgreeMail();
+					Integer agreeSms = metadataEntity.getAgreeSms();
+					Integer agreeVisit = metadataEntity.getAgreeVisit();
+					
+					if ((agreeYn != null && agreeYn == 0) && (agreeMail != null && agreeMail == 1) && (agreeSms != null && agreeSms == 1) && (agreeVisit != null && agreeVisit == 0)) {
+						// update all
+						metadataEntity.update(LocalDate.parse(dateExamined, formatter), Long.parseLong(hospitalDataId), examinationYear, agreeYnParam, agreeMailParam, agreeSmsParam, agreeVisitParam);
+					} else {
+						// update all except agreeYn, agreeMail, agreeSms, agreeVisit
+						metadataEntity.update(LocalDate.parse(dateExamined, formatter), Long.parseLong(hospitalDataId), examinationYear);
 					}
-
-					String agreeMailStr = (String) map.get("agreeMail");
-
-					if (agreeMailStr != null) {
-						metadataEntity.setAgreeMail(Integer.parseInt(agreeMailStr));
-					}
-
-					String agreeSmsStr = (String) map.get("agreeSms");
-
-					if (agreeSmsStr != null) {
-						metadataEntity.setAgreeSms(Integer.parseInt(agreeSmsStr));
-					}
-
-					String agreeVisitStr = (String) map.get("agreeVisit");
-
-					if (agreeVisitStr != null) {
-						metadataEntity.setAgreeVisit(Integer.parseInt(agreeVisitStr));
-					}
-
+					
 					Optional<UserExaminationMetadataDetail> metadataDetail = userExaminationMetadataDetailRepository
 							.findByMetaDataAndExaminationYearAndType(metadataEntity.getId(), examinationYear,
 									inspectionType, inspectionSubType);
@@ -237,14 +310,14 @@ public class ParserService {
 					}
 
 					UserExaminationEntireDataOfOne dataOfOne = metadataEntity.getUserExaminationEntireDataOfOne();
-					dataOfOne = saveDataOfOne(map, dataOfOne, userData.get());
+					dataOfOne = saveDataOfOne(map, dataOfOne, userData.get(0));
 
 					metadataEntity.setUserExaminationEntireDataOfOne(dataOfOne);
 
 					saveCancerDataApp(map, dataOfOne);
 				} else {
-					UserExaminationEntireDataOfOne newDataOfOne = saveDataOfOne(map, null, userData.get());
-					UserExaminationMetadata newMetaData = saveMetadata(map, newDataOfOne, userData.get());
+					UserExaminationEntireDataOfOne newDataOfOne = saveDataOfOne(map, null, userData.get(0));
+					UserExaminationMetadata newMetaData = saveMetadata(map, newDataOfOne, userData.get(0));
 					saveMetadataDetail(map, newMetaData, null);
 					saveCancerDataApp(map, newDataOfOne);
 				}
@@ -390,13 +463,13 @@ public class ParserService {
 		LocalDate dateExaminedDate = LocalDate.parse(dateExamined);
 		String examinationYear = (String) map.get("examinationYear");
 		String hospitalDataId = (String) map.get("hospitalDataId");
-		Integer agreeYn = 0;
-
-		String agreeYnStr = (String) map.get("agreeYn");
-
-		if (agreeYnStr != null) {
-			agreeYn = Integer.parseInt(agreeYnStr);
-		}
+		
+		Map<String, Object> userExaminationMetadata = (Map<String, Object>) map.get("userExaminationMetadata");
+		
+		Integer agreeYn = (Integer) userExaminationMetadata.get("agreeYn");
+		Integer agreeMail = (Integer) userExaminationMetadata.get("agreeMail");
+		Integer agreeSms = (Integer) userExaminationMetadata.get("agreeSms");
+		Integer agreeVisit = (Integer) userExaminationMetadata.get("agreeVisit");
 
 		UserExaminationMetadata userExaminationMetadataEntity = UserExaminationMetadata.builder() //
 				.userData(userData) //
@@ -405,11 +478,12 @@ public class ParserService {
 				.hospitalDataId(Long.parseLong(hospitalDataId)) //
 				.address(address) //
 				.userExaminationEntireDataOfOne(dataOfOne) //
-				.agreeYn(agreeYn).agreeMail(1) //
-				.agreeSms(1) //
-				.agreeVisit(0) //
+				.agreeYn(agreeYn) //
+				.agreeMail(agreeMail) //
+				.agreeSms(agreeSms) //
+				.agreeVisit(agreeVisit) //
 				.build();
-
+		
 		userExaminationMetadataEntity = userExaminationMetadataRepository.save(userExaminationMetadataEntity);
 
 		System.out.println("userExaminationMetadata: " + userExaminationMetadataEntity.getId());
@@ -863,6 +937,13 @@ public class ParserService {
 					.pastDiseaseHistory(surveyDataItem.get("pastDiseaseHistory")) //
 					.nowDrugTreatment(surveyDataItem.get("nowDrugTreatment")) //
 					.recommendationsForLifeStyle(surveyDataItem.get("recommendationsForLifeStyle")) //
+					.smokerCategory(surveyDataItem.get("smokerCategory")) //
+					.levelOfNicotineDependence(surveyDataItem.get("levelOfNicotineDependence")) //
+					.drinkingCategory(surveyDataItem.get("drinkingCategory")) //
+					.exerciseStatus(surveyDataItem.get("exerciseStatus")) //
+					.nutritionStatus(surveyDataItem.get("nutritionStatus")) //
+					.obesityStatus(surveyDataItem.get("obesityStatus")) //
+					.drugTreatment(surveyDataItem.get("drugTreatment")) //
 					.build();
 
 			surveyData = surveyDataRepository.save(surveyData);
@@ -879,6 +960,13 @@ public class ParserService {
 			surveyData.setPastDiseaseHistory(surveyDataItem.get("pastDiseaseHistory"));
 			surveyData.setNowDrugTreatment(surveyDataItem.get("nowDrugTreatment"));
 			surveyData.setRecommendationsForLifeStyle(surveyDataItem.get("recommendationsForLifeStyle"));
+			surveyData.setSmokerCategory(surveyDataItem.get("smokerCategory"));
+			surveyData.setLevelOfNicotineDependence(surveyDataItem.get("levelOfNicotineDependence"));
+			surveyData.setDrinkingCategory(surveyDataItem.get("drinkingCategory"));
+			surveyData.setExerciseStatus(surveyDataItem.get("exerciseStatus"));
+			surveyData.setNutritionStatus(surveyDataItem.get("nutritionStatus"));
+			surveyData.setObesityStatus(surveyDataItem.get("obesityStatus"));
+			surveyData.setDrugTreatment(surveyDataItem.get("drugTreatment"));
 		}
 	}
 
@@ -1037,10 +1125,10 @@ public class ParserService {
 			String ssnPartial = data.get("ssnPartial");
 
 			UserData userData = null;
-			Optional<UserData> userDataOptional = userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
+			List<UserData> userDataList = userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
 
-			if (userDataOptional.isPresent()) {
-				userData = userDataOptional.get();
+			if (userDataList.size()>0) {
+				userData = userDataList.get(0);
 			}
 			
 			Optional<PdfIndividualWeb> pdfOptional = pdfIndividualWebRepository.findByUserDataAndPdfWebAndInspectionTypeAndInspectionSubType(userData, pdfWeb, inspectionType, inspectionSubType);
@@ -1061,7 +1149,7 @@ public class ParserService {
 				
 				Integer examinationYear = Integer.parseInt(data.get("dateExaminedYear"));
 				Optional<UserExaminationMetadata> metadata = userExaminationMetadataRepository
-						.findByUserAndExaminationYear(Optional.of(userData), examinationYear);
+						.findByUserAndExaminationYear(userData, examinationYear);
 				
 				if (metadata.isPresent()) {
 					List<UserExaminationMetadataDetail> metadataDetailList = metadata.get()
@@ -1093,10 +1181,10 @@ public class ParserService {
 			String ssnPartial = data.get("ssnPartial");
 
 			UserData userData = null;
-			Optional<UserData> userDataOptional = userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
+			List<UserData> userDataList = userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
 
-			if (userDataOptional.isPresent()) {
-				userData = userDataOptional.get();
+			if (userDataList.size() > 0) {
+				userData = userDataList.get(0);
 			}
 
 			Integer examinationYear = Integer.parseInt(data.get("dateExaminedYear"));

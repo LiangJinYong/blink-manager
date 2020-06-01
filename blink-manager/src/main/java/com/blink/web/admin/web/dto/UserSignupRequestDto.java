@@ -26,6 +26,9 @@ public class UserSignupRequestDto {
 	private String employeeEmail;
 	private Integer agreeSendYn;
 	private String programInUse;
+	private Integer signagesStand;
+	private Integer signagesMountable;
+	private Integer signagesExisting;
 
 	public Admin toAdminEntity(String username, String password, String employeeEmail) {
 		return Admin.builder().name(username).password(password).email(employeeEmail).build();
@@ -33,7 +36,7 @@ public class UserSignupRequestDto {
 
 	public Hospital toHospitalEntity(String hospitalName, String hospitalTel, String postcode, String address,
 			String addressDetail, String employeeName, String employeePosition, String employeeTel,
-			String employeeEmail, Integer agreeSendYn, String programInUse) {
+			String employeeEmail, Integer agreeSendYn, String programInUse, Integer signagesStand, Integer signagesMountable, Integer signagesExisting) {
 		return Hospital.builder().displayName(hospitalName)
 								.tel(hospitalTel)
 								.postcode(postcode)
@@ -44,13 +47,17 @@ public class UserSignupRequestDto {
 								.employeeTel(employeeTel).employeeEmail(employeeEmail)
 								.agreeSendYn(agreeSendYn)
 								.name(username)
-								.programInUse(programInUse).build();
+								.programInUse(programInUse)
+								.signagesStand(signagesStand)
+								.signagesMountable(signagesMountable)
+								.signagesExisting(signagesExisting)
+								.build();
 	}
 
 	@Builder
 	public UserSignupRequestDto(String username, String password, String hospitalName, String hospitalTel,
 			String postcode, String address, String addressDetail, String employeeName, String employeePosition,
-			String employeeTel, String employeeEmail, Integer agreeSendYn, String programInUse) {
+			String employeeTel, String employeeEmail, Integer agreeSendYn, String programInUse, Integer signagesStand, Integer signagesMountable, Integer signagesExisting) {
 		this.username = username;
 		this.password = password;
 		this.hospitalName = hospitalName;
@@ -64,5 +71,8 @@ public class UserSignupRequestDto {
 		this.employeeEmail = employeeEmail;
 		this.agreeSendYn = agreeSendYn;
 		this.programInUse = programInUse;
+		this.signagesStand = signagesStand;
+		this.signagesMountable = signagesMountable;
+		this.signagesExisting = signagesExisting;
 	}
 }

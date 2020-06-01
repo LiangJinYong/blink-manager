@@ -1,5 +1,7 @@
 package com.blink.web.hospital.dto.userExamination;
 
+import java.time.LocalDate;
+
 import com.blink.enumeration.InspectionSubType;
 import com.blink.enumeration.InspectionType;
 
@@ -14,4 +16,5 @@ public class InspectionTypeDto {
 	private final InspectionSubType inspectionSubType;
 	private final String filekey;
 	private final String filename;
+	private final LocalDate dateExamined;
 }

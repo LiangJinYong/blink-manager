@@ -125,7 +125,7 @@ public class AgreeUserService {
 		agreeUserListRepository.delete(agreeUserList);
 	}
 
-	public com.blink.web.admin.web.dto.agreeUserList.AgreeUserResponseDto getAdminAgreeUserInfo(String title,
+	public com.blink.web.admin.web.dto.agreeUserList.AgreeUserResponseDto getAdminAgreeUserInfo(String searchText,
 			SearchPeriod period, Pageable pageable) {
 
 		LocalDateTime time = CommonUtils.getSearchPeriod(period);

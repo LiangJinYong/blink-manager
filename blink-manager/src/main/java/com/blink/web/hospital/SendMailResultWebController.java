@@ -59,7 +59,7 @@ public class SendMailResultWebController {
 	public ResponseEntity<CommonResponse> registerSendMailResultWeb(@PathVariable("hospitalId") Long hospitalId,
 			@RequestParam("sentCount") Integer sentCount,
 			@DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam("sentDate") LocalDate sentDate,
-			@RequestParam("uploadDate") LocalDate uploadDate, @RequestParam("file") MultipartFile file) {
+			@DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam("uploadDate") LocalDate uploadDate, @RequestParam("file") MultipartFile file) {
 
 		sendMailResultWebService.registerSendMailResultWeb(hospitalId, sentCount, sentDate, uploadDate, file);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));

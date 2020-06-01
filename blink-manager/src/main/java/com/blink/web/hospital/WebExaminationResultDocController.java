@@ -49,7 +49,7 @@ public class WebExaminationResultDocController {
 	}
 	
 	@ApiOperation(value = "검진결과지 삭제")
-	@DeleteMapping("/{WebExaminationResultDocId}")
+	@DeleteMapping("/{webExaminationResultDocId}")
 	public ResponseEntity<CommonResponse> deleteExaminationResultDoc(@PathVariable("webExaminationResultDocId") Long webExaminationResultDocId) {
 		webExaminationResultDocService.deleteExaminationResultDoc(webExaminationResultDocId);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));

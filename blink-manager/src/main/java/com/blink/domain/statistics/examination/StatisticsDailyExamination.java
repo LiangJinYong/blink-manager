@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import com.blink.domain.BaseTimeEntity;
 import com.blink.domain.examinatinPresent.StatisticsDailyId;
 import com.blink.domain.hospital.Hospital;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -34,6 +35,7 @@ public class StatisticsDailyExamination extends BaseTimeEntity {
 	@Id
 	@JoinColumn(name = "hospital_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "NONE"))
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JsonIgnore
 	private Hospital hospital;
 
 	@Column(columnDefinition = "BIGINT(20) DEFAULT 0")

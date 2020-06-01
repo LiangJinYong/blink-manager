@@ -40,7 +40,8 @@ public class HospitailManageController {
 			@RequestParam("hospitalName") String hospitalName, @RequestParam("employeeName") String employeeName,
 			@RequestParam("hospitalTel") String hospitalTel, @RequestParam("employeeTel") String employeeTel,
 			@RequestParam("agreeSendYn") Integer agreeSendYn, @RequestParam("postcode") String postcode,
-			@RequestParam("address") String address, @RequestParam("addressDetail") String addressDetail,
+			@RequestParam("address") String address,
+			@RequestParam(name = "addressDetail", required = false) String addressDetail,
 			@RequestParam("employeeEmail") String employeeEmail, @RequestParam("programInUse") String programInUse,
 			@RequestParam(name = "signagesStand", required = false) Integer signagesStand,
 			@RequestParam(name = "signagesMountable", required = false) Integer signagesMountable,
@@ -55,6 +56,7 @@ public class HospitailManageController {
 				.hospitalName(hospitalName) //
 				.employeeName(employeeName) //
 				.hospitalTel(hospitalTel) //
+				.hospitalTel(hospitalTel) //
 				.employeeTel(employeeTel) //
 				.agreeSendYn(agreeSendYn) //
 				.postcode(postcode) //
@@ -66,14 +68,14 @@ public class HospitailManageController {
 				.signagesMountable(signagesMountable) //
 				.signagesExisting(signagesExisting) //
 				.employeePosition(employeePosition) //
-				.groupFileId(groupFileId)
-				.password(password)
+				.groupFileId(groupFileId) //
+				.password(password) //
 				.build();
 
 		hospitalService.updateHospitalDetail(requestDto, files);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 	}
-	
+
 	@ApiOperation(value = "병원관리 - 병원 탈퇴")
 	@DeleteMapping("/{hospitalId}")
 	public ResponseEntity<CommonResponse> deleteHospital(@PathVariable("hospitalId") Long hospitalId) {

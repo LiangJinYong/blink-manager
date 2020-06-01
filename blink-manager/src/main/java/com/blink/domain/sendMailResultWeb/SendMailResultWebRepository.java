@@ -24,11 +24,11 @@ public interface SendMailResultWebRepository extends JpaRepository<SendMailResul
 	List<Map<Long, String>> findPdfInfoList(@Param("hospitalId") Long hospitalId);
 
 	// 업무 관리
-	@Query("SELECT SUM(w.sentCount) FROM SendMailResultWeb w WHERE w.sentDate = :searchLocalDate AND w.hospital = :hospital")
-	Integer findSentCountBySentDateAndHospital(@Param("searchLocalDate") LocalDate searchLocalDate, @Param("hospital") Hospital hospital);
+//	@Query("SELECT COALESCE(SUM(w.sentCount), 0) FROM SendMailResultWeb w WHERE w.sentDate >= DATE(:searchLocalDate) AND w.hospital = :hospital")
+//	Integer findSentCountBySentDateAndHospital(@Param("searchLocalDate") LocalDateTime searchLocalDate, @Param("hospital") Hospital hospital);
 
-	@Query("SELECT SUM(w.sentCount) FROM SendMailResultWeb w WHERE w.sentDate = :searchLocalDate")
-	Integer findTotalSentCount(@Param("searchLocalDate") LocalDate searchLocalDate);
+//	@Query("SELECT COALESCE(SUM(w.sentCount), 0) FROM SendMailResultWeb w WHERE w.sentDate >= DATE(:searchLocalDate)")
+//	Integer findTotalSentCount(@Param("searchLocalDate") LocalDate searchLocalDate);
 
 	// 통계
 	@Query("SELECT COALESCE(SUM(w.sentCount), 0) FROM SendMailResultWeb w WHERE DATE(w.createdAt) = DATE(:yesterday) AND w.hospital.id = :hospitalId")

@@ -1,4 +1,4 @@
-package com.blink.web.admin.web.dto.business;
+package com.blink.web.admin.web.dto.examinationResultDocMobile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -11,15 +11,16 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @RequiredArgsConstructor
-public class SingleBusinessResponseDto {
+public class WebExaminationResultDocMobileResponseDto {
 
-	private final Long hospitalId;
+	private final Long id;
 	private final LocalDateTime createdAt;
-	private final String hospitalName;
-	private final Integer agreeSendYn;
-	private final String groupId;
 	private final String username;
-	private final String programInUse;
-	private List<WebFileResponseDto> files = new ArrayList<>();
+	private final String birthday;
+	private final String phone;
+	private final String hospitalName;
+	private final Integer status;
+	private final String groupId;
 	
+	private List<WebFileResponseDto> files = new ArrayList<>();
 }

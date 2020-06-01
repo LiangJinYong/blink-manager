@@ -75,6 +75,8 @@ public class WebQnaService {
 				dto.setAnswerFiles(answerFiles);
 			}
 		}
+		
+		webQnaRepository.updateReadAnswerStatus(hospitalId);
 
 		return list;
 	}
@@ -117,8 +119,8 @@ public class WebQnaService {
 		
 		long totalCount = list.getTotalElements();
 		
-		int waitingCount = webQnaRepository.findByAnswerYn(false);
-		int completedCount = webQnaRepository.findByAnswerYn(true);
+		int waitingCount = webQnaRepository.findCountByAnswerYn(false);
+		int completedCount = webQnaRepository.findCountByAnswerYn(true);
 		
 		QuestionType questionTypeMost = webQnaRepository.findByQuestionTypeMost();
 		

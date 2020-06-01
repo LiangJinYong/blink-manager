@@ -19,5 +19,8 @@ public class AgreeUserListResponseDto {
 	private final Integer count;
 	private final Long hospitalId;
 	private final String username; 
+	private final String programInUse;
+	private final Integer agreeSendYn;
+	
 	private List<WebFileResponseDto> files = new ArrayList<>();
 }

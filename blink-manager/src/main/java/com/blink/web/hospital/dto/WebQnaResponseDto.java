@@ -24,6 +24,10 @@ public class WebQnaResponseDto {
 	private final String answerGroupId;
 	private final String hospitalName;
 	private final String username;
+	private final String programInUse;
+	private final Long hospitalId;
+	private final Integer agreeSendYn;
+	
 	private List<WebFileResponseDto> questionFiles = new ArrayList<>();
 	private List<WebFileResponseDto> answerFiles = new ArrayList<>();
 }

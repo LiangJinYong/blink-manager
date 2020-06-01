@@ -112,7 +112,7 @@ public class Hospital extends BaseTimeEntity {
 	@Builder
 	public Hospital(String displayName, String tel, String postcode, String address, String addressDetail,
 			String employeeName, String employeePosition, String employeeTel, String employeeEmail, Integer agreeSendYn,
-			String name, String programInUse, String groupId) {
+			String name, String programInUse, String groupId, Integer signagesStand, Integer signagesMountable, Integer signagesExisting) {
 		this.displayName = displayName;
 		this.tel = tel;
 		this.postcode = postcode;
@@ -126,16 +126,20 @@ public class Hospital extends BaseTimeEntity {
 		this.name = name;
 		this.programInUse = programInUse;
 		this.groupId = groupId;
+		this.signagesStand = signagesStand;
+		this.signagesMountable = signagesMountable;
+		this.signagesExisting = signagesExisting;
 	}
 
 	public void modifyEmail(String newEmail) {
 		this.employeeEmail = newEmail;
 	}
 
-	public void updateHospitalInfo(String hospitalName, String employeeTel, String address, String addressDetail,
+	public void updateHospitalInfo(String hospitalName, String hospitalTel, String employeeTel, String address, String addressDetail,
 			String postcode, String employeeEmail, String employeePosition, String employeeName, Integer agreeSendYn,
 			String programInUse, Integer signagesStand, Integer signagesMountable, Integer signagesExisting) {
 		this.displayName = hospitalName;
+		this.tel = hospitalTel;
 		this.employeeTel = employeeTel;
 		this.address = address;
 		this.addressDetail = addressDetail;

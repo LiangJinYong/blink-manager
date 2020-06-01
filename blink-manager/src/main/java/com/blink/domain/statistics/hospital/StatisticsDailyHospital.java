@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import com.blink.domain.BaseTimeEntity;
 import com.blink.domain.examinatinPresent.StatisticsDailyId;
 import com.blink.domain.hospital.Hospital;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -33,7 +34,13 @@ public class StatisticsDailyHospital extends BaseTimeEntity {
 	@Id
 	@JoinColumn(name = "hospital_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "NONE"))
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JsonIgnore
 	private Hospital hospital;
+	
+	
+	private Integer year;
+	private Integer month;
+	private Integer dayOfWeek;
 
 	@Column(name = "agreencount", columnDefinition = "bigint(20)")
 	private Integer agreeNCount;
@@ -66,11 +73,14 @@ public class StatisticsDailyHospital extends BaseTimeEntity {
 	private Integer paymentAmount;
 
 	@Builder
-	public StatisticsDailyHospital(LocalDate date, Hospital hospital, Integer agreeNCount, Integer agreeYCount,
+	public StatisticsDailyHospital(LocalDate date, Hospital hospital, Integer year, Integer month, Integer dayOfWeek, Integer agreeNCount, Integer agreeYCount,
 			Integer examinationCount, Integer examineeCount, Integer consentCount, Integer sentCount, Integer sentCost,
 			Integer omissionCost, Integer agreeSendYn, Integer paymentAmount) {
 		this.date = date;
 		this.hospital = hospital;
+		this.year = year;
+		this.month = month;
+		this.dayOfWeek = dayOfWeek;
 		this.agreeNCount = agreeNCount;
 		this.agreeYCount = agreeYCount;
 		this.examinationCount = examinationCount;

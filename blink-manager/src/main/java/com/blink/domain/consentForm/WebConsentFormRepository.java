@@ -9,21 +9,22 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.blink.domain.hospital.Hospital;
 import com.blink.web.admin.web.dto.consentForm.AdminConsentFormDetailResponseDto;
 import com.blink.web.hospital.dto.consentForm.HospitalConsentFormDetailResponseDto;
 
 public interface WebConsentFormRepository extends JpaRepository<WebConsentForm, Long> {
 
 	@Query("SELECT new com.blink.web.admin.web.dto.consentForm.AdminConsentFormDetailResponseDto(f.id, f.createdAt, h.displayName, f.receiveDate, f.receiveType, f.receiveTypeText, f.consentYear, f.consentMonth," + 
-			"f.count, f.groupId, h.id, h.name) FROM WebConsentForm f LEFT JOIN f.hospital h WHERE f.createdAt > :time")
-	Page<AdminConsentFormDetailResponseDto> findBySearchTextAndPeriodForAdmin(@Param("time") LocalDateTime time, Pageable pageable);
+			"f.count, f.groupId, h.id, h.name) FROM WebConsentForm f LEFT JOIN f.hospital h LEFT JOIN WebFiles wf ON f.groupId = wf.groupId WHERE (f.hospital.displayName LIKE %:searchText% OR wf.fileName LIKE %:searchText%) AND f.createdAt > :time")
+	Page<AdminConsentFormDetailResponseDto> findBySearchTextAndPeriodForAdmin(@Param("searchText") String searchText, @Param("time") LocalDateTime time, Pageable pageable);
 
 	@Query("SELECT new com.blink.web.admin.web.dto.consentForm.AdminConsentFormDetailResponseDto(f.id, f.createdAt, h.displayName, f.receiveDate, f.receiveType, f.receiveTypeText, f.consentYear, f.consentMonth," + 
 			"f.count, f.groupId, h.id, h.name) FROM WebConsentForm f LEFT JOIN f.hospital h WHERE f.createdAt > :time AND h.id = :hospitalId")
 	Page<AdminConsentFormDetailResponseDto> findBySearchTextAndPeriodForHospital(@Param("hospitalId") Long hospitalId, @Param("time") LocalDateTime time,
 			Pageable pageable);
 
-	@Query("SELECT new com.blink.web.hospital.dto.consentForm.HospitalConsentFormDetailResponseDto(f.id, f.createdAt, f.consentYear, f.consentMonth," + 
+	@Query("SELECT new com.blink.web.hospital.dto.consentForm.HospitalConsentFormDetailResponseDto(f.id, f.createdAt, f.receiveDate, f.receiveType, f.receiveTypeText, f.consentYear, f.consentMonth," + 
 			"f.count, f.groupId) FROM WebConsentForm f WHERE f.createdAt > :time AND f.hospital.id = :hospitalId")
 	Page<HospitalConsentFormDetailResponseDto> findBySearchTextAndPeriodForHospitalSelf(@Param("hospitalId") Long hospitalId,
 			@Param("time") LocalDateTime time, Pageable pageable);
@@ -37,5 +38,9 @@ public interface WebConsentFormRepository extends JpaRepository<WebConsentForm, 
 	// 통계
 	@Query("SELECT COALESCE(SUM(f.count), 0) FROM WebConsentForm f WHERE DATE(f.createdAt) = DATE(:yesterday) AND f.hospital.id = :hospitalId")
 	Integer findConsentFormCountSum(@Param("yesterday") LocalDate yesterday, @Param("hospitalId") Long hospitalId);
+
+	// 병원별 대시보디 배송수량
+	@Query("SELECT COALESCE(SUM(f.count), 0) FROM WebConsentForm f WHERE f.consentYear = :year AND f.hospital = :hospital")
+	Integer findYearlyConsentFormCount(@Param("hospital") Hospital hospital, @Param("year") String year);
 
 }

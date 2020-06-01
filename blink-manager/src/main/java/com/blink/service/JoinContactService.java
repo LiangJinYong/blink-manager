@@ -42,7 +42,9 @@ public class JoinContactService {
 			VisitAim visitAim) {
 		
 		JoinContact joinContact = joinContactRepository.findById(joinContactId).orElseThrow(() -> new IllegalArgumentException("No such join contact"));
-		
+		if (visitDate == null) {
+			visitDate = LocalDateTime.now();
+		}
 		joinContact.answer(answerContent, visitReserveYn, visitDate, visitAim);
 	}
 

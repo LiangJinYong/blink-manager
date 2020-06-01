@@ -1,18 +1,13 @@
 package com.blink.domain.app.notice;
 
-import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.blink.domain.BaseTimeEntity;
-import com.blink.domain.webfiles.WebFiles;
 
 import lombok.Builder;
 import lombok.Getter;

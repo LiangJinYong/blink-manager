@@ -29,6 +29,8 @@ public class SingleUserExaminationResponseDto {
 	private final Integer agreeVisit;
 	private final Long hospitalId;
 	private final String username;
+	private final String programInUse;
+	private final Integer agreeSendYn;
 	
 	private List<InspectionTypeDto> inspectionTypeList;
 }

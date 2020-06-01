@@ -96,11 +96,11 @@ public class HospitalService {
 			}
 		}
 
-		if (files.length == 1) {
+		if (files != null && files.length == 1) {
 			fileUploadUtils.upload(files, "licensePhoto", FileUploadUserType.WEB, hospitalId, hospital.getGroupId());
 		}
 
-		hospital.updateHospitalInfo(requestDto.getHospitalName(), requestDto.getEmployeeTel(), requestDto.getAddress(),
+		hospital.updateHospitalInfo(requestDto.getHospitalName(), requestDto.getHospitalTel(), requestDto.getEmployeeTel(), requestDto.getAddress(),
 				requestDto.getAddressDetail(), requestDto.getPostcode(), requestDto.getEmployeeEmail(),
 				requestDto.getEmployeePosition(), requestDto.getEmployeeName(), requestDto.getAgreeSendYn(),
 				requestDto.getProgramInUse(), requestDto.getSignagesStand(), requestDto.getSignagesMountable(),

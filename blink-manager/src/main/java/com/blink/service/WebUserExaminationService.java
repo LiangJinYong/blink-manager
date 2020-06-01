@@ -3,7 +3,6 @@ package com.blink.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -56,11 +55,11 @@ public class WebUserExaminationService {
 			dto.setInspectionTypeList(inspectionTypeList);
 		}
 		
-		Integer totalUserExaminationCount = metadataRepository.findUserExaminationCountForHospital(hospitalId);
-		Integer firstExaminationCount = detailRepository.findExaminationCountByInspectionForHospital(hospitalId, InspectionType.first);
-		Integer secondExaminationCount = detailRepository.findExaminationCountByInspectionForHospital(hospitalId, InspectionType.second);
-		Integer thirdExaminationCount = detailRepository.findExaminationCountByInspectionForHospital(hospitalId, InspectionType.cancer);
-		Integer nonexistConsetFormCount = metadataRepository.findNonexistConsetFormCountForHospital(hospitalId);
+		Integer totalUserExaminationCount = metadataRepository.findUserExaminationCountForHospital(hospitalId, time);
+		Integer firstExaminationCount = detailRepository.findExaminationCountByInspectionForHospital(hospitalId, InspectionType.first, time);
+		Integer secondExaminationCount = detailRepository.findExaminationCountByInspectionForHospital(hospitalId, InspectionType.second, time);
+		Integer thirdExaminationCount = detailRepository.findExaminationCountByInspectionForHospital(hospitalId, InspectionType.cancer, time);
+		Integer nonexistConsetFormCount = metadataRepository.findNonexistConsetFormCountForHospital(hospitalId, time);
 
 		UserExaminationResponseDto responseDto = new UserExaminationResponseDto(totalUserExaminationCount, firstExaminationCount, secondExaminationCount, thirdExaminationCount, nonexistConsetFormCount, list);
 
@@ -82,11 +81,11 @@ public class WebUserExaminationService {
 			dto.setInspectionTypeList(inspectionTypeList);
 		}
 		
-		Integer totalUserExaminationCount = metadataRepository.findUserExaminationCountForAdmin();
-		Integer firstExaminationCount = detailRepository.findExaminationCountByInspectionForAdmin(InspectionType.first);
-		Integer secondExaminationCount = detailRepository.findExaminationCountByInspectionForAdmin(InspectionType.second);
-		Integer thirdExaminationCount = detailRepository.findExaminationCountByInspectionForAdmin(InspectionType.cancer);
-		Integer nonexistConsetFormCount = metadataRepository.findNonexistConsetFormCountForAdmin();
+		Integer totalUserExaminationCount = metadataRepository.findUserExaminationCountForAdmin(time);
+		Integer firstExaminationCount = detailRepository.findExaminationCountByInspectionForAdmin(time, InspectionType.first);
+		Integer secondExaminationCount = detailRepository.findExaminationCountByInspectionForAdmin(time, InspectionType.second);
+		Integer thirdExaminationCount = detailRepository.findExaminationCountByInspectionForAdmin(time, InspectionType.cancer);
+		Integer nonexistConsetFormCount = metadataRepository.findNonexistConsetFormCountForAdmin(time);
 
 		UserExaminationResponseDto responseDto = new UserExaminationResponseDto(totalUserExaminationCount, firstExaminationCount, secondExaminationCount, thirdExaminationCount, nonexistConsetFormCount, list);
 
@@ -103,8 +102,8 @@ public class WebUserExaminationService {
 
 	public boolean checkUserExists(String phone, String ssnPartial) {
 
-		Optional<UserData> userData = userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
-		return userData.isPresent();
+		List<UserData> userData = userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
+		return userData.size() > 0;
 	}
 
 	public void registerUserExamination(Long hospitalId, String name, LocalDate birthday, Gender gender,
