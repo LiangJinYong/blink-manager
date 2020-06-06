@@ -22,6 +22,8 @@ public enum CommonResultCode {
 	METADATA_ENTIRE_DATA_OF_ONE_NOT_EXISTS(4003, "검진 데이터 이미 존재하여 삭제할수 없습니다."),
 	ALREADY_10_SIGNS_EXIST(4004, "하나의 병원의 사인 기록은 최대 10건입니다."),
 	ALREADY_EXIST_BY_DOCTOR(4005, "해당 의사가 등록한 사인이 이미 존재합니다."),
+	REGISTER_EXAMINATION_DATA_ERROR(4006, "검진 데이터 등록 오류."),
+	MOBILE_REGISTER_EXAMINATION_DATA_ERROR(4007, "모바일 검진 데이터 등록 오류."),
 	INTERNAL_ERROR(5000, "서버 내부 오류"); 
 	
 	private final int resultCode;

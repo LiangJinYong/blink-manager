@@ -22,6 +22,7 @@ import org.hibernate.annotations.LazyToOne;
 import org.hibernate.annotations.LazyToOneOption;
 
 import com.blink.domain.BaseTimeEntity;
+import com.blink.domain.examinationResultDocMobile.WebExaminationResultDocMobile;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -70,9 +71,13 @@ public class UserExaminationMetadata extends BaseTimeEntity implements Serializa
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "userExaminationMetadata")
 	private List<UserExaminationMetadataDetail> userExaminationMetadataDetailList;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_data_id")
 	private UserData userData;
+
+	@JsonIgnore
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "userExaminationMetadata")
+	private List<WebExaminationResultDocMobile> webExaminationResultDocMobile;
 
 	@Builder
 	public UserExaminationMetadata(Integer agreeYn, UserData userData, Integer examinationYear, LocalDate dateExamined,
@@ -91,7 +96,8 @@ public class UserExaminationMetadata extends BaseTimeEntity implements Serializa
 		this.agreeVisit = agreeVisit;
 	}
 
-	public void update(LocalDate dateExamined, Long hospitalDataId, Integer examinationYear, Integer agreeYn, Integer agreeMail, Integer agreeSms, Integer agreeVisit) {
+	public void update(LocalDate dateExamined, Long hospitalDataId, Integer examinationYear, Integer agreeYn,
+			Integer agreeMail, Integer agreeSms, Integer agreeVisit) {
 
 		this.dateExamined = dateExamined;
 		this.hospitalDataId = hospitalDataId;
@@ -117,7 +123,7 @@ public class UserExaminationMetadata extends BaseTimeEntity implements Serializa
 		this.agreeVisit = agreeVisit;
 	}
 
-	public void update(LocalDate dateExamined,  Long hospitalDataId, Integer examinationYear) {
+	public void update(LocalDate dateExamined, Long hospitalDataId, Integer examinationYear) {
 		this.dateExamined = dateExamined;
 		this.hospitalDataId = hospitalDataId;
 		this.examinationYear = examinationYear;

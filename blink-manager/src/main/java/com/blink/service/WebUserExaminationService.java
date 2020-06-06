@@ -122,7 +122,7 @@ public class WebUserExaminationService {
 
 		userData = userDataRepository.save(userData);
 
-		int examinationYear = dateExamined.getYear();
+		Integer examinationYear = dateExamined.getYear();
 		UserExaminationMetadata metadata = UserExaminationMetadata.builder() //
 		.dateExamined(dateExamined) //
 		.agreeYn(agreeYn) //

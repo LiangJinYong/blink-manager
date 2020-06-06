@@ -22,5 +22,5 @@ public class DashboardHospitalResponseDto {
 	private final Integer agreeSendYn;
 	private final Integer paymentAmount;
 	private final String programInUse;
-	
+	private final String username;
 }

@@ -36,8 +36,7 @@ public class WebUserExaminationController {
 	@GetMapping("/{hospitalId}")
 	public ResponseEntity<CommonResponse> getUserExamination(@PathVariable("hospitalId") Long hospitalId,
 			@RequestParam("searchText") Optional<String> searchText,
-			@RequestParam(name = "period", defaultValue = "ONEYEAR") Optional<SearchPeriod> period,
-			Pageable pageable) {
+			@RequestParam(name = "period", defaultValue = "ONEYEAR") Optional<SearchPeriod> period, Pageable pageable) {
 
 		UserExaminationResponseDto result = webUserExaminationService.getUserExamination(hospitalId,
 				searchText.orElse("_"), period.orElse(SearchPeriod.ONEYEAR), pageable);
@@ -80,12 +79,12 @@ public class WebUserExaminationController {
 				dateExamined, agreeYn, specialCase, agreeMail, agreeSms, agreeVisit);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 	}
-	
+
 	@ApiOperation(value = "수검자 데이터 삭제")
 	@DeleteMapping("/{userExaminationId}")
 	public ResponseEntity<CommonResponse> deleteUserData(@PathVariable("userExaminationId") Long userExaminationId) {
 		ResponseEntity<CommonResponse> result = webUserExaminationService.deleteUserData(userExaminationId);
-		
+
 		return result;
 	}
 }

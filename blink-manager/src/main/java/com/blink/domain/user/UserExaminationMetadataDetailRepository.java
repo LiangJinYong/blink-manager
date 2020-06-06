@@ -3,23 +3,22 @@ package com.blink.domain.user;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.blink.domain.hospital.Hospital;
 import com.blink.enumeration.InspectionSubType;
 import com.blink.enumeration.InspectionType;
+import com.blink.web.admin.app.dto.userExamination.MobileResultDocMetadataDetailResponseDto;
 import com.blink.web.hospital.dto.userExamination.InspectionTypeDto;
 
 public interface UserExaminationMetadataDetailRepository extends JpaRepository<UserExaminationMetadataDetail, Long> {
 	List<UserExaminationMetadataDetail> findAllByUserExaminationMetadataId(long userExaminationMetadataId, Sort sort);
 
 	@Query(value = "SELECT d.* FROM user_examination_metadata_detail d WHERE d.user_examination_metadata_id = :metadataId AND EXTRACT(YEAR FROM date_examined) = :examinationYear AND inspection_type = :inspectionType AND inspection_sub_type = :inspectionSubType", nativeQuery = true)
-	Optional<UserExaminationMetadataDetail> findByMetaDataAndExaminationYearAndType(
+	List<UserExaminationMetadataDetail> findByMetaDataAndExaminationYearAndType(
 			@Param("metadataId") Long metadataId, @Param("examinationYear") Integer examinationYear,
 			@Param("inspectionType") Integer inspectionType, @Param("inspectionSubType") Integer inspectionSubType);
 
@@ -51,5 +50,15 @@ public interface UserExaminationMetadataDetailRepository extends JpaRepository<U
 	// 병원별 대시보디 연도 전체 검진수
 	@Query("SELECT COUNT(*) FROM UserExaminationMetadataDetail d JOIN d.userExaminationMetadata m WHERE m.hospitalDataId = :hospitalId AND m.examinationYear = :year")
 	Integer findYearlyTotalExaminationCount(@Param("hospitalId") Long hospitalId, @Param("year") Integer year);
+
+	// parser json
+	@Query("SELECT d FROM UserExaminationMetadataDetail d WHERE d.userExaminationMetadata = :metadata AND d.inspectionType = :inspectionType AND d.inspectionSubType = :inspectionSubType")
+	List<UserExaminationMetadataDetail> findByMetaDataAndInspectionType(@Param("metadata") UserExaminationMetadata metadata,
+			@Param("inspectionType") InspectionType inspectionType, @Param("inspectionSubType") InspectionSubType inspectionSubType);
+
+	// mobile get examination result doc
+	@Query("SELECT new com.blink.web.admin.app.dto.userExamination.MobileResultDocMetadataDetailResponseDto(d.inspectionType, d.inspectionSubType, d.dateExamined, d.doctorName, d.doctorLicenseNumber, d.inspectionPlace, d.dateInterpreted) FROM UserExaminationMetadataDetail d WHERE d.userExaminationMetadata = :userExaminationMetadata")
+	List<MobileResultDocMetadataDetailResponseDto> findMobileMetadataDetail(@Param("userExaminationMetadata")
+			UserExaminationMetadata userExaminationMetadata);
 
 }

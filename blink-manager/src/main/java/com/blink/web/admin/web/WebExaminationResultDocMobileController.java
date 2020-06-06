@@ -2,7 +2,6 @@ package com.blink.web.admin.web;
 
 import java.util.Optional;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +19,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RestController
+@RestController("WebExaminationResultDocMobileController")
 @RequestMapping("/admin/web/examinationResultDocs")
 public class WebExaminationResultDocMobileController {
 
@@ -32,7 +31,7 @@ public class WebExaminationResultDocMobileController {
 			@RequestParam("searchText") Optional<String> searchText,
 			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period,
 			Pageable pageable) {
-		Page<WebExaminationResultDocMobileResponseDto> result = mobileService.getExaminationResultDocMobileList(
+		WebExaminationResultDocMobileResponseDto result = mobileService.getExaminationResultDocMobileList(
 				searchText.orElse("_"), period.orElse(SearchPeriod.ONEMONTH), pageable);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}

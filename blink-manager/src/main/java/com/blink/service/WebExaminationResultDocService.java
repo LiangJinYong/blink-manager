@@ -14,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.blink.domain.examinationResultDoc.WebExaminationResultDoc;
 import com.blink.domain.examinationResultDoc.WebExaminationResultDocRepository;
+import com.blink.domain.examinationResultDocMobile.WebExaminationResultDocMobile;
+import com.blink.domain.examinationResultDocMobile.WebExaminationResultDocMobileRepository;
 import com.blink.domain.hospital.Hospital;
 import com.blink.domain.hospital.HospitalRepository;
 import com.blink.domain.pdf.PdfWeb;
@@ -42,6 +44,7 @@ public class WebExaminationResultDocService {
 	private final HospitalRepository hospitalRepository;
 	private final PdfWebRepository pdfWebRepository;
 	private final BucketService bucketService;
+	private final WebExaminationResultDocMobileRepository mobileRepository;
 
 	public void registerExaminationResultDocs(MultipartFile[] files, Long hospitalId) {
 
@@ -106,7 +109,7 @@ public class WebExaminationResultDocService {
 
 	public void deleteExaminationResultDoc(Long webExaminationResultDocId) {
 
-		WebExaminationResultDoc resultDoc = webExaminationResultDocRepository.findById(webExaminationResultDocId).orElseThrow(() -> new IllegalArgumentException("NO shuch examination result doc"));
+		WebExaminationResultDoc resultDoc = webExaminationResultDocRepository.findById(webExaminationResultDocId).orElseThrow(() -> new IllegalArgumentException("NO such examination result doc"));
 		
 		String groupId = resultDoc.getGroupId();
 		
@@ -118,6 +121,20 @@ public class WebExaminationResultDocService {
 		}
 		
 		webExaminationResultDocRepository.deleteById(webExaminationResultDocId);
+	}
+
+	public void deleteExaminationDataMobile(Long examinationResultDocMobileId) {
+		WebExaminationResultDocMobile resultDocMobile = mobileRepository.findById(examinationResultDocMobileId).orElseThrow(() -> new IllegalArgumentException("NO such mobile examination result doc"));
+		
+		String groupId = resultDocMobile.getGroupId();
+		List<WebFileResponseDto> examinationResultDocFiles = webFilesRepository.findByGroupId(groupId);
+		
+		for(WebFileResponseDto dto : examinationResultDocFiles) {
+			String fileKey = dto.getFileKey();
+			bucketService.delete(fileKey);
+		}
+		
+		mobileRepository.delete(resultDocMobile);
 	}
 
 }

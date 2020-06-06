@@ -17,7 +17,7 @@ public interface StatisticsDailyHospitalReporitory extends JpaRepository<Statist
 	@Query("SELECT h FROM StatisticsDailyHospital h WHERE h.hospital.id = :hospitalId AND h.date >= DATE(:time)  ORDER BY h.date DESC")
 	Page<StatisticsDailyHospital> findByHospitalId(@Param("hospitalId") Long hospitalId, @Param("time") LocalDateTime time, Pageable pageable);
 
-	@Query("SELECT new com.blink.web.admin.web.dto.dashboard.DashboardHospitalResponseDto(dh.date, h.id, h.displayName, dh.agreeYCount, dh.agreeNCount, dh.examinationCount, dh.examineeCount, dh.consentCount, dh.sentCount, dh.sentCost, dh.omissionCost, dh.agreeSendYn, dh.paymentAmount, h.programInUse) FROM StatisticsDailyHospital dh JOIN dh.hospital h WHERE h.displayName LIKE %:searchText% AND dh.date >= DATE(:time)  ORDER BY dh.date DESC")
+	@Query("SELECT new com.blink.web.admin.web.dto.dashboard.DashboardHospitalResponseDto(dh.date, h.id, h.displayName, dh.agreeYCount, dh.agreeNCount, dh.examinationCount, dh.examineeCount, dh.consentCount, dh.sentCount, dh.sentCost, dh.omissionCost, dh.agreeSendYn, dh.paymentAmount, h.programInUse, h.name) FROM StatisticsDailyHospital dh JOIN dh.hospital h WHERE h.displayName LIKE %:searchText% AND dh.date >= DATE(:time)  ORDER BY dh.date DESC")
 	Page<DashboardHospitalResponseDto> findBySearchTextAndPeriod(@Param("searchText") String searchText, @Param("time") LocalDateTime time, Pageable pageable);
 
 	@Query("SELECT SUM(h.examinationCount) FROM StatisticsDailyHospital h WHERE h.date >= DATE(:time)")

@@ -17,8 +17,8 @@ public interface WebSignRepository extends JpaRepository<WebSign, Long> {
 
 	Long countByDoctorId(String doctorId);
 
-	@Query("SELECT new com.blink.web.hospital.dto.webSign.WebSignResponseDto(s.id, s.doctorName, s.doctorPhone, s.doctorId, s.license, s.groupId) FROM WebSign s ORDER BY createdAt DESC")
-	List<WebSignResponseDto> findByHospital(Hospital hospital);
+	@Query("SELECT new com.blink.web.hospital.dto.webSign.WebSignResponseDto(s.id, s.doctorName, s.doctorPhone, s.doctorId, s.license, s.groupId, s.createdAt) FROM WebSign s WHERE s.hospital = :hospital ORDER BY createdAt DESC")
+	List<WebSignResponseDto> findByHospital(@Param("hospital") Hospital hospital);
 
 	@Modifying
 	@Query("DELETE FROM WebSign s WHERE s.doctorId = :doctorId")

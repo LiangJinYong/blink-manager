@@ -16,11 +16,11 @@ import com.blink.web.hospital.dto.consentForm.HospitalConsentFormDetailResponseD
 public interface WebConsentFormRepository extends JpaRepository<WebConsentForm, Long> {
 
 	@Query("SELECT new com.blink.web.admin.web.dto.consentForm.AdminConsentFormDetailResponseDto(f.id, f.createdAt, h.displayName, f.receiveDate, f.receiveType, f.receiveTypeText, f.consentYear, f.consentMonth," + 
-			"f.count, f.groupId, h.id, h.name) FROM WebConsentForm f LEFT JOIN f.hospital h LEFT JOIN WebFiles wf ON f.groupId = wf.groupId WHERE (f.hospital.displayName LIKE %:searchText% OR wf.fileName LIKE %:searchText%) AND f.createdAt > :time")
+			"f.count, f.groupId, h.id, h.name, h.programInUse) FROM WebConsentForm f LEFT JOIN f.hospital h LEFT JOIN WebFiles wf ON f.groupId = wf.groupId WHERE (f.hospital.displayName LIKE %:searchText% OR wf.fileName LIKE %:searchText%) AND f.createdAt > :time")
 	Page<AdminConsentFormDetailResponseDto> findBySearchTextAndPeriodForAdmin(@Param("searchText") String searchText, @Param("time") LocalDateTime time, Pageable pageable);
 
 	@Query("SELECT new com.blink.web.admin.web.dto.consentForm.AdminConsentFormDetailResponseDto(f.id, f.createdAt, h.displayName, f.receiveDate, f.receiveType, f.receiveTypeText, f.consentYear, f.consentMonth," + 
-			"f.count, f.groupId, h.id, h.name) FROM WebConsentForm f LEFT JOIN f.hospital h WHERE f.createdAt > :time AND h.id = :hospitalId")
+			"f.count, f.groupId, h.id, h.name, h.programInUse) FROM WebConsentForm f LEFT JOIN f.hospital h WHERE f.createdAt > :time AND h.id = :hospitalId")
 	Page<AdminConsentFormDetailResponseDto> findBySearchTextAndPeriodForHospital(@Param("hospitalId") Long hospitalId, @Param("time") LocalDateTime time,
 			Pageable pageable);
 

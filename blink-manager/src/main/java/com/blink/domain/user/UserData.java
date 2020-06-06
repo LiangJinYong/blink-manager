@@ -84,4 +84,8 @@ public class UserData extends BaseTimeEntity {
 		this.phone = phone;
 		this.nationality = nationality;
 	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
 }

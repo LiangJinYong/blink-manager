@@ -211,6 +211,8 @@ public class AccountService {
 			String displayName = hospital.getDisplayName();
 			userStatusInfo.put("displayName", displayName);
 			userStatusInfo.put("hospitalId", hospital.getId());
+			userStatusInfo.put("agreeSendYn", hospital.getAgreeSendYn());
+			userStatusInfo.put("programInUse", hospital.getProgramInUse());
 
 			boolean accountStatus = user.isAccountStatus();
 			userStatusInfo.put("accountStatus", accountStatus);

@@ -42,14 +42,15 @@ public class ParserController {
 	}
 	
 	@PostMapping("/registerExaminationData")
-	public ResponseEntity registerExaminationData(@RequestBody List<Map<String, Object>> param) {
+	public ResponseEntity<CommonResponse> registerExaminationData(@RequestBody List<Map<String, Object>> param) {
 
-		Map<String, Object> result = new HashMap<String, Object>();
+		List<Map<String, Object>> result = parserService.registerExaminationData(param);
 
-		parserService.entireSave(param);
-
-		result.put("resultCode", 200);
-		return new ResponseEntity<>(result, HttpStatus.OK);
+		if (result.size() == 0) {
+			return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
+		}
+		
+		return ResponseEntity.ok(new CommonResponse(CommonResultCode.REGISTER_EXAMINATION_DATA_ERROR, result));
 	}
 	
 	@PostMapping("/registerPdfFiles")
@@ -70,16 +71,17 @@ public class ParserController {
 	@PostMapping("/registerJsonFiles")
 	public ResponseEntity registerJsonFiles(@RequestParam("data") String param, @RequestParam("file") MultipartFile[] files) throws Exception {
 		
-		Map<String, Object> result = new HashMap<String, Object>();
-		
 		ObjectMapper mapper = new ObjectMapper();
 		
 		List<Map<String, String>> dataList = mapper.readValue(param, List.class);
 		
-		parserService.registerJsonFiles(dataList, files);
+		List<Map<String, Object>> result = parserService.registerJsonFiles(dataList, files);
 		
-		result.put("resultCode", 200);
-		return new ResponseEntity<>(result, HttpStatus.OK);
+		if (result.size() == 0) {
+			return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
+		}
+		
+		return ResponseEntity.ok(new CommonResponse(CommonResultCode.USER_DATA_ALREADY_EXISTS, result));
 	}
 	
 	@DeleteMapping("/deleteUserData")

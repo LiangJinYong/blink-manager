@@ -3,7 +3,6 @@ package com.blink.domain.user;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,10 +15,12 @@ import com.blink.web.hospital.dto.userExamination.SingleUserExaminationResponseD
 public interface UserExaminationMetadataRepository extends JpaRepository<UserExaminationMetadata, Long> {
 
 	@Query("SELECT u FROM UserExaminationMetadata u WHERE u.userData = :userData AND u.examinationYear = :examinationYear")
-	Optional<UserExaminationMetadata> findByUserAndExaminationYear(@Param("userData") UserData userData,
+	List<UserExaminationMetadata> findByUserAndExaminationYear(@Param("userData") UserData userData,
 			@Param("examinationYear") Integer examinationYear);
 
-	Optional<UserExaminationMetadata> findByUserDataAndExaminationYear(UserData userData, Integer examinationYear);
+	List<UserExaminationMetadata> findByUserDataAndExaminationYear(UserData userData, Integer examinationYear);
+	
+	List<UserExaminationMetadata> findByUserDataAndExaminationYearAndHospitalDataId(UserData userData, Integer examinationYear, Long hospitalDataId);
 
 	// 수검자 관리
 	@Query("SELECT new com.blink.web.hospital.dto.userExamination.SingleUserExaminationResponseDto(m.id, u.name, u.gender, u.birthday, u.phone, '', m.dateExamined, m.agreeYn, m.consentFormExistYn, m.address, m.specialCase, u.ssnPartial, m.agreeMail, m.agreeSms, m.agreeVisit, h.id, h.name, h.programInUse, h.agreeSendYn) FROM UserExaminationMetadata m JOIN Hospital h ON m.hospitalDataId = h.id JOIN m.userData u WHERE m.hospitalDataId = :hospitalId AND (u.name LIKE %:searchText% OR u.phone LIKE %:searchText% OR h.displayName LIKE %:searchText%) AND DATE(m.createdAt) > DATE(:time)")
