@@ -1,6 +1,7 @@
 package com.blink.web.hospital;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.blink.common.CommonResponse;
 import com.blink.common.CommonResultCode;
 import com.blink.enumeration.Gender;
-import com.blink.enumeration.SearchPeriod;
 import com.blink.service.WebUserExaminationService;
 import com.blink.web.hospital.dto.userExamination.UserExaminationResponseDto;
 
@@ -36,10 +36,11 @@ public class WebUserExaminationController {
 	@GetMapping("/{hospitalId}")
 	public ResponseEntity<CommonResponse> getUserExamination(@PathVariable("hospitalId") Long hospitalId,
 			@RequestParam("searchText") Optional<String> searchText,
-			@RequestParam(name = "period", defaultValue = "ONEYEAR") Optional<SearchPeriod> period, Pageable pageable) {
+			@RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+			@RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate, Pageable pageable) {
 
 		UserExaminationResponseDto result = webUserExaminationService.getUserExamination(hospitalId,
-				searchText.orElse("_"), period.orElse(SearchPeriod.ONEYEAR), pageable);
+				searchText.orElse("_"), startDate, endDate, pageable);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}
 

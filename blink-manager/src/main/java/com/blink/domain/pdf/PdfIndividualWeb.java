@@ -43,6 +43,8 @@ public class PdfIndividualWeb extends BaseEntity {
 
     @Column(columnDefinition = "tinyint default 0 comment '0: 구분없음'")
     private InspectionSubType inspectionSubType;
+    
+    private Integer examinationYear;
 
     @JoinColumn(name = "pdf_web_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "NONE"))
     @ManyToOne(fetch = FetchType.LAZY)

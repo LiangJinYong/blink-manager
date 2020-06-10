@@ -1,6 +1,6 @@
 package com.blink.domain.joinContact;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,8 +10,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface JoinContactRepository extends JpaRepository<JoinContact, Long> {
 
-	@Query("SELECT new com.blink.web.admin.web.dto.joinConcact.SingleJoinConcactResponseDto(c.id, c.clinicName, c.regDate, c.name, c.tel, c.answerYn, c.inquiry, c.usedProgram, c.email, c.answerContent, c.visitReserveYn, c.visitDate, c.visitAim) FROM JoinContact c WHERE (c.clinicName LIKE %:searchText% OR c.usedProgram LIKE %:searchText% OR c.tel LIKE %:searchText%) AND c.regDate > :time")
-	Page<JoinContact> findBySearchTextAndPeriod(@Param("searchText") String searchText, @Param("time") LocalDateTime time, Pageable pageable);
+	@Query("SELECT new com.blink.web.admin.web.dto.joinConcact.SingleJoinConcactResponseDto(c.id, c.clinicName, c.regDate, c.name, c.tel, c.answerYn, c.inquiry, c.usedProgram, c.email, c.answerContent, c.visitReserveYn, c.visitDate, c.visitAim) FROM JoinContact c WHERE (c.clinicName LIKE %:searchText% OR c.usedProgram LIKE %:searchText% OR c.tel LIKE %:searchText%) AND DATE(c.regDate) BETWEEN :startDate AND :endDate")
+	Page<JoinContact> findBySearchTextAndPeriod(@Param("searchText") String searchText, @Param("startDate") Date startDate, @Param("endDate") Date endDate, Pageable pageable);
 
 	@Query("SELECT COUNT(c.id) FROM JoinContact c WHERE c.answerYn = :answerYn")
 	Long findCountByAnswerYn(@Param("answerYn") Boolean answerYn);

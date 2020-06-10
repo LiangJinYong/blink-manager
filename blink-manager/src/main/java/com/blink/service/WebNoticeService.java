@@ -1,6 +1,6 @@
 package com.blink.service;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -14,8 +14,6 @@ import com.blink.domain.notice.WebNotice;
 import com.blink.domain.notice.WebNoticeRepository;
 import com.blink.domain.webfiles.WebFilesRepository;
 import com.blink.enumeration.FileUploadUserType;
-import com.blink.enumeration.SearchPeriod;
-import com.blink.util.CommonUtils;
 import com.blink.util.FileUploadUtils;
 import com.blink.web.admin.web.dto.WebFileResponseDto;
 import com.blink.web.admin.web.dto.WebNoticeResponseDto;
@@ -31,11 +29,9 @@ public class WebNoticeService {
 	private final WebFilesRepository webFilesRepository;
 	private final FileUploadUtils fileUploadUtils;
 
-	public Page<WebNoticeResponseDto> getNoticeList(String searchText, SearchPeriod period, Pageable pageable) {
+	public Page<WebNoticeResponseDto> getNoticeList(String searchText, Date startDate, Date endDate, Pageable pageable) {
 
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
-
-		Page<WebNoticeResponseDto> list = webNoticeRepository.findByTitleAndPeriod(searchText, time, pageable);
+		Page<WebNoticeResponseDto> list = webNoticeRepository.findByTitleAndPeriod(searchText, startDate, endDate, pageable);
 
 		List<WebNoticeResponseDto> content = list.getContent();
 

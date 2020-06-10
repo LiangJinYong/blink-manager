@@ -1,8 +1,10 @@
 package com.blink.web.admin.web;
 
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.blink.common.CommonResponse;
 import com.blink.common.CommonResultCode;
-import com.blink.enumeration.SearchPeriod;
 import com.blink.service.WebExaminationResultDocMobileService;
 import com.blink.web.admin.web.dto.examinationResultDocMobile.WebExaminationResultDocMobileResponseDto;
 
@@ -29,10 +30,11 @@ public class WebExaminationResultDocMobileController {
 	@GetMapping
 	public ResponseEntity<CommonResponse> getExaminationResultDocMobileList(
 			@RequestParam("searchText") Optional<String> searchText,
-			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period,
+			@RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+			@RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
 			Pageable pageable) {
 		WebExaminationResultDocMobileResponseDto result = mobileService.getExaminationResultDocMobileList(
-				searchText.orElse("_"), period.orElse(SearchPeriod.ONEMONTH), pageable);
+				searchText.orElse("_"), startDate, endDate, pageable);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}
 }

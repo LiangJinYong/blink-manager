@@ -2,8 +2,6 @@ package com.blink.web.hospital.dto.examinatinPresent;
 
 import org.springframework.data.domain.Page;
 
-import com.blink.domain.statistics.hospital.StatisticsDailyHospital;
-
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -17,5 +15,5 @@ public class ExaminatinPresentResponseDto {
 	private final Integer totalSentCount;
 	private final Integer totalNonexistConsentForm;
 	
-	private final Page<StatisticsDailyHospital> examinatinPresentHospitalList; 
+	private final Page<ExaminationPresentHospitalDailyResponseDto> examinatinPresentHospitalList; 
 }

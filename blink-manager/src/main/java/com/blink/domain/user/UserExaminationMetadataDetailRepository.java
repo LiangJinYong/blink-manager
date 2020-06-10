@@ -1,7 +1,7 @@
 package com.blink.domain.user;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Sort;
@@ -33,11 +33,11 @@ public interface UserExaminationMetadataDetailRepository extends JpaRepository<U
 			+ "SELECT m.hospital_data_id, COUNT(*) c FROM user_examination_metadata_detail d INNER JOIN user_examination_metadata m ON d.user_examination_metadata_id = m.id GROUP BY m.hospital_data_id ORDER BY C DESC LIMIT 1) t)", nativeQuery = true)
 	String findMostExaminationHospitalName();
 
-	@Query("SELECT COUNT(d.id) FROM UserExaminationMetadataDetail d JOIN d.userExaminationMetadata m WHERE m.hospitalDataId = :hospitalId AND d.inspectionType = :type AND DATE(m.createdAt) >= DATE(:time)")
-	Integer findExaminationCountByInspectionForHospital(@Param("hospitalId") Long hospitalId, @Param("type") InspectionType type,  @Param("time") LocalDateTime time);
+	@Query("SELECT COUNT(d.id) FROM UserExaminationMetadataDetail d JOIN d.userExaminationMetadata m WHERE m.hospitalDataId = :hospitalId AND d.inspectionType = :type AND DATE(m.createdAt) BETWEEN :startDate AND :endDate")
+	Integer findExaminationCountByInspectionForHospital(@Param("hospitalId") Long hospitalId, @Param("type") InspectionType type,  @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
-	@Query("SELECT COUNT(d.id) FROM UserExaminationMetadataDetail d JOIN d.userExaminationMetadata m  WHERE d.inspectionType = :type AND DATE(m.createdAt) > DATE(:time)")
-	Integer findExaminationCountByInspectionForAdmin(@Param("time") LocalDateTime time, @Param("type") InspectionType type);
+	@Query("SELECT COUNT(d.id) FROM UserExaminationMetadataDetail d JOIN d.userExaminationMetadata m  WHERE d.inspectionType = :type AND DATE(m.createdAt) BETWEEN :startDate AND :endDate")
+	Integer findExaminationCountByInspectionForAdmin(@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("type") InspectionType type);
 
 	// 통계
 	@Query("SELECT COUNT(*) FROM UserExaminationMetadataDetail d JOIN d.userExaminationMetadata m WHERE DATE(m.createdAt) = DATE(:yesterday) AND m.hospitalDataId = :hospitalId")

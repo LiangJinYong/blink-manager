@@ -43,6 +43,7 @@ public class JsonIndividualApi extends BaseEntity {
 
 	@Column(columnDefinition = "tinyint default 0 comment '0: 구분없음'")
 	private InspectionSubType inspectionSubType;
+	
 
 	@JsonIgnore
 	@JoinColumn(name = "user_data_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "NONE"))

@@ -1,9 +1,11 @@
 package com.blink.web.admin.app;
 
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,8 +32,10 @@ public class AppNoticeController {
 	@ApiOperation(value="공지사항 - 전체 조회")
 	@GetMapping
 	public ResponseEntity<CommonResponse> getNoticeList(@RequestParam("searchText") Optional<String> searchText,
-			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period, Pageable pageable) {
-		Page<AppNotice> noticeList = appNoticeService.getNoticeList(searchText.orElse("_"), period.orElse(SearchPeriod.ONEMONTH), pageable);
+			@RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+			@RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
+			Pageable pageable) {
+		Page<AppNotice> noticeList = appNoticeService.getNoticeList(searchText.orElse("_"), startDate, endDate, pageable);
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, noticeList));
 	}

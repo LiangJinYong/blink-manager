@@ -1,6 +1,6 @@
 package com.blink.service;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,9 +18,7 @@ import com.blink.domain.hospital.HospitalRepository;
 import com.blink.domain.webfiles.WebFiles;
 import com.blink.domain.webfiles.WebFilesRepository;
 import com.blink.enumeration.FileUploadUserType;
-import com.blink.enumeration.SearchPeriod;
 import com.blink.service.aws.BucketService;
-import com.blink.util.CommonUtils;
 import com.blink.util.FileUploadUtils;
 import com.blink.web.admin.web.dto.WebFileResponseDto;
 import com.blink.web.hospital.dto.agreeUserList.AgreeUserListResponseDto;
@@ -55,13 +53,12 @@ public class AgreeUserService {
 		agreeUserListRepository.save(agreeUserList);
 	}
 
-	public AgreeUserResponseDto getHospitalAgreeUserInfo(String searchText, SearchPeriod period, Pageable pageable,
+	public AgreeUserResponseDto getHospitalAgreeUserInfo(String searchText, Date startDate, Date endDate, Pageable pageable,
 			Long hospitalId) {
 
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 
 		Page<AgreeUserListResponseDto> agreeUserLists = agreeUserListRepository
-				.findBySearchTextAndPeriodWithHospital(time, hospitalId, pageable);
+				.findBySearchTextAndPeriodWithHospital(startDate, endDate, hospitalId, pageable);
 
 		List<AgreeUserListResponseDto> content = agreeUserLists.getContent();
 
@@ -126,11 +123,9 @@ public class AgreeUserService {
 	}
 
 	public com.blink.web.admin.web.dto.agreeUserList.AgreeUserResponseDto getAdminAgreeUserInfo(String searchText,
-			SearchPeriod period, Pageable pageable) {
+			Date startDate, Date endDate, Pageable pageable) {
 
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
-
-		Page<AgreeUserListResponseDto> agreeUserLists = agreeUserListRepository.findBySearchTextAndPeriodWithAdmin(time,
+		Page<AgreeUserListResponseDto> agreeUserLists = agreeUserListRepository.findBySearchTextAndPeriodWithAdmin(startDate, endDate,
 				pageable);
 
 		List<AgreeUserListResponseDto> content = agreeUserLists.getContent();

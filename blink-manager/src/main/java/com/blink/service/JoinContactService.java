@@ -1,6 +1,7 @@
 package com.blink.service;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import javax.transaction.Transactional;
 
@@ -10,9 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.blink.domain.joinContact.JoinContact;
 import com.blink.domain.joinContact.JoinContactRepository;
-import com.blink.enumeration.SearchPeriod;
 import com.blink.enumeration.VisitAim;
-import com.blink.util.CommonUtils;
 import com.blink.web.admin.web.dto.joinConcact.JoinContactResponseDto;
 
 import lombok.RequiredArgsConstructor;
@@ -24,11 +23,9 @@ public class JoinContactService {
 
 	private final JoinContactRepository joinContactRepository;
 
-	public JoinContactResponseDto getJoinContacts(String searchText, SearchPeriod period, Pageable pageable) {
+	public JoinContactResponseDto getJoinContacts(String searchText, Date startDate, Date endDate, Pageable pageable) {
 		
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
-		
-		Page<JoinContact> joinContactList = joinContactRepository.findBySearchTextAndPeriod(searchText, time, pageable);
+		Page<JoinContact> joinContactList = joinContactRepository.findBySearchTextAndPeriod(searchText, startDate, endDate, pageable);
 		
 		Long unanwseredCount = joinContactRepository.findCountByAnswerYn(false);
 		Long answeredCount = joinContactRepository.findCountByAnswerYn(true);

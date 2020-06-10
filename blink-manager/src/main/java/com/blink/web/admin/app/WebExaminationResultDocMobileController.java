@@ -25,21 +25,26 @@ public class WebExaminationResultDocMobileController {
 
 	private final ParserService parserService;
 	private final WebExaminationResultDocService webExaminationResultDocService;
-	
+
 	@PostMapping("/{examinationResultDocMobileId}")
-	public ResponseEntity<CommonResponse> registerExaminationDataMobile(@PathVariable("examinationResultDocMobileId") Long examinationResultDocMobileId, @RequestBody Map<String, Object> param) {
-		
-		List<Map<String, Object>> result = parserService.registerExaminationDataMobile(examinationResultDocMobileId, param);
+	public ResponseEntity<CommonResponse> registerExaminationDataMobile(
+			@PathVariable("examinationResultDocMobileId") Long examinationResultDocMobileId,
+			@RequestBody Map<String, Object> param) {
+
+		List<Map<String, Object>> result = parserService.registerExaminationDataMobile(examinationResultDocMobileId,
+				param);
 		if (result.size() == 0) {
 			return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 		}
-		
+
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.MOBILE_REGISTER_EXAMINATION_DATA_ERROR, result));
 	}
-	
+
 	@DeleteMapping("/{examinationResultDocMobileId}")
-	public ResponseEntity<CommonResponse> deleteExaminationDataMobile(@PathVariable("examinationResultDocMobileId") Long examinationResultDocMobileId) {
+	public ResponseEntity<CommonResponse> deleteExaminationDataMobile(
+			@PathVariable("examinationResultDocMobileId") Long examinationResultDocMobileId) {
 		webExaminationResultDocService.deleteExaminationDataMobile(examinationResultDocMobileId);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 	}
+	
 }

@@ -56,12 +56,16 @@ import com.blink.domain.user.UserExaminationMetadata;
 import com.blink.domain.user.UserExaminationMetadataDetail;
 import com.blink.domain.user.UserExaminationMetadataDetailRepository;
 import com.blink.domain.user.UserExaminationMetadataRepository;
+import com.blink.domain.user.UserInfo;
+import com.blink.domain.user.UserToken;
+import com.blink.domain.user.UserTokenRepository;
 import com.blink.enumeration.CancerAnalyzerStatus;
 import com.blink.enumeration.CancerType;
 import com.blink.enumeration.Gender;
 import com.blink.enumeration.InspectionSubType;
 import com.blink.enumeration.InspectionType;
 import com.blink.enumeration.Nationality;
+import com.blink.util.FCMUtils;
 import com.blink.util.FileUploadUtils;
 import com.blink.web.admin.web.dto.UserDataRequestDto;
 import com.blink.web.admin.web.dto.UserExaminationMetadataRequestDto;
@@ -75,7 +79,7 @@ import lombok.RequiredArgsConstructor;
 public class ParserService {
 
 	private final HospitalRepository hospitalRepository;
-	
+
 	private final UserDataRepository userDataRepository;
 	private final UserExaminationMetadataRepository userExaminationMetadataRepository;
 
@@ -98,57 +102,60 @@ public class ParserService {
 	private final PdfWebRepository pdfWebRepository;
 	private final PdfIndividualWebRepository pdfIndividualWebRepository;
 	private final JsonIndividualApiRepository jsonIndividualApiRepository;
-	
+
 	private final WebExaminationResultDocMobileRepository resultDocMobileRepository;
+	private final UserTokenRepository userTokenRepository;
 
 	private final FileUploadUtils fileUploadUtils;
-	
+
 	private UserExaminationMetadata metadataForMobile;
 
 	public List<Map<String, Object>> save(List<UserParserRequestDto> userList) {
 
 		List<Map<String, Object>> result = new ArrayList<>();
-		
+
 		for (UserParserRequestDto user : userList) {
 			UserDataRequestDto userDataDto = user.getUserData();
 			UserExaminationMetadataRequestDto userExaminationMetadataDto = user.getUserExaminationMetadata();
-			
+
 			String phone = userDataDto.getPhone();
 			String ssnPartial = userDataDto.getSsnPartial();
 			String userName = userDataDto.getName();
-			
-			List<UserData> userDataList= userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
-			
+
+			List<UserData> userDataList = userDataRepository.findByPhoneAndSsnPartial(phone, ssnPartial);
+
 			if (userDataList.size() > 0) {
 				Integer count = userDataRepository.findUserDataCountByPhoneAndSsnPartial(phone, ssnPartial);
-				
+
 				if (count == 1) {
 					UserData userData = userDataList.get(0);
 					String name = userData.getName();
 					if (name == null || "".equals(name)) {
 						userData.setName(userName);
 					}
-					
+
 					Integer examinationYear = userExaminationMetadataDto.getExaminationYear();
-					
+
 					List<UserExaminationMetadata> metadataList = userExaminationMetadataRepository
 							.findByUserAndExaminationYear(userData, examinationYear);
-					
+
 					if (metadataList.size() == 1) {
 						UserExaminationMetadata metadata = metadataList.get(0);
 						Long hospitalDataId = userExaminationMetadataDto.getHospitalDataId();
-						
+
 						String dateExamined = userExaminationMetadataDto.getDateExamined();
 						DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-						
+
 						Integer agreeYn = metadata.getAgreeYn();
 						Integer agreeMail = metadata.getAgreeMail();
 						Integer agreeSms = metadata.getAgreeSms();
 						Integer agreeVisit = metadata.getAgreeVisit();
-						
-						if ((agreeYn != null && agreeYn == 0) && (agreeMail != null && agreeMail == 1) && (agreeSms != null && agreeSms == 1) && (agreeVisit != null && agreeVisit == 0)) {
+
+						if ((agreeYn != null && agreeYn == 0) && (agreeMail != null && agreeMail == 1)
+								&& (agreeSms != null && agreeSms == 1) && (agreeVisit != null && agreeVisit == 0)) {
 							// update all
-							metadata.update(LocalDate.parse(dateExamined, formatter), hospitalDataId, examinationYear, agreeYn, agreeMail, agreeSms, agreeVisit);
+							metadata.update(LocalDate.parse(dateExamined, formatter), hospitalDataId, examinationYear,
+									agreeYn, agreeMail, agreeSms, agreeVisit);
 						} else {
 							// update all except agreeYn, agreeMail, agreeSms, agreeVisit
 							metadata.update(LocalDate.parse(dateExamined, formatter), hospitalDataId, examinationYear);
@@ -170,7 +177,7 @@ public class ParserService {
 					Map<String, Object> existedMultipleUsers = new HashMap<>();
 					existedMultipleUsers.put("phone", phone);
 					existedMultipleUsers.put("ssnPartial", ssnPartial);
-					
+
 					result.add(existedMultipleUsers);
 					continue;
 				}
@@ -187,37 +194,59 @@ public class ParserService {
 		return result;
 	}
 
-	public List<Map<String, Object>> registerExaminationDataMobile(Long examinationResultDocMobileId, Map<String, Object> param) {
-		
+	public List<Map<String, Object>> registerExaminationDataMobile(Long examinationResultDocMobileId,
+			Map<String, Object> param) {
+
 		List<Map<String, Object>> userExaminationData = (List<Map<String, Object>>) param.get("data");
-		
+
 		List<Map<String, Object>> registerExaminationDataResult = registerExaminationData(userExaminationData);
-		
+
 		if (registerExaminationDataResult.size() == 0) {
-			WebExaminationResultDocMobile resultDocMobile = resultDocMobileRepository.findById(examinationResultDocMobileId).orElseThrow(() -> new IllegalArgumentException("No such mobile examination result doc"));
-			
+			WebExaminationResultDocMobile resultDocMobile = resultDocMobileRepository
+					.findById(examinationResultDocMobileId)
+					.orElseThrow(() -> new IllegalArgumentException("No such mobile examination result doc"));
+
 			Integer hospitalId = (Integer) param.get("hospitalId");
-			Hospital hospital = hospitalRepository.findById(hospitalId.longValue()).orElseThrow(() -> new IllegalArgumentException("No such hospital"));
+			Hospital hospital = hospitalRepository.findById(hospitalId.longValue())
+					.orElseThrow(() -> new IllegalArgumentException("No such hospital"));
 			String hospitalName = (String) param.get("hospitalName");
 			String hospitalAddress = (String) param.get("hospitalAddress");
 			String hospitalPostcode = (String) param.get("hospitalPostcode");
 			Integer status = (Integer) param.get("status");
 			Integer resultStatus = (Integer) param.get("resultStatus");
-			
+
 			String pushMsg = (String) param.get("pushMsg");
 			String appMsg1 = (String) param.get("appMsg1");
 			String appMsg2 = (String) param.get("appMsg2");
-			
-			resultDocMobile.update(hospital, metadataForMobile, status, hospitalName, hospitalAddress, hospitalPostcode, resultStatus, pushMsg, appMsg1, appMsg2);
+
+			resultDocMobile.update(hospital, metadataForMobile, status, hospitalName, hospitalAddress, hospitalPostcode,
+					resultStatus, pushMsg, appMsg1, appMsg2);
+
+			if (status == 2) {
+
+				try {
+					UserInfo userInfo = resultDocMobile.getUserInfo();
+					UserToken userToken = userTokenRepository.findByUserInfoId(userInfo.getId()).orElseThrow(() -> new IllegalArgumentException("No such user token"));
+					String pushToken = userToken.getPushToken();
+					
+					if (resultStatus == 0) {
+						FCMUtils.sendFCM(0, pushToken, "B LINK", "검진결과지등록이 실패했습니다.", -1, "RD_FAIL", appMsg1, appMsg2);
+					} else if (resultStatus == 1) {
+						FCMUtils.sendFCM(0, pushToken, "B LINK", "검진결과지가 등록되었습니다.", -1, "RD_SUCCESS", "", "");
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 		}
-		
+
 		return registerExaminationDataResult;
 	}
-	
+
 	public List<Map<String, Object>> registerExaminationData(List<Map<String, Object>> param) {
 
 		List<Map<String, Object>> result = new ArrayList<>();
-		
+
 		for (Map<String, Object> map : param) {
 
 			Map<String, String> userDataMap = (Map<String, String>) map.get("userData");
@@ -235,7 +264,8 @@ public class ParserService {
 				String hospitalDataId = (String) map.get("hospitalDataId");
 				// DB에 해당 연도에 존재하는 metadata
 				List<UserExaminationMetadata> metadataList = userExaminationMetadataRepository
-						.findByUserDataAndExaminationYearAndHospitalDataId(userData.get(0), examinationYear, Long.parseLong(hospitalDataId));
+						.findByUserDataAndExaminationYearAndHospitalDataId(userData.get(0), examinationYear,
+								Long.parseLong(hospitalDataId));
 
 				if (metadataList.size() == 1) {
 					// update address
@@ -243,29 +273,33 @@ public class ParserService {
 					metadataForMobile = metadataEntity;
 					String userAddress = (String) map.get("userAddress");
 					metadataEntity.updateAddress(userAddress);
-					
-					Map<String, Object> userExaminationMetadata = (Map<String, Object>) map.get("userExaminationMetadata");
+
+					Map<String, Object> userExaminationMetadata = (Map<String, Object>) map
+							.get("userExaminationMetadata");
 					String dateExamined = (String) userExaminationMetadata.get("dateExamined");
 					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-					
+
 					Integer agreeYnParam = (Integer) userExaminationMetadata.get("agreeYn");
 					Integer agreeMailParam = (Integer) userExaminationMetadata.get("agreeMail");
 					Integer agreeSmsParam = (Integer) userExaminationMetadata.get("agreeSms");
 					Integer agreeVisitParam = (Integer) userExaminationMetadata.get("agreeVisit");
-					
+
 					Integer agreeYn = metadataEntity.getAgreeYn();
 					Integer agreeMail = metadataEntity.getAgreeMail();
 					Integer agreeSms = metadataEntity.getAgreeSms();
 					Integer agreeVisit = metadataEntity.getAgreeVisit();
-					
-					if ((agreeYn != null && agreeYn == 0) && (agreeMail != null && agreeMail == 1) && (agreeSms != null && agreeSms == 1) && (agreeVisit != null && agreeVisit == 0)) {
+
+					if ((agreeYn != null && agreeYn == 0) && (agreeMail != null && agreeMail == 1)
+							&& (agreeSms != null && agreeSms == 1) && (agreeVisit != null && agreeVisit == 0)) {
 						// update all
-						metadataEntity.update(LocalDate.parse(dateExamined, formatter), Long.parseLong(hospitalDataId), examinationYear, agreeYnParam, agreeMailParam, agreeSmsParam, agreeVisitParam);
+						metadataEntity.update(LocalDate.parse(dateExamined, formatter), Long.parseLong(hospitalDataId),
+								examinationYear, agreeYnParam, agreeMailParam, agreeSmsParam, agreeVisitParam);
 					} else {
 						// update all except agreeYn, agreeMail, agreeSms, agreeVisit
-						metadataEntity.update(LocalDate.parse(dateExamined, formatter), Long.parseLong(hospitalDataId), examinationYear);
+						metadataEntity.update(LocalDate.parse(dateExamined, formatter), Long.parseLong(hospitalDataId),
+								examinationYear);
 					}
-					
+
 					List<UserExaminationMetadataDetail> metadataDetailList = userExaminationMetadataDetailRepository
 							.findByMetaDataAndExaminationYearAndType(metadataEntity.getId(), examinationYear,
 									inspectionType, inspectionSubType);
@@ -279,9 +313,9 @@ public class ParserService {
 						existedMultipleMetadataDetail.put("phone", phone);
 						existedMultipleMetadataDetail.put("ssnPartial", ssnPartial);
 						StringBuilder idBuilder = new StringBuilder();
-						for(UserExaminationMetadataDetail metadataDetail : metadataDetailList) {
+						for (UserExaminationMetadataDetail metadataDetail : metadataDetailList) {
 							Long id = metadataDetail.getId();
-							idBuilder.append(id+"-");
+							idBuilder.append(id + "-");
 						}
 
 						existedMultipleMetadataDetail.put("existingMetadataDetailIds", idBuilder.toString());
@@ -296,7 +330,7 @@ public class ParserService {
 					metadataEntity.setUserExaminationEntireDataOfOne(dataOfOne);
 
 					saveCancerDataApp(map, dataOfOne);
-				} else if(metadataList.size() == 0) {
+				} else if (metadataList.size() == 0) {
 					UserExaminationEntireDataOfOne newDataOfOne = saveDataOfOne(map, null, userData.get(0));
 					UserExaminationMetadata newMetaData = saveMetadata(map, newDataOfOne, userData.get(0));
 					saveMetadataDetail(map, newMetaData, null);
@@ -306,27 +340,32 @@ public class ParserService {
 					existedMultipleMetadata.put("phone", phone);
 					existedMultipleMetadata.put("ssnPartial", ssnPartial);
 					StringBuilder idBuilder = new StringBuilder();
-					for(UserExaminationMetadata metadata : metadataList) {
+					for (UserExaminationMetadata metadata : metadataList) {
 						Long id = metadata.getId();
-						idBuilder.append(id+"-");
+						idBuilder.append(id + "-");
 					}
 					existedMultipleMetadata.put("existingMetadataIds", idBuilder.toString());
 					existedMultipleMetadata.put("errorType", "multiple metadata exist");
-					
+
 					result.add(existedMultipleMetadata);
 					continue;
 				}
 			} else if (userData.size() == 0) {
-				
+
 				String birthday = userDataMap.get("birthday");
 				String gender = userDataMap.get("gender");
 				String nationality = userDataMap.get("nationality");
-				
+
+				String name = userDataMap.get("name");
+				if (name == null) {
+					name = "";
+				}
+
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		        LocalDate birthdayDate = LocalDate.parse(birthday, formatter);
-				
+				LocalDate birthdayDate = LocalDate.parse(birthday, formatter);
+
 				UserData newUserEntity = UserData.builder() //
-						.name("") //
+						.name(name) //
 						.nationality(Nationality.values()[Integer.parseInt(nationality)]) //
 						.phone(phone) //
 						.birthday(birthdayDate) //
@@ -345,12 +384,12 @@ public class ParserService {
 				existedMultipleUsers.put("phone", phone);
 				existedMultipleUsers.put("ssnPartial", ssnPartial);
 				existedMultipleUsers.put("errorType", "multiple user exist");
-				
+
 				result.add(existedMultipleUsers);
 				continue;
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -468,9 +507,9 @@ public class ParserService {
 		LocalDate dateExaminedDate = LocalDate.parse(dateExamined);
 		String examinationYear = (String) map.get("examinationYear");
 		String hospitalDataId = (String) map.get("hospitalDataId");
-		
+
 		Map<String, Object> userExaminationMetadata = (Map<String, Object>) map.get("userExaminationMetadata");
-		
+
 		Integer agreeYn = (Integer) userExaminationMetadata.get("agreeYn");
 		Integer agreeMail = (Integer) userExaminationMetadata.get("agreeMail");
 		Integer agreeSms = (Integer) userExaminationMetadata.get("agreeSms");
@@ -488,7 +527,7 @@ public class ParserService {
 				.agreeSms(agreeSms) //
 				.agreeVisit(agreeVisit) //
 				.build();
-		
+
 		userExaminationMetadataEntity = userExaminationMetadataRepository.save(userExaminationMetadataEntity);
 		metadataForMobile = userExaminationMetadataEntity;
 		System.out.println("userExaminationMetadata: " + userExaminationMetadataEntity.getId());
@@ -966,54 +1005,54 @@ public class ParserService {
 			if (pastDiseaseHistory != null) {
 				surveyData.setPastDiseaseHistory(pastDiseaseHistory);
 			}
-			
+
 			String nowDrugTreatment = surveyDataItem.get("nowDrugTreatment");
 			if (nowDrugTreatment != null) {
 				surveyData.setNowDrugTreatment(nowDrugTreatment);
 			}
-			
+
 			String recommendationsForLifeStyle = surveyDataItem.get("recommendationsForLifeStyle");
 			if (recommendationsForLifeStyle != null) {
 				surveyData.setRecommendationsForLifeStyle(recommendationsForLifeStyle);
 			}
-			
+
 			String smokerCategory = surveyDataItem.get("smokerCategory");
 			if (smokerCategory != null) {
 				surveyData.setSmokerCategory(smokerCategory);
 			}
-			
+
 			String levelOfNicotineDependence = surveyDataItem.get("levelOfNicotineDependence");
 			if (levelOfNicotineDependence != null) {
 				surveyData.setLevelOfNicotineDependence(levelOfNicotineDependence);
 			}
-			
+
 			String drinkingCategory = surveyDataItem.get("drinkingCategory");
 			if (drinkingCategory != null) {
 				surveyData.setDrinkingCategory(drinkingCategory);
 			}
-			
+
 			String exerciseStatus = surveyDataItem.get("exerciseStatus");
 			if (exerciseStatus != null) {
 				surveyData.setExerciseStatus(exerciseStatus);
 			}
-			
+
 			String nutritionStatus = surveyDataItem.get("nutritionStatus");
 			if (nutritionStatus != null) {
 				surveyData.setNutritionStatus(nutritionStatus);
 			}
-			
+
 			String obesityStatus = surveyDataItem.get("obesityStatus");
 			if (obesityStatus != null) {
 				surveyData.setObesityStatus(obesityStatus);
 			}
-			
+
 			String drugTreatment = surveyDataItem.get("drugTreatment");
 			if (drugTreatment != null) {
 				surveyData.setDrugTreatment(drugTreatment);
 			}
 		}
 	}
-	
+
 	private HepatitisData insertHepatitisData(Map<String, Map<String, String>> dataItem) {
 		Map<String, String> hepatitisDataItem = dataItem.get("hepatitisData");
 
@@ -1165,7 +1204,7 @@ public class ParserService {
 				pdfWeb = pdfWebOptional.get();
 			} else {
 				Map<String, Object> nonexistPdf = new HashMap<>();
-				
+
 				nonexistPdf.put("pdfWebId", pdfWebId);
 				nonexistPdf.put("errorType", "Pdf web not exist");
 				result.add(nonexistPdf);
@@ -1180,7 +1219,7 @@ public class ParserService {
 
 			if (userDataList.size() == 1) {
 				userData = userDataList.get(0);
-			} else if(userDataList.size() == 0) {
+			} else if (userDataList.size() == 0) {
 				Map<String, Object> nonexistUser = new HashMap<>();
 				nonexistUser.put("phone", phone);
 				nonexistUser.put("ssnPartial", ssnPartial);
@@ -1195,13 +1234,17 @@ public class ParserService {
 				result.add(existedMultipleUsers);
 				continue;
 			}
+
+			Integer examinationYear = Integer.parseInt(data.get("dateExaminedYear"));
 			
-			List<PdfIndividualWeb> pdfList = pdfIndividualWebRepository.findByUserDataAndPdfWebAndInspectionTypeAndInspectionSubType(userData, pdfWeb, inspectionType, inspectionSubType);
-			
+			List<PdfIndividualWeb> pdfList = pdfIndividualWebRepository
+					.findByUserDataAndPdfWebAndInspectionTypeAndInspectionSubTypeAndExaminationYear(userData, pdfWeb, inspectionType,
+							inspectionSubType, examinationYear);
+
 			if (pdfList.size() == 0) {
-				
+
 				FileInfo fileInfo = fileUploadUtils.uploadIndividualFile(files[i]);
-				
+
 				PdfIndividualWeb pdfIndividualWeb = PdfIndividualWeb.builder() //
 						.inspectionType(inspectionType) //
 						.inspectionSubType(inspectionSubType) //
@@ -1209,13 +1252,12 @@ public class ParserService {
 						.userData(userData) //
 						.fileInfo(fileInfo) //
 						.build();
-				
+
 				PdfIndividualWeb pdfEntity = pdfIndividualWebRepository.save(pdfIndividualWeb);
-				
-				Integer examinationYear = Integer.parseInt(data.get("dateExaminedYear"));
+
 				List<UserExaminationMetadata> metadataList = userExaminationMetadataRepository
 						.findByUserAndExaminationYear(userData, examinationYear);
-				
+
 				if (metadataList.size() == 1) {
 					List<UserExaminationMetadataDetail> metadataDetailList = metadataList.get(0)
 							.getUserExaminationMetadataDetailList();
@@ -1241,6 +1283,46 @@ public class ParserService {
 					result.add(existedMultipleMetadatas);
 					continue;
 				}
+			} else if (pdfList.size() == 1) {
+				Map<String, Object> existedPdfFile = new HashMap<>();
+				existedPdfFile.put("phone", phone);
+				existedPdfFile.put("ssnPartial", ssnPartial);
+				existedPdfFile.put("inspectionType", inspectionType);
+				existedPdfFile.put("inspectionSubType", inspectionSubType);
+				existedPdfFile.put("errorType", "pdf individual exist");
+				result.add(existedPdfFile);
+				
+				PdfIndividualWeb pdfEntity = pdfList.get(0);
+				
+				List<UserExaminationMetadata> metadataList = userExaminationMetadataRepository
+						.findByUserAndExaminationYear(userData, examinationYear);
+
+				if (metadataList.size() == 1) {
+					List<UserExaminationMetadataDetail> metadataDetailList = metadataList.get(0)
+							.getUserExaminationMetadataDetailList();
+					for (UserExaminationMetadataDetail detail : metadataDetailList) {
+						if (inspectionType.equals(detail.getInspectionType())
+								&& inspectionSubType.equals(detail.getInspectionSubType())) {
+							detail.setPdfIndividualWeb(pdfEntity);
+							break;
+						}
+					}
+				} else if (metadataList.size() == 0) {
+					Map<String, Object> nonexistMetadata = new HashMap<>();
+					nonexistMetadata.put("phone", phone);
+					nonexistMetadata.put("ssnPartial", ssnPartial);
+					nonexistMetadata.put("errorType", "No such metadata");
+					result.add(nonexistMetadata);
+					continue;
+				} else {
+					Map<String, Object> existedMultipleMetadatas = new HashMap<>();
+					existedMultipleMetadatas.put("phone", phone);
+					existedMultipleMetadatas.put("ssnPartial", ssnPartial);
+					existedMultipleMetadatas.put("errorType", "Multiple metadatas exist");
+					result.add(existedMultipleMetadatas);
+					continue;
+				}
+				
 			} else {
 				Map<String, Object> existedPdfFile = new HashMap<>();
 				existedPdfFile.put("phone", phone);
@@ -1251,7 +1333,7 @@ public class ParserService {
 				result.add(existedPdfFile);
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -1275,7 +1357,7 @@ public class ParserService {
 
 			if (userDataList.size() == 1) {
 				userData = userDataList.get(0);
-			} else if(userDataList.size() == 0) {
+			} else if (userDataList.size() == 0) {
 				Map<String, Object> nonexistUser = new HashMap<>();
 				nonexistUser.put("phone", phone);
 				nonexistUser.put("ssnPartial", ssnPartial);
@@ -1292,10 +1374,11 @@ public class ParserService {
 			}
 
 			Integer examinationYear = Integer.parseInt(data.get("dateExaminedYear"));
-			
+
 			UserExaminationMetadata metadata = null;
-			List<UserExaminationMetadata> metadataList = userExaminationMetadataRepository.findByUserDataAndExaminationYear(userData, examinationYear);
-			
+			List<UserExaminationMetadata> metadataList = userExaminationMetadataRepository
+					.findByUserDataAndExaminationYear(userData, examinationYear);
+
 			if (metadataList.size() == 1) {
 				metadata = metadataList.get(0);
 			} else if (metadataList.size() == 0) {
@@ -1313,13 +1396,14 @@ public class ParserService {
 				result.add(existedMultipleMetadatas);
 				continue;
 			}
-			
-			List<JsonIndividualApi> jsonList = jsonIndividualApiRepository.findByUserDataAndInspectionTypeAndInspectionSubType(userData, inspectionType, inspectionSubType);
-			
-			if (jsonList .size() == 0) {
-				
+
+			List<JsonIndividualApi> jsonList = jsonIndividualApiRepository
+					.findByUserDataAndInspectionTypeAndInspectionSubType(userData, inspectionType, inspectionSubType);
+
+			if (jsonList.size() == 0) {
+
 				FileInfo fileInfo = fileUploadUtils.uploadIndividualFile(files[i]);
-				
+
 				JsonIndividualApi jsonIndividualApi = JsonIndividualApi.builder() //
 						.inspectionType(inspectionType) //
 						.inspectionSubType(inspectionSubType) //
@@ -1327,7 +1411,7 @@ public class ParserService {
 						.userExaminationMetadata(metadata) //
 						.fileInfo(fileInfo) //
 						.build();
-				
+
 				jsonIndividualApiRepository.save(jsonIndividualApi);
 			} else {
 				Map<String, Object> existedJsonFile = new HashMap<>();
@@ -1339,20 +1423,21 @@ public class ParserService {
 				result.add(existedJsonFile);
 			}
 		}
-		
+
 		return result;
 	}
 
 	public void deleteUserData(Long userDataId) {
-		
+
 		userDataRepository.deleteById(userDataId);
 	}
 
 	public void updateUserMetadata(Long userExaminationId) {
-		UserExaminationMetadata metadata = userExaminationMetadataRepository.findById(userExaminationId).orElseThrow(() -> new IllegalArgumentException("No such metadata"));
-		
+		UserExaminationMetadata metadata = userExaminationMetadataRepository.findById(userExaminationId)
+				.orElseThrow(() -> new IllegalArgumentException("No such metadata"));
+
 		Integer agreeYn = metadata.getAgreeYn();
-		
+
 		if (agreeYn.equals(1)) {
 			metadata.setUserExaminationEntireDataOfOne(null);
 			metadata.setAddress("");

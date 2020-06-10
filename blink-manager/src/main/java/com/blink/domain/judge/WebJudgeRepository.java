@@ -1,6 +1,6 @@
 package com.blink.domain.judge;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -15,8 +15,8 @@ import com.blink.web.admin.web.dto.WebJudgeDetailResponseDto;
 
 public interface WebJudgeRepository extends JpaRepository<WebJudge, Long> {
 	
-	@Query("SELECT new com.blink.web.admin.web.dto.SingleWebJudgeRecordDto(j.id, j.createdAt, h.displayName, h.postcode, h.address, h.addressDetail, h.tel, j.judgeStatus) FROM WebJudge j JOIN j.hospital h WHERE h.address LIKE %:searchText% AND j.createdAt >= :time")
-	Page<SingleWebJudgeRecordDto> findBySearchTextAndPeriod(@Param("searchText") String searchText, @Param("time") LocalDateTime time, Pageable pageable);
+	@Query("SELECT new com.blink.web.admin.web.dto.SingleWebJudgeRecordDto(j.id, j.createdAt, h.displayName, h.postcode, h.address, h.addressDetail, h.tel, j.judgeStatus) FROM WebJudge j JOIN j.hospital h WHERE h.address LIKE %:searchText% AND DATE(j.createdAt) BETWEEN :startDate AND :endDate")
+	Page<SingleWebJudgeRecordDto> findBySearchTextAndPeriod(@Param("searchText") String searchText, @Param("startDate") Date startDate, @Param("endDate") Date endDate, Pageable pageable);
 
 	@Query("SELECT COUNT(j.id) FROM WebJudge j WHERE j.judgeStatus = :status")
 	long findCountByJudgeStatus(@Param("status") JudgeStatus status);

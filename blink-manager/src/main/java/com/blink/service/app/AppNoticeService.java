@@ -1,6 +1,7 @@
 package com.blink.service.app;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,10 +20,9 @@ public class AppNoticeService {
 
 	private final AppNoticeRepository appNoticeRepository;
 
-	public Page<AppNotice> getNoticeList(String searchText, SearchPeriod period, Pageable pageable) {
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
+	public Page<AppNotice> getNoticeList(String searchText, Date startDate, Date endDate, Pageable pageable) {
 		
-		Page<AppNotice> list = appNoticeRepository.findByNameAndPeriod(searchText, time, pageable);
+		Page<AppNotice> list = appNoticeRepository.findByNameAndPeriod(searchText, startDate, endDate, pageable);
 		return list;
 	}
 

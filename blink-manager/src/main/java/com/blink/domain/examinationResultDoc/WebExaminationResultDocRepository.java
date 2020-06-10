@@ -1,6 +1,6 @@
 package com.blink.domain.examinationResultDoc;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,14 +15,14 @@ import com.blink.web.hospital.dto.webExaminationResultDoc.WebExaminationResultDo
 
 public interface WebExaminationResultDocRepository extends JpaRepository<WebExaminationResultDoc, Long> {
 
-	@Query("SELECT DISTINCT new com.blink.web.hospital.dto.webExaminationResultDoc.WebExaminationResultDocResponseDto(d.id, d.createdAt, d.groupId) FROM WebExaminationResultDoc d LEFT JOIN WebFiles f ON d.groupId = f.groupId WHERE f.fileName LIKE %:searchText% AND d.createdAt >= :time AND d.hospital.id = :hospitalId ORDER BY d.createdAt DESC")
-	Page<WebExaminationResultDocResponseDto> findBySearchTextAndPeriodWithHospital(@Param("searchText") String searchText, @Param("time") LocalDateTime time, @Param("hospitalId") Long hospitalId,
+	@Query("SELECT DISTINCT new com.blink.web.hospital.dto.webExaminationResultDoc.WebExaminationResultDocResponseDto(d.id, d.createdAt, d.groupId) FROM WebExaminationResultDoc d LEFT JOIN WebFiles f ON d.groupId = f.groupId WHERE f.fileName LIKE %:searchText% AND DATE(d.createdAt) BETWEEN :startDate AND :endDate AND d.hospital.id = :hospitalId")
+	Page<WebExaminationResultDocResponseDto> findBySearchTextAndPeriodWithHospital(@Param("searchText") String searchText, @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("hospitalId") Long hospitalId,
 			Pageable pageable);
 
-	@Query("SELECT new com.blink.web.admin.web.dto.business.SingleHospitalBusinessResponseDto(d.id, d.groupId) FROM WebExaminationResultDoc d WHERE d.createdAt >= :date AND d.hospital = :hospital ORDER BY d.createdAt DESC")
-	Page<SingleHospitalBusinessResponseDto> findByCreatedAtAndHospital(@Param("date") LocalDateTime date, @Param("hospital") Hospital hospital,
+	@Query("SELECT new com.blink.web.admin.web.dto.business.SingleHospitalBusinessResponseDto(d.id, d.groupId, d.createdAt) FROM WebExaminationResultDoc d WHERE DATE(d.createdAt) BETWEEN :startDate AND :endDate AND d.hospital = :hospital")
+	Page<SingleHospitalBusinessResponseDto> findByCreatedAtAndHospital(@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("hospital") Hospital hospital,
 			Pageable pageable);
 	
-	@Query("SELECT new com.blink.web.admin.web.dto.business.SingleBusinessResponseDto(h.id, d.createdAt, h.displayName, h.agreeSendYn, d.groupId, h.name, h.programInUse) FROM WebExaminationResultDoc d JOIN d.hospital h WHERE DATE(d.createdAt) >= DATE(:startDate) AND h.displayName LIKE %:searchText% ORDER BY d.createdAt DESC")
-	Page<SingleBusinessResponseDto> findBySearchTextAndPeriodForBusiness(@Param("searchText") String searchText, @Param("startDate") LocalDateTime startDate, Pageable pageable);
+	@Query("SELECT new com.blink.web.admin.web.dto.business.SingleBusinessResponseDto(h.id, d.createdAt, h.displayName, h.agreeSendYn, d.groupId, h.name, h.programInUse) FROM WebExaminationResultDoc d JOIN d.hospital h WHERE DATE(d.createdAt) BETWEEN :startDate AND :endDate AND h.displayName LIKE %:searchText%")
+	Page<SingleBusinessResponseDto> findBySearchTextAndPeriodForBusiness(@Param("searchText") String searchText, @Param("startDate") Date startDate, @Param("endDate") Date endDate, Pageable pageable);
 }

@@ -1,7 +1,9 @@
 package com.blink.web.admin.web.dto.business;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 
 import com.blink.web.admin.web.dto.WebFileResponseDto;
 
@@ -14,9 +16,9 @@ public class SingleHospitalBusinessResponseDto {
 
 	private final Long examinationResultDocId;
 	private final String groupId;
-	private String createdAt;
+	private final LocalDateTime createdAt;
 	private List<WebFileResponseDto> files = new ArrayList<WebFileResponseDto>();
-	private Integer agreeYCount;
+	private Integer agreeYCount; 
 	private Integer agreeNCount;
 	
 }

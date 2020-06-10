@@ -46,7 +46,7 @@ public class JoinContact extends BaseTimeEntity {
 	@Column(columnDefinition = "text")
 	private String answerContent;
 
-	private Boolean answerYn;
+	private Boolean answerYn = false;
 
 	private Boolean visitReserveYn;
 

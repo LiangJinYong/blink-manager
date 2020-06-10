@@ -1,8 +1,10 @@
 package com.blink.web.hospital;
 
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.blink.common.CommonResponse;
 import com.blink.common.CommonResultCode;
-import com.blink.enumeration.SearchPeriod;
 import com.blink.service.WebConsentFormService;
 import com.blink.web.hospital.dto.consentForm.ConsentFormResponseDto;
 
@@ -42,11 +43,12 @@ public class WebConsentFormController {
 	@GetMapping("/{hospitalId}")
 	ResponseEntity<CommonResponse> getConsentFormsForHospital(@PathVariable("hospitalId") Long hospitalId,
 			@RequestParam("searchText") Optional<String> searchText,
-			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period,
+			@RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+			@RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
 			Pageable pageable) {
 
 		ConsentFormResponseDto result = webConsentFormService.getConsentFormsForHospitalSelf(hospitalId,
-				searchText.orElse("_"), period.orElse(SearchPeriod.ONEMONTH), pageable);
+				searchText.orElse("_"), startDate, endDate, pageable);
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}

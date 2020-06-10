@@ -1,6 +1,6 @@
 package com.blink.service;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -15,9 +15,7 @@ import com.blink.domain.signage.WebDigitalSignage;
 import com.blink.domain.signage.WebDigitalSignageRepository;
 import com.blink.domain.webfiles.WebFilesRepository;
 import com.blink.enumeration.FileUploadUserType;
-import com.blink.enumeration.SearchPeriod;
 import com.blink.enumeration.SignageType;
-import com.blink.util.CommonUtils;
 import com.blink.util.FileUploadUtils;
 import com.blink.web.admin.web.dto.WebDigitalSignageAdminResponseDto;
 import com.blink.web.admin.web.dto.WebFileResponseDto;
@@ -56,12 +54,10 @@ public class WebDigitalSignageService {
 		webDigitalSignageRepository.save(webDigitalSignage);
 	}
 
-	public Page<WebDigitalSignageResponseDto> getHospitalDigitalSignageList(Long hospitalId, String searchText, SearchPeriod period,
+	public Page<WebDigitalSignageResponseDto> getHospitalDigitalSignageList(Long hospitalId, String searchText, Date startDate, Date endDate,
 			Pageable pageable) {
 		
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
-		
-		Page<WebDigitalSignageResponseDto> list = webDigitalSignageRepository.findByTitleAndPeriodWithHospital(searchText, time, hospitalId, pageable);
+		Page<WebDigitalSignageResponseDto> list = webDigitalSignageRepository.findByTitleAndPeriodWithHospital(searchText, startDate, endDate, hospitalId, pageable);
 		
 		List<WebDigitalSignageResponseDto> content = list.getContent();
 		
@@ -98,12 +94,10 @@ public class WebDigitalSignageService {
 		digitalSignage.completeAnswer(answerContent);
 	}
 
-	public WebDigitalSignageAdminResponseDto getAdminDigitalSignageInfo(String searchText, SearchPeriod period,
+	public WebDigitalSignageAdminResponseDto getAdminDigitalSignageInfo(String searchText, Date startDate, Date endDate,
 			Pageable pageable) {
 		
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
-		
-		Page<WebDigitalSignageResponseDto> list = webDigitalSignageRepository.findByTitleAndPeriodWithAdmin(searchText, time, pageable);
+		Page<WebDigitalSignageResponseDto> list = webDigitalSignageRepository.findByTitleAndPeriodWithAdmin(searchText, startDate, endDate, pageable);
 		List<WebDigitalSignageResponseDto> content = list.getContent();
 		
 		for(WebDigitalSignageResponseDto dto : content) {

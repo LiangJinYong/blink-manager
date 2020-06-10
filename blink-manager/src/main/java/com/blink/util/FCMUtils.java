@@ -119,7 +119,7 @@ public class FCMUtils {
 		}
 	}
 	
-	public static void sendFCM(int userNumber, String pushToken, String title, String body, int targetNumber, String type) throws JSONException
+	public static void sendFCM(int userNumber, String pushToken, String title, String body, int targetNumber, String type, String appMsg1, String appMsg2) throws JSONException
 	   {
 	      try
 	      {
@@ -141,6 +141,8 @@ public class FCMUtils {
 	 	         msg.put("type", type);
 	 	         msg.put("sound", "default");
 	 	         msg.put("click_action", type);
+	 	         msg.put("appMsg1", appMsg1);
+	 	         msg.put("appMsg2", appMsg2);
 	 	         
 	 	         info.put("data", msg);
 	 	         

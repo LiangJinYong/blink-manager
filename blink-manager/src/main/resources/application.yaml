@@ -343,7 +343,7 @@ logging:
   level:
     org:
       hibernate:
-        SQL: error
+        SQL: debug
         type:
           descriptor:
             sql: trace

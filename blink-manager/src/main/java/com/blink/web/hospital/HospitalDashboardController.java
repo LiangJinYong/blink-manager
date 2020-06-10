@@ -25,20 +25,23 @@ import lombok.RequiredArgsConstructor;
 public class HospitalDashboardController {
 
 	private final DashboardService dashboardService;
-	
+
 	@ApiOperation(value = "대시보드 데이터 가져오기")
 	@GetMapping("/{hospitalId}")
-	public ResponseEntity<CommonResponse> getDashboardData(@PathVariable("hospitalId") Long hospitalId, @RequestParam("year") Optional<Integer> year, @RequestParam("month") Optional<Integer> month, Pageable pageable) {
-		
+	public ResponseEntity<CommonResponse> getDashboardData(@PathVariable("hospitalId") Long hospitalId,
+			@RequestParam("year") Optional<Integer> year, @RequestParam("month") Optional<Integer> month,
+			Pageable pageable) {
+
 		LocalDate today = LocalDate.now();
-		Map<String, Object> result = dashboardService.getDashboardDataWithHospital(hospitalId, year.orElse(today.getYear()), month.orElse(today.getMonthOfYear()), pageable);
+		Map<String, Object> result = dashboardService.getDashboardDataWithHospital(hospitalId,
+				year.orElse(today.getYear()), month.orElse(today.getMonthOfYear()), pageable);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}
-	
+
 	@ApiOperation(value = "고객센터, 디지털 사이니지에 대한 답변을 읽지않는 기록이 있는지 표시")
 	@GetMapping("/markUnread/{hospitalId}")
 	public ResponseEntity<CommonResponse> markUnread(@PathVariable("hospitalId") Long hospitalId) {
-		
+
 		Map<String, Boolean> result = dashboardService.getUnreadData(hospitalId);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}

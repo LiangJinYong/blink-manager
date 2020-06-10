@@ -1,6 +1,7 @@
 package com.blink.web.admin.web;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
@@ -17,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.blink.common.CommonResponse;
 import com.blink.common.CommonResultCode;
 import com.blink.enumeration.ReceiveType;
-import com.blink.enumeration.SearchPeriod;
 import com.blink.service.WebConsentFormService;
 import com.blink.web.admin.web.dto.consentForm.ConsentFormResponseDto;
 
@@ -40,19 +40,19 @@ public class WebConsentFormController {
 			@RequestParam("consentYear") String consentYear, @RequestParam("consentMonth") String consentMonth,
 			@RequestParam("count") Long count, @RequestParam("file") MultipartFile[] files) {
 
-		webConsentFormService.registerConsentForm(hospitalId, receiveDate, receiveType, receiveTypeText, consentYear, consentMonth,
-				count, files);
+		webConsentFormService.registerConsentForm(hospitalId, receiveDate, receiveType, receiveTypeText, consentYear,
+				consentMonth, count, files);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 	}
 
 	@ApiOperation(value = "동의서 리스트 가져오기")
 	@GetMapping
 	public ResponseEntity<CommonResponse> getConsentForms(@RequestParam("searchText") Optional<String> searchText,
-			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period,
-			Pageable pageable) {
+			@RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+			@RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate, Pageable pageable) {
 
-		ConsentFormResponseDto result = webConsentFormService.getConsentForms(searchText.orElse("_"),
-				period.orElse(SearchPeriod.ONEMONTH), pageable);
+		ConsentFormResponseDto result = webConsentFormService.getConsentForms(searchText.orElse("_"), startDate,
+				endDate, pageable);
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}
@@ -61,11 +61,11 @@ public class WebConsentFormController {
 	@GetMapping("/{hospitalId}")
 	ResponseEntity<CommonResponse> getConsentFormsForHospital(@PathVariable("hospitalId") Long hospitalId,
 			@RequestParam("searchText") Optional<String> searchText,
-			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period,
-			Pageable pageable) {
+			@RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+			@RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate, Pageable pageable) {
 
 		ConsentFormResponseDto result = webConsentFormService.getConsentFormsForHospital(hospitalId,
-				searchText.orElse("_"), period.orElse(SearchPeriod.ONEMONTH), pageable);
+				searchText.orElse("_"), startDate, endDate, pageable);
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}

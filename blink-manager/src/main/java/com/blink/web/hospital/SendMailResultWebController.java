@@ -1,6 +1,7 @@
 package com.blink.web.hospital;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,10 +39,11 @@ public class SendMailResultWebController {
 	@GetMapping("/{hospitalId}")
 	public ResponseEntity<CommonResponse> getSendMailResultWeb(@PathVariable("hospitalId") Long hospitalId,
 			@RequestParam("searchText") Optional<String> searchText,
-			@RequestParam(name = "period", defaultValue = "ONEYEAR") Optional<SearchPeriod> period, Pageable pageable) {
+			@RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+			@RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate, Pageable pageable) {
 
 		Page<SendMailResultWebResponseDto> result = sendMailResultWebService.getSendMailResultWeb(
-				searchText.orElse("_"), period.orElse(SearchPeriod.ONEYEAR), pageable, hospitalId);
+				searchText.orElse("_"), startDate, endDate, pageable, hospitalId);
 
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}
@@ -59,7 +61,8 @@ public class SendMailResultWebController {
 	public ResponseEntity<CommonResponse> registerSendMailResultWeb(@PathVariable("hospitalId") Long hospitalId,
 			@RequestParam("sentCount") Integer sentCount,
 			@DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam("sentDate") LocalDate sentDate,
-			@DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam("uploadDate") LocalDate uploadDate, @RequestParam("file") MultipartFile file) {
+			@DateTimeFormat(pattern = "yyyy-MM-dd") @RequestParam("uploadDate") LocalDate uploadDate,
+			@RequestParam("file") MultipartFile file) {
 
 		sendMailResultWebService.registerSendMailResultWeb(hospitalId, sentCount, sentDate, uploadDate, file);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));

@@ -1,7 +1,7 @@
 package com.blink.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -17,9 +17,7 @@ import com.blink.domain.hospital.HospitalRepository;
 import com.blink.domain.sendMailResultWeb.FileInfo;
 import com.blink.domain.sendMailResultWeb.SendMailResultWeb;
 import com.blink.domain.sendMailResultWeb.SendMailResultWebRepository;
-import com.blink.enumeration.SearchPeriod;
 import com.blink.service.aws.BucketService;
-import com.blink.util.CommonUtils;
 import com.blink.util.FileUploadUtils;
 import com.blink.web.hospital.dto.sendMailResultWeb.SendMailResultWebResponseDto;
 
@@ -35,13 +33,11 @@ public class SendMailResultWebService {
 	private final FileUploadUtils fileUploadUtils;
 	private final BucketService bucketService;
 
-	public Page<SendMailResultWebResponseDto> getSendMailResultWeb(String searchText, SearchPeriod period,
+	public Page<SendMailResultWebResponseDto> getSendMailResultWeb(String searchText, Date startDate, Date endDate,
 			Pageable pageable, Long hospitalId) {
 
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
-
 		Page<SendMailResultWebResponseDto> sendMailResultWebList = sendMailResultWebRepository
-				.findBySearchTextAndPeriod(time, hospitalId, pageable);
+				.findBySearchTextAndPeriod(startDate, endDate, hospitalId, pageable);
 		return sendMailResultWebList;
 	}
 

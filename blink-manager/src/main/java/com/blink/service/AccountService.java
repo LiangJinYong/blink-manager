@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ import com.blink.enumeration.Role;
 import com.blink.service.aws.BucketService;
 import com.blink.service.aws.remote.FeignAuthMTService;
 import com.blink.util.CommonUtils;
+import com.blink.util.FCMUtils;
 import com.blink.web.admin.web.dto.AuthCodeMTDto;
 import com.blink.web.admin.web.dto.UserSignupRequestDto;
 
@@ -284,5 +286,14 @@ public class AccountService {
 		admin.setHospital(hospital);
 		admin.setAccountStatus(true);
 		adminRepo.save(admin);
+	}
+	
+	public void sendPush(String pushToken, String pushMsg, String type, String appMsg1, String appMsg2) {
+		
+		try {
+			FCMUtils.sendFCM(0, pushToken, "B LINK", pushMsg, -1, type, appMsg1, appMsg2);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 }

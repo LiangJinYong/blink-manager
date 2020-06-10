@@ -1,9 +1,11 @@
 package com.blink.web.hospital;
 
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.blink.common.CommonResponse;
 import com.blink.common.CommonResultCode;
-import com.blink.enumeration.SearchPeriod;
 import com.blink.service.WebExaminationResultDocService;
 import com.blink.web.hospital.dto.webExaminationResultDoc.WebExaminationResultDocResponseDto;
 
@@ -41,10 +42,11 @@ public class WebExaminationResultDocController {
 	@ApiOperation(value = "검진결과지 - 해당 병원 결과지 조회")
 	@GetMapping("/{hospitalId}")
 	public ResponseEntity<CommonResponse> getExaminationResultDocList(@PathVariable("hospitalId") Long hospitalId, @RequestParam("searchText") Optional<String> searchText,
-			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period, Pageable pageable) {
+			@RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+			@RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate, Pageable pageable) {
 		
 		Page<WebExaminationResultDocResponseDto> result = webExaminationResultDocService.getExaminationResultDocList(searchText.orElse("_"),
-				period.orElse(SearchPeriod.ONEMONTH), pageable, hospitalId);
+				startDate, endDate, pageable, hospitalId);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}
 	

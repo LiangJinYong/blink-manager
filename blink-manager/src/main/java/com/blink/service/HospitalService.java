@@ -1,6 +1,7 @@
 package com.blink.service;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,9 +20,7 @@ import com.blink.domain.user.UserExaminationMetadataDetailRepository;
 import com.blink.domain.webfiles.WebFiles;
 import com.blink.domain.webfiles.WebFilesRepository;
 import com.blink.enumeration.FileUploadUserType;
-import com.blink.enumeration.SearchPeriod;
 import com.blink.service.aws.BucketService;
-import com.blink.util.CommonUtils;
 import com.blink.util.FileUploadUtils;
 import com.blink.web.admin.web.dto.hospital.HospitalDetailResponseDto;
 import com.blink.web.admin.web.dto.hospital.HospitalResponseDto;
@@ -43,15 +42,13 @@ public class HospitalService {
 	
 
 	// ------------------ ADMIN ------------------
-	public HospitalResponseDto getHospitalList(String searchText, SearchPeriod period, Pageable pageable) {
-
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
+	public HospitalResponseDto getHospitalList(String searchText, Date startDate, Date endDate, Pageable pageable) {
 
 		Integer hospitalCount = hospitalRepository.findHospitalCount();
 		Integer diagnoseCount = userExaminationMetadataDetailRepository.findDiagnoseCount();
 		String mostExaminationHospitalName = userExaminationMetadataDetailRepository.findMostExaminationHospitalName();
 				
-		Page<HospitalDetailResponseDto> hospitalList = hospitalRepository.findBySearchTextAndPeriod(searchText, time,
+		Page<HospitalDetailResponseDto> hospitalList = hospitalRepository.findBySearchTextAndPeriod(searchText, startDate, endDate,
 				pageable);
 		
 		List<HospitalDetailResponseDto> content = hospitalList.getContent();

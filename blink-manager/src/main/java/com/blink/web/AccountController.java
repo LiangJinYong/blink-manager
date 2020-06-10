@@ -214,4 +214,14 @@ public class AccountController {
 		joinContactService.saveQuestion(clinicName, email, name, tel, inquiry, usedProgram);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
 	}
+
+	@GetMapping("/sendPush")
+	public ResponseEntity<CommonResponse> sendPush(@RequestParam("pushToken") String pushToken,
+			@RequestParam("pushMsg") String pushMsg, @RequestParam("type") String type,
+			@RequestParam(name = "appMsg1", required = false) String appMsg1,
+			@RequestParam(name = "appMsg2", required = false) String appMsg2) {
+
+		accountService.sendPush(pushToken, pushMsg, type, appMsg1, appMsg2);
+		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS));
+	}
 }

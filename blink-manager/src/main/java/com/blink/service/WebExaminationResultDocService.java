@@ -1,12 +1,13 @@
 package com.blink.service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.transaction.Transactional;
 
+import org.json.JSONException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,9 +25,8 @@ import com.blink.domain.sendMailResultWeb.FileInfo;
 import com.blink.domain.webfiles.WebFilesRepository;
 import com.blink.enumeration.FileUploadUserType;
 import com.blink.enumeration.PdfProcessStatus;
-import com.blink.enumeration.SearchPeriod;
 import com.blink.service.aws.BucketService;
-import com.blink.util.CommonUtils;
+import com.blink.util.FCMUtils;
 import com.blink.util.FileUploadUtils;
 import com.blink.web.admin.web.dto.WebFileResponseDto;
 import com.blink.web.hospital.dto.webExaminationResultDoc.WebExaminationResultDocResponseDto;
@@ -45,7 +45,7 @@ public class WebExaminationResultDocService {
 	private final PdfWebRepository pdfWebRepository;
 	private final BucketService bucketService;
 	private final WebExaminationResultDocMobileRepository mobileRepository;
-
+	
 	public void registerExaminationResultDocs(MultipartFile[] files, Long hospitalId) {
 
 		Hospital hospital = hospitalRepository.findById(hospitalId)
@@ -89,12 +89,10 @@ public class WebExaminationResultDocService {
 		}
 	}
 
-	public Page<WebExaminationResultDocResponseDto> getExaminationResultDocList(String searchText, SearchPeriod period,
+	public Page<WebExaminationResultDocResponseDto> getExaminationResultDocList(String searchText, Date startDate, Date endDate,
 			Pageable pageable, Long hospitalId) {
 		
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
-		
-		Page<WebExaminationResultDocResponseDto> examinationResultDocList = webExaminationResultDocRepository.findBySearchTextAndPeriodWithHospital(searchText, time, hospitalId, pageable);
+		Page<WebExaminationResultDocResponseDto> examinationResultDocList = webExaminationResultDocRepository.findBySearchTextAndPeriodWithHospital(searchText, startDate, endDate, hospitalId, pageable);
 		
 		List<WebExaminationResultDocResponseDto> content = examinationResultDocList.getContent();
 		

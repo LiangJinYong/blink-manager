@@ -1,6 +1,7 @@
 package com.blink.service;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -11,16 +12,12 @@ import org.springframework.stereotype.Service;
 
 import com.blink.domain.examinationResultDocMobile.WebExaminationResultDocMobile;
 import com.blink.domain.examinationResultDocMobile.WebExaminationResultDocMobileRepository;
-import com.blink.domain.hospital.Hospital;
-import com.blink.domain.hospital.HospitalRepository;
 import com.blink.domain.user.UserExaminationEntireDataOfOne;
 import com.blink.domain.user.UserExaminationEntireDataOfOneRepository;
 import com.blink.domain.user.UserExaminationMetadata;
 import com.blink.domain.user.UserExaminationMetadataDetailRepository;
-import com.blink.domain.user.UserExaminationMetadataRepository;
 import com.blink.domain.webfiles.WebFilesRepository;
 import com.blink.enumeration.GenderType;
-import com.blink.enumeration.SearchPeriod;
 import com.blink.util.CommonUtils;
 import com.blink.web.admin.app.dto.userExamination.MobileResultDocMetadataDetailResponseDto;
 import com.blink.web.admin.web.dto.WebFileResponseDto;
@@ -40,10 +37,9 @@ public class WebExaminationResultDocMobileService {
 	private final WebFilesRepository webFilesRepository;
 
 	public WebExaminationResultDocMobileResponseDto getExaminationResultDocMobileList(String searchText,
-			SearchPeriod period, Pageable pageable) {
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
+			Date startDate, Date endDate, Pageable pageable) {
 		
-		Page<SingleWebExaminationResultDocMobileResponseDto> resultDocMobileList = mobileRepository.findResultDocMobildList(searchText, time, pageable);
+		Page<SingleWebExaminationResultDocMobileResponseDto> resultDocMobileList = mobileRepository.findResultDocMobildList(searchText, startDate, endDate, pageable);
 
 		for (SingleWebExaminationResultDocMobileResponseDto dto : resultDocMobileList) {
 			String groupId = dto.getGroupId();

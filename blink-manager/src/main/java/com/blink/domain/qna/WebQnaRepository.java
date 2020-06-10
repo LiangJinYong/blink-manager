@@ -1,6 +1,6 @@
 package com.blink.domain.qna;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,13 +14,13 @@ import com.blink.web.hospital.dto.WebQnaResponseDto;
 
 public interface WebQnaRepository extends JpaRepository<WebQna, Long> {
 
-	@Query("SELECT new com.blink.web.hospital.dto.WebQnaResponseDto(q.id, q.questionType, q.title, q.createdAt, q.answerYn, q.questionContent, q.answerContent, q.questionGroupId, q.answerGroupId, h.displayName, h.name, h.programInUse, h.id, h.agreeSendYn) FROM WebQna q JOIN q.hospital h WHERE title LIKE %:searchText% AND q.createdAt >= :time AND q.hospital.id = :hospitalId")
+	@Query("SELECT new com.blink.web.hospital.dto.WebQnaResponseDto(q.id, q.questionType, q.title, q.createdAt, q.answerYn, q.questionContent, q.answerContent, q.questionGroupId, q.answerGroupId, h.displayName, h.name, h.programInUse, h.id, h.agreeSendYn) FROM WebQna q JOIN q.hospital h WHERE title LIKE %:searchText% AND DATE(q.createdAt) BETWEEN :startDate AND :endDate AND q.hospital.id = :hospitalId")
 	Page<WebQnaResponseDto> findByTitleAndPeriodWithHospital(@Param("searchText") String searchText,
-			@Param("time") LocalDateTime time, @Param("hospitalId") Long hospitalId, Pageable pageable);
+			@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("hospitalId") Long hospitalId, Pageable pageable);
 
-	@Query("SELECT new com.blink.web.hospital.dto.WebQnaResponseDto(q.id, q.questionType, q.title, q.createdAt, q.answerYn, q.questionContent, q.answerContent, q.questionGroupId, q.answerGroupId, h.displayName, h.name, h.programInUse, h.id, h.agreeSendYn) FROM WebQna q JOIN q.hospital h WHERE title LIKE %:searchText% AND q.createdAt >= :time")
+	@Query("SELECT new com.blink.web.hospital.dto.WebQnaResponseDto(q.id, q.questionType, q.title, q.createdAt, q.answerYn, q.questionContent, q.answerContent, q.questionGroupId, q.answerGroupId, h.displayName, h.name, h.programInUse, h.id, h.agreeSendYn) FROM WebQna q JOIN q.hospital h WHERE title LIKE %:searchText% AND DATE(q.createdAt) BETWEEN :startDate AND :endDate")
 	Page<WebQnaResponseDto> findByTitleAndPeriodWithAdmin(@Param("searchText") String searchText,
-			@Param("time") LocalDateTime time, Pageable pageable);
+			@Param("startDate") Date startDate, @Param("endDate") Date endDate, Pageable pageable);
 
 	@Query("SELECT COUNT(q.answerYn) FROM WebQna q WHERE q.answerYn = :answerYn")
 	int findCountByAnswerYn(@Param("answerYn") boolean answerYn);

@@ -1,6 +1,7 @@
 package com.blink.web.admin.web;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.blink.common.CommonResponse;
 import com.blink.common.CommonResultCode;
-import com.blink.enumeration.SearchPeriod;
 import com.blink.enumeration.VisitAim;
 import com.blink.service.JoinContactService;
 import com.blink.web.admin.web.dto.joinConcact.JoinContactResponseDto;
@@ -32,10 +32,10 @@ public class JoinContactController {
 	@ApiOperation(value = "제휴문의 - 리스트 가져오기")
 	@GetMapping
 	public ResponseEntity<CommonResponse> getJoinContacts(@RequestParam("searchText") Optional<String> searchText,
-			@RequestParam(name = "period", defaultValue = "ONEMONTH") Optional<SearchPeriod> period,
-			Pageable pageable) {
-		JoinContactResponseDto result = joinContactService.getJoinContacts(searchText.orElse("_"),
-				period.orElse(SearchPeriod.ONEMONTH), pageable);
+			@RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+			@RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate, Pageable pageable) {
+		JoinContactResponseDto result = joinContactService.getJoinContacts(searchText.orElse("_"), startDate, endDate,
+				pageable);
 		return ResponseEntity.ok(new CommonResponse(CommonResultCode.SUCCESS, result));
 	}
 

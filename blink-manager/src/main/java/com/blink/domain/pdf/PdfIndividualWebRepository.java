@@ -10,7 +10,7 @@ import com.blink.enumeration.InspectionType;
 
 public interface PdfIndividualWebRepository extends JpaRepository<PdfIndividualWeb, Long>{
 
-	List<PdfIndividualWeb> findByUserDataAndPdfWebAndInspectionTypeAndInspectionSubType(UserData userData,
-			PdfWeb pdfWeb, InspectionType inspectionType, InspectionSubType inspectionSubType);
+	List<PdfIndividualWeb> findByUserDataAndPdfWebAndInspectionTypeAndInspectionSubTypeAndExaminationYear(UserData userData,
+			PdfWeb pdfWeb, InspectionType inspectionType, InspectionSubType inspectionSubTypemInspectionSubType, Integer examinationYear);
 
 }

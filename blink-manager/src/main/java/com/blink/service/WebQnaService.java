@@ -1,6 +1,6 @@
 package com.blink.service;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -16,8 +16,6 @@ import com.blink.domain.qna.WebQnaRepository;
 import com.blink.domain.webfiles.WebFilesRepository;
 import com.blink.enumeration.FileUploadUserType;
 import com.blink.enumeration.QuestionType;
-import com.blink.enumeration.SearchPeriod;
-import com.blink.util.CommonUtils;
 import com.blink.util.FileUploadUtils;
 import com.blink.web.admin.web.dto.WebFileResponseDto;
 import com.blink.web.admin.web.dto.WebQnaAdminResponseDto;
@@ -54,11 +52,9 @@ public class WebQnaService {
 		webQnaRepository.save(webQna);
 	}
 
-	public Page<WebQnaResponseDto> getHospitalQnaList(Long hospitalId, String searchText, SearchPeriod period, Pageable pageable) {
+	public Page<WebQnaResponseDto> getHospitalQnaList(Long hospitalId, String searchText, Date startDate, Date endDate, Pageable pageable) {
 		
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
-
-		Page<WebQnaResponseDto> list = webQnaRepository.findByTitleAndPeriodWithHospital(searchText, time, hospitalId, pageable);
+		Page<WebQnaResponseDto> list = webQnaRepository.findByTitleAndPeriodWithHospital(searchText, startDate, endDate, hospitalId, pageable);
 
 		List<WebQnaResponseDto> content = list.getContent();
 
@@ -95,11 +91,9 @@ public class WebQnaService {
 		webQna.completeAnswer(answerContent);
 	}
 
-	public WebQnaAdminResponseDto getAdminQnaInfo(String searchText, SearchPeriod period, Pageable pageable) {
+	public WebQnaAdminResponseDto getAdminQnaInfo(String searchText, Date startDate, Date endDate, Pageable pageable) {
 		
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
-		
-		Page<WebQnaResponseDto> list = webQnaRepository.findByTitleAndPeriodWithAdmin(searchText, time, pageable);
+		Page<WebQnaResponseDto> list = webQnaRepository.findByTitleAndPeriodWithAdmin(searchText, startDate, endDate, pageable);
 		List<WebQnaResponseDto> content = list.getContent();
 
 		for (WebQnaResponseDto dto : content) {

@@ -1,7 +1,7 @@
 package com.blink.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -22,8 +22,6 @@ import com.blink.domain.user.UserExaminationMetadataRepository;
 import com.blink.enumeration.Gender;
 import com.blink.enumeration.InspectionType;
 import com.blink.enumeration.Nationality;
-import com.blink.enumeration.SearchPeriod;
-import com.blink.util.CommonUtils;
 import com.blink.web.hospital.dto.userExamination.InspectionTypeDto;
 import com.blink.web.hospital.dto.userExamination.SingleUserExaminationResponseDto;
 import com.blink.web.hospital.dto.userExamination.UserExaminationResponseDto;
@@ -39,13 +37,11 @@ public class WebUserExaminationService {
 	private final UserExaminationMetadataRepository metadataRepository;
 	private final UserExaminationMetadataDetailRepository detailRepository;
 
-	public UserExaminationResponseDto getUserExamination(Long hospitalId, String searchText, SearchPeriod period,
+	public UserExaminationResponseDto getUserExamination(Long hospitalId, String searchText, Date startDate, Date endDate,
 			Pageable pageable) {
 
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
-
 		Page<SingleUserExaminationResponseDto> list = metadataRepository
-				.findBySearchTextAndPeriodWithHospital(hospitalId, searchText, time, pageable);
+				.findBySearchTextAndPeriodWithHospital(hospitalId, searchText, startDate, endDate, pageable);
 
 		List<SingleUserExaminationResponseDto> content = list.getContent();
 
@@ -55,24 +51,22 @@ public class WebUserExaminationService {
 			dto.setInspectionTypeList(inspectionTypeList);
 		}
 		
-		Integer totalUserExaminationCount = metadataRepository.findUserExaminationCountForHospital(hospitalId, time);
-		Integer firstExaminationCount = detailRepository.findExaminationCountByInspectionForHospital(hospitalId, InspectionType.first, time);
-		Integer secondExaminationCount = detailRepository.findExaminationCountByInspectionForHospital(hospitalId, InspectionType.second, time);
-		Integer thirdExaminationCount = detailRepository.findExaminationCountByInspectionForHospital(hospitalId, InspectionType.cancer, time);
-		Integer nonexistConsetFormCount = metadataRepository.findNonexistConsetFormCountForHospital(hospitalId, time);
+		Integer totalUserExaminationCount = metadataRepository.findUserExaminationCountForHospital(hospitalId, startDate, endDate);
+		Integer firstExaminationCount = detailRepository.findExaminationCountByInspectionForHospital(hospitalId, InspectionType.first, startDate, endDate);
+		Integer secondExaminationCount = detailRepository.findExaminationCountByInspectionForHospital(hospitalId, InspectionType.second, startDate, endDate);
+		Integer thirdExaminationCount = detailRepository.findExaminationCountByInspectionForHospital(hospitalId, InspectionType.cancer, startDate, endDate);
+		Integer nonexistConsetFormCount = metadataRepository.findNonexistConsetFormCountForHospital(hospitalId, startDate, endDate);
 
 		UserExaminationResponseDto responseDto = new UserExaminationResponseDto(totalUserExaminationCount, firstExaminationCount, secondExaminationCount, thirdExaminationCount, nonexistConsetFormCount, list);
 
 		return responseDto;
 	}
 
-	public UserExaminationResponseDto getUserExaminationWithAdmin(String searchText, SearchPeriod period,
+	public UserExaminationResponseDto getUserExaminationWithAdmin(String searchText, Date startDate, Date endDate,
 			Pageable pageable) {
 
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
-
 		Page<SingleUserExaminationResponseDto> list = metadataRepository
-				.findBySearchTextAndPeriodWithHospitalWithAdmin(searchText, time, pageable);
+				.findBySearchTextAndPeriodWithHospitalWithAdmin(searchText, startDate, endDate, pageable);
 		List<SingleUserExaminationResponseDto> content = list.getContent();
 
 		for (SingleUserExaminationResponseDto dto : content) {
@@ -81,11 +75,11 @@ public class WebUserExaminationService {
 			dto.setInspectionTypeList(inspectionTypeList);
 		}
 		
-		Integer totalUserExaminationCount = metadataRepository.findUserExaminationCountForAdmin(time);
-		Integer firstExaminationCount = detailRepository.findExaminationCountByInspectionForAdmin(time, InspectionType.first);
-		Integer secondExaminationCount = detailRepository.findExaminationCountByInspectionForAdmin(time, InspectionType.second);
-		Integer thirdExaminationCount = detailRepository.findExaminationCountByInspectionForAdmin(time, InspectionType.cancer);
-		Integer nonexistConsetFormCount = metadataRepository.findNonexistConsetFormCountForAdmin(time);
+		Integer totalUserExaminationCount = metadataRepository.findUserExaminationCountForAdmin(startDate, endDate);
+		Integer firstExaminationCount = detailRepository.findExaminationCountByInspectionForAdmin(startDate, endDate, InspectionType.first);
+		Integer secondExaminationCount = detailRepository.findExaminationCountByInspectionForAdmin(startDate, endDate, InspectionType.second);
+		Integer thirdExaminationCount = detailRepository.findExaminationCountByInspectionForAdmin(startDate, endDate, InspectionType.cancer);
+		Integer nonexistConsetFormCount = metadataRepository.findNonexistConsetFormCountForAdmin(startDate, endDate);
 
 		UserExaminationResponseDto responseDto = new UserExaminationResponseDto(totalUserExaminationCount, firstExaminationCount, secondExaminationCount, thirdExaminationCount, nonexistConsetFormCount, list);
 

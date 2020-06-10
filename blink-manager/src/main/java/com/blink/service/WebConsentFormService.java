@@ -1,7 +1,7 @@
 package com.blink.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -18,8 +18,6 @@ import com.blink.domain.hospital.HospitalRepository;
 import com.blink.domain.webfiles.WebFilesRepository;
 import com.blink.enumeration.FileUploadUserType;
 import com.blink.enumeration.ReceiveType;
-import com.blink.enumeration.SearchPeriod;
-import com.blink.util.CommonUtils;
 import com.blink.util.FileUploadUtils;
 import com.blink.web.admin.web.dto.WebFileResponseDto;
 import com.blink.web.admin.web.dto.consentForm.AdminConsentFormDetailResponseDto;
@@ -59,12 +57,10 @@ public class WebConsentFormService {
 		webConsentFormRepository.save(webConsentForm);
 	}
 
-	public ConsentFormResponseDto getConsentForms(String searchText, SearchPeriod period, Pageable pageable) {
-
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
+	public ConsentFormResponseDto getConsentForms(String searchText, Date startDate, Date endDate, Pageable pageable) {
 
 		Page<AdminConsentFormDetailResponseDto> consentFormList = webConsentFormRepository
-				.findBySearchTextAndPeriodForAdmin(searchText, time, pageable);
+				.findBySearchTextAndPeriodForAdmin(searchText, startDate, endDate, pageable);
 
 		List<AdminConsentFormDetailResponseDto> content = consentFormList.getContent();
 
@@ -82,12 +78,11 @@ public class WebConsentFormService {
 		return responseDto;
 	}
 
-	public ConsentFormResponseDto getConsentFormsForHospital(Long hospitalId, String searchText, SearchPeriod period,
+	public ConsentFormResponseDto getConsentFormsForHospital(Long hospitalId, String searchText, Date startDate, Date endDate,
 			Pageable pageable) {
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
 
 		Page<AdminConsentFormDetailResponseDto> consentFormList = webConsentFormRepository
-				.findBySearchTextAndPeriodForHospital(hospitalId, time, pageable);
+				.findBySearchTextAndPeriodForHospital(hospitalId, startDate, endDate, pageable);
 		List<AdminConsentFormDetailResponseDto> content = consentFormList.getContent();
 
 		for (AdminConsentFormDetailResponseDto dto : content) {
@@ -123,12 +118,10 @@ public class WebConsentFormService {
 	}
 
 	public com.blink.web.hospital.dto.consentForm.ConsentFormResponseDto getConsentFormsForHospitalSelf(Long hospitalId,
-			String searchText, SearchPeriod period, Pageable pageable) {
-
-		LocalDateTime time = CommonUtils.getSearchPeriod(period);
+			String searchText, Date startDate, Date endDate, Pageable pageable) {
 
 		Page<HospitalConsentFormDetailResponseDto> consentFormList = webConsentFormRepository
-				.findBySearchTextAndPeriodForHospitalSelf(hospitalId, time, pageable);
+				.findBySearchTextAndPeriodForHospitalSelf(hospitalId, startDate, endDate, pageable);
 
 		List<HospitalConsentFormDetailResponseDto> content = consentFormList.getContent();
 
